@@ -31,9 +31,7 @@ $(document).on("dataAcquired0",function(){
 					],
 					"allLabels": [],
 					"balloon": {},
-					"legend": {
-						"useGraphSettings": false
-					},
+					
 					"titles": [
 						{
 							"id": "Title-1",
@@ -53,7 +51,8 @@ $(document).on("dataAcquired1",function(){
 					"type": "pie",
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"angle": 12,
-                    "fontSize": 5,
+                    labelRadius:-10,
+                    "fontSize": 11,
 					"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
 					"depth3D": 0,
 					"innerRadius": "40%",
