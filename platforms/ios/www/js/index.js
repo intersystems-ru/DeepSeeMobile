@@ -1,4 +1,6 @@
-$(document).ready(function(){
+var chartData = [];
+$(document).on("dataAcquired0",function(){
+    
     AmCharts.makeChart("chartdiv1",
 				{
 					"type": "serial",
@@ -14,24 +16,16 @@ $(document).ready(function(){
 							"balloonText": "[[title]] of [[category]]:[[value]]",
 							"fillAlphas": 1,
 							"id": "AmGraph-1",
-							"title": "graph 1",
+							"title": "Профили",
 							"type": "column",
-							"valueField": "column-1"
-						},
-						{
-							"balloonText": "[[title]] of [[category]]:[[value]]",
-							"fillAlphas": 1,
-							"id": "AmGraph-2",
-							"title": "graph 2",
-							"type": "column",
-							"valueField": "column-2"
+							"valueField": "value"
 						}
 					],
 					"guides": [],
 					"valueAxes": [
 						{
 							"id": "ValueAxis-1",
-							"title": "Axis title"
+							"title": "Кол-во человек"
 						}
 					],
 					"allLabels": [],
@@ -43,39 +37,27 @@ $(document).ready(function(){
 						{
 							"id": "Title-1",
 							"size": 15,
-							"text": "Chart Title"
+							"text": "Профили"
 						}
 					],
-					"dataProvider": [
-						{
-							"category": "category 1",
-							"column-1": 8,
-							"column-2": 5
-						},
-						{
-							"category": "category 2",
-							"column-1": 6,
-							"column-2": 7
-						},
-						{
-							"category": "category 3",
-							"column-1": 2,
-							"column-2": 3
-						}
-					]
+					"dataProvider": chartData[0]
 				}
 			);
+});
+$(document).on("dataAcquired1",function(){
+    
 
 	AmCharts.makeChart("chartdiv2",
 				{
 					"type": "pie",
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"angle": 12,
+                    "fontSize": 5,
 					"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
 					"depth3D": 15,
 					"innerRadius": "40%",
 					"titleField": "category",
-					"valueField": "column-1",
+					"valueField": "value",
 					"allLabels": [],
 					"balloon": {},
 					"legend": {
@@ -83,58 +65,49 @@ $(document).ready(function(){
 						"markerType": "circle"
 					},
 					"titles": [],
-					"dataProvider": [
-						{
-							"category": "category 1",
-							"column-1": 8
-						},
-						{
-							"category": "category 2",
-							"column-1": 6
-						},
-						{
-							"category": "category 3",
-							"column-1": 2
-						}
-					]
+					"dataProvider": chartData[1]
 				}
 			);
-    AmCharts.makeChart("chartdiv3",
+});
+$(document).on("dataAcquired2",function(){
+    
+
+    gauge = AmCharts.makeChart("chartdiv3",
 				{
 					"type": "gauge",
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"theme": "default",
 					"arrows": [
 						{
-							"id": "GaugeArrow-1"
+							"id": "GaugeArrow-1",
 						}
 					],
 					"axes": [
 						{
-							"bottomText": "0 km/h",
+							"bottomText": "0  человек",
 							"bottomTextYOffset": -20,
-							"endValue": 220,
+							"endValue": 100000,
 							"id": "GaugeAxis-1",
-							"valueInterval": 10,
+							"valueInterval": 10000,
 							"bands": [
 								{
 									"color": "#00CC00",
-									"endValue": 90,
+									"endValue": 40000,
 									"id": "GaugeBand-1",
 									"startValue": 0
 								},
 								{
 									"color": "#ffac29",
-									"endValue": 130,
+									"endValue": 80000,
 									"id": "GaugeBand-2",
-									"startValue": 90
+									"startValue": 40000
 								},
 								{
 									"color": "#ea3838",
-									"endValue": 220,
+									"endValue": 100000,
 									"id": "GaugeBand-3",
 									"innerRadius": "95%",
-									"startValue": 130
+									"startValue": 80000
 								}
 							]
 						}
@@ -149,5 +122,49 @@ $(document).ready(function(){
 						}
 					]
 				}
+                       
 			);
+    var v = chartData[2][0].value;
+    gauge.arrows[0].setValue(v);
+    gauge.axes[0].setBottomText(v + " человек");
 });
+
+var opts = {
+    id:0,
+    url:"http://37.139.4.54/tfoms/MDX",
+    type:"POST",
+    data:{
+        MDX:'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube] %FILTER [status].[H1].[status].&[0]'
+    },
+    username:"_SYSTEM",
+    password:"159eAe72a79539f32acb15b305030060",
+    success: function( d ) {
+        console.log(d);
+        if(d) { 
+            var d = JSON.parse(d) || d;
+            var transformedData = [];
+            for(var i=0;i<d.axes[1].tuples.length;i++) {
+                transformedData.push({
+                    category:d.axes[1].tuples[i].caption,
+                    value:d.cells[i]
+                });
+            }
+            console.log(this.id, transformedData);
+            chartData[this.id]=transformedData;
+        }
+        $(document).trigger("dataAcquired"+this.id);
+        return 1;
+    }
+}
+$.ajax( opts );
+
+var opts2 = $.extend(opts,{
+    data : {MDX:'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube] %FILTER [status].[H1].[status].&[0]'},id:1
+});
+$.ajax(opts2);
+
+var opts3 = $.extend(opts,{
+    data : {MDX:'SELECT NON EMPTY {%LABEL([status].[H1].[status].&[0],"В очереди",""),%LABEL([Measures].[%COUNT],"Всего","")} ON 0 FROM [QueueCube]'},id:2
+});
+$.ajax(opts3);
+

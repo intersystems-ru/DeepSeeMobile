@@ -5,19 +5,19 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>71647EE0-8405-4A7C-9D37-DCED18E6EE29</string>
+	<string>CE567E5F-1768-41DA-8D38-D4E223A45384</string>
 	<key>IDESourceControlProjectName</key>
 	<string>iDeepSee</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>4B8AA7E7-A9B3-4C41-96EE-6C06DEC84926</key>
+		<key>02188C3E-A561-4EC2-9F7D-7BCE8CDD4B2D</key>
 		<string>https://github.com/ShmidtIvan/DeepSeeMobile.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>platforms/ios/iDeepSee.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>4B8AA7E7-A9B3-4C41-96EE-6C06DEC84926</key>
+		<key>02188C3E-A561-4EC2-9F7D-7BCE8CDD4B2D</key>
 		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
@@ -25,14 +25,14 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>4B8AA7E7-A9B3-4C41-96EE-6C06DEC84926</string>
+	<string>02188C3E-A561-4EC2-9F7D-7BCE8CDD4B2D</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>4B8AA7E7-A9B3-4C41-96EE-6C06DEC84926</string>
+			<string>02188C3E-A561-4EC2-9F7D-7BCE8CDD4B2D</string>
 			<key>IDESourceControlWCCName</key>
 			<string>DeepSeeMobile</string>
 		</dict>

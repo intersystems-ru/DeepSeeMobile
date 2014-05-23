@@ -7,6 +7,7 @@ $(document).on("dataAcquired0",function(){
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"categoryField": "category",
 					"startDuration": 1,
+                    rotate:true,
 					"categoryAxis": {
 						"gridPosition": "start"
 					},
@@ -31,7 +32,7 @@ $(document).on("dataAcquired0",function(){
 					"allLabels": [],
 					"balloon": {},
 					"legend": {
-						"useGraphSettings": true
+						"useGraphSettings": false
 					},
 					"titles": [
 						{
@@ -54,7 +55,7 @@ $(document).on("dataAcquired1",function(){
 					"angle": 12,
                     "fontSize": 5,
 					"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
-					"depth3D": 15,
+					"depth3D": 0,
 					"innerRadius": "40%",
 					"titleField": "category",
 					"valueField": "value",
