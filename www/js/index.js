@@ -1,4 +1,6 @@
-$(document).ready(function(){
+var chartData = [];
+$(document).on("dataAcquired",function(){
+    
     AmCharts.makeChart("chartdiv1",
 				{
 					"type": "serial",
@@ -16,15 +18,7 @@ $(document).ready(function(){
 							"id": "AmGraph-1",
 							"title": "graph 1",
 							"type": "column",
-							"valueField": "column-1"
-						},
-						{
-							"balloonText": "[[title]] of [[category]]:[[value]]",
-							"fillAlphas": 1,
-							"id": "AmGraph-2",
-							"title": "graph 2",
-							"type": "column",
-							"valueField": "column-2"
+							"valueField": "value"
 						}
 					],
 					"guides": [],
@@ -46,23 +40,7 @@ $(document).ready(function(){
 							"text": "Chart Title"
 						}
 					],
-					"dataProvider": [
-						{
-							"category": "category 1",
-							"column-1": 8,
-							"column-2": 5
-						},
-						{
-							"category": "category 2",
-							"column-1": 6,
-							"column-2": 7
-						},
-						{
-							"category": "category 3",
-							"column-1": 2,
-							"column-2": 3
-						}
-					]
+					"dataProvider": chartData[0]
 				}
 			);
 
@@ -151,3 +129,30 @@ $(document).ready(function(){
 				}
 			);
 });
+
+var opts = {
+    url:"http://37.139.4.54/tfoms/MDX",
+    type:"POST",
+    data:{
+        MDX:'SELECT {CROSSJOIN([SEXNAM].[H1].[SEXNAM].Members,%LABEL(CROSSJOIN(,{%LABEL([Measures].[%COUNT],"Всего",""),%LABEL([daysWaitingOverStandard].[H1].[daysWaiting].&[Дольше 30 дней],"> 30 дней","",,"background:rgb(255, 208, 208);summary:sum;")}),"Число пациентов","")),%LABEL(CROSSJOIN(,%LABEL(CROSSJOIN(,{%LABEL([Measures].[%COUNT],"Всего",""),%LABEL([daysWaitingOverStandard].[H1].[daysWaiting].&[Дольше 30 дней],"> 30 дней","",,"background:rgb(255, 208, 208);"),%LABEL([Measures].[daysWaiting],"","",,"summary:avg;")}),"Число пациентов","")),"ИТОГО","")} ON 0,NON EMPTY HEAD([ProfileMODep].[H1].[Profile].Members,15) ON 1 FROM [QueueCube] %FILTER [status].[H1].[status].&[0]'
+    },
+    username:"_SYSTEM",
+    password:"159eAe72a79539f32acb15b305030060",
+    success: function( data ) {
+        console.log(data);
+        if(data) { 
+            var data = JSON.parse(data) || data;
+            var transformedData = [];
+            for(var i=0;i<data.axes[0].tuples.length;i++) {
+                transformedData.push({
+                    category:data.axes[0].tuples[i].caption,
+                    value:data.cells[i]
+                });
+            }
+            chartData.push(transformedData);
+        }
+        $(document).trigger("dataAcquired");
+        return 1;
+    }
+}
+$.ajax( opts );
