@@ -7,8 +7,10 @@ $(document).on("dataAcquired0",function(){
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"categoryField": "category",
 					"startDuration": 1,
+                    rotate:true,
 					"categoryAxis": {
-						"gridPosition": "start"
+						"gridPosition": "start",
+                        "inside": true
 					},
 					"trendLines": [],
 					"graphs": [
@@ -16,7 +18,6 @@ $(document).on("dataAcquired0",function(){
 							"balloonText": "[[title]] of [[category]]:[[value]]",
 							"fillAlphas": 1,
 							"id": "AmGraph-1",
-							"title": "Профили",
 							"type": "column",
 							"valueField": "value"
 						}
@@ -30,14 +31,12 @@ $(document).on("dataAcquired0",function(){
 					],
 					"allLabels": [],
 					"balloon": {},
-					"legend": {
-						"useGraphSettings": true
-					},
+					
 					"titles": [
 						{
 							"id": "Title-1",
 							"size": 15,
-							"text": "Профили"
+							"text": ""
 						}
 					],
 					"dataProvider": chartData[0]
@@ -52,9 +51,11 @@ $(document).on("dataAcquired1",function(){
 					"type": "pie",
 					"pathToImages": "http://cdn.amcharts.com/lib/3/images/",
 					"angle": 12,
-                    "fontSize": 5,
+                    labelRadius:-30,
+                    labelText:"[[value]]",
+                    "fontSize": 11,
 					"balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
-					"depth3D": 15,
+					"depth3D": 0,
 					"innerRadius": "40%",
 					"titleField": "category",
 					"valueField": "value",
@@ -86,28 +87,28 @@ $(document).on("dataAcquired2",function(){
 						{
 							"bottomText": "0  человек",
 							"bottomTextYOffset": -20,
-							"endValue": 100000,
+							"endValue": 30000,
 							"id": "GaugeAxis-1",
-							"valueInterval": 10000,
+							"valueInterval": 3000,
 							"bands": [
 								{
 									"color": "#00CC00",
-									"endValue": 40000,
+									"endValue": 10000,
 									"id": "GaugeBand-1",
 									"startValue": 0
 								},
 								{
 									"color": "#ffac29",
-									"endValue": 80000,
+									"endValue": 20000,
 									"id": "GaugeBand-2",
-									"startValue": 40000
+									"startValue": 10000
 								},
 								{
 									"color": "#ea3838",
-									"endValue": 100000,
+									"endValue": 30000,
 									"id": "GaugeBand-3",
 									"innerRadius": "95%",
-									"startValue": 80000
+									"startValue": 20000
 								}
 							]
 						}
@@ -118,7 +119,7 @@ $(document).on("dataAcquired2",function(){
 						{
 							"id": "Title-1",
 							"size": 15,
-							"text": "Speedometer"
+							"text": ""
 						}
 					]
 				}
@@ -127,6 +128,13 @@ $(document).on("dataAcquired2",function(){
     var v = chartData[2][0].value;
     gauge.arrows[0].setValue(v);
     gauge.axes[0].setBottomText(v + " человек");
+//    window.setInterval(function(){
+//        var sign = Math.round((Math.random()*2 - 1)) || 1;
+//        var v = gauge.arrows[0].value+sign*Math.round(Math.random()*1000);
+//        v= (v>30000)?18000:v;
+//        gauge.arrows[0].setValue(v);
+//        gauge.axes[0].setBottomText(v + " человек");
+//    },2000);
 });
 
 var opts = {

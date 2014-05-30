@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Ratchet template page</title>
 
@@ -15,73 +16,101 @@
     <link href="css/ratchet.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
 
-      <!-- amCharts javascript sources -->
-      <script type="text/javascript" src="js/amcharts/amcharts.js"></script>
-      <script type="text/javascript" src="js/amcharts/serial.js"></script>
-      <script type="text/javascript" src="js/amcharts/pie.js"></script>
-      <script type="text/javascript" src="js/amcharts/gauge.js"></script>
-      
-      <!-- amCharts custom font -->
-		<link href='http://fonts.googleapis.com/css?family=Covered+By+Your+Grace' rel='stylesheet' type='text/css'>
+    <!-- amCharts javascript sources -->
+    <script type="text/javascript" src="js/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="js/amcharts/serial.js"></script>
+    <script type="text/javascript" src="js/amcharts/pie.js"></script>
+    <script type="text/javascript" src="js/amcharts/gauge.js"></script>
 
-		
-		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
-		
-      
+    <!-- amCharts custom font -->
+    <link href='http://fonts.googleapis.com/css?family=Covered+By+Your+Grace' rel='stylesheet' type='text/css'>
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
+    <script src="js/jquery.tap.js"></script>
+
+
     <!-- Include the compiled Ratchet JS -->
     <script src="js/ratchet.js"></script>
-      <script src="js/phonegap.js"></script>
-      
-  </head>
-  <body>
+    <script src="js/phonegap.js"></script>
+
+</head>
+
+<body>
 
     <!-- Make sure all your bars are the first things in your <body> -->
     <header class="bar bar-nav">
-      <h1 class="title">Deep See Mobile</h1>
+        <h1 class="title">Deep See Mobile</h1>
     </header>
 
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
     <div class="content">
+<!--
         <div class="slider" id="mySlider">
-          <div class="slide-group">
-            <div class="slide">
-              <div id="chartdiv1"></div>
-            </div>
-            <div class="slide">
-                 <div id="chartdiv2"></div>
-             
-            </div>
-            <div class="slide" >
-                 <div id="chartdiv3"></div>
-                
-                
+            <div class="slide-group">
+                <div class="slide">
+                    <header>
+                        <h1 class="title">
+                    Очередь пациентов по профилям
+                    </h1>
+                    </header>
+                    <div style="padding-left:5px" id="chartdiv1"></div>
+                </div>
+
+                <div class="slide">
+                    <header>
+                        <h1 class="title">
+                    Топ 5 МО по размеру очереди
+                    </h1>
+                    </header>
+                    <div id="chartdiv2"></div>
+
+                </div>
+                <div class="slide">
+                    <header>
+                        <h1 class="title">
+                    Пациентов в очереди
+                    </h1>
+                    </header>
+                    <div id="chartdiv3"></div>
+
+
+                </div>
             </div>
         </div>
+-->
+    </div>
+    <!--content-->
+
+    <nav class="bar bar-tab">
+        <a class="tab-item active" href="#">
+            <span class="icon icon-home"></span>
+            <span class="tab-label">Home</span>
+        </a>
+        <a class="tab-item" href="#filters" data-transition="slide-in">
+            <span class="icon icon-plus"></span>
+            <span class="tab-label">Add Filter</span>
+        </a>
+        <a class="tab-item" href="#">
+            <span class="icon icon-gear"></span>
+            <span class="tab-label">Settings</span>
+        </a>
+    </nav>
+<div id="filters" class="modal">
+  <header class="bar bar-nav">
+    <a class="icon icon-close pull-right" href="#filters"></a>
+    <h1 class="title">Filters</h1>
+  </header>
+
+  <div class="content">
+   <ul class="table-view filter-list"></ul>
+  </div>
 </div>
-    </div> <!--content-->
-      
-<nav class="bar bar-tab">
-  <a class="tab-item active" href="#">
-    <span class="icon icon-home"></span>
-    <span class="tab-label">Home</span>
-  </a>
-  <a class="tab-item" href="#">
-    <span class="icon icon-person"></span>
-    <span class="tab-label">Profile</span>
-  </a>
-  <a class="tab-item" href="#">
-    <span class="icon icon-star-filled"></span>
-    <span class="tab-label">Favorites</span>
-  </a>
-  <a class="tab-item" href="#">
-    <span class="icon icon-search"></span>
-    <span class="tab-label">Search</span>
-  </a>
-  <a class="tab-item" href="#">
-    <span class="icon icon-gear"></span>
-    <span class="tab-label">Settings</span>
-  </a>
-</nav>
-<script src="js/index.js"></script>
-  </body>
+
+    <script data-main="js/main" src="js/require.js"></script>
+
+
+
+</body>
+
 </html>
