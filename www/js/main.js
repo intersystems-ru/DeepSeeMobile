@@ -70,11 +70,11 @@ requirejs(['Dashboard', 'MessageCenter'], function (Dashboard, MessageCenter) {
         }
     });
     a.addWidget({
-        title: "",
-        callback:function(data){
+        title: "Человек в очереди",
+        callback:function(d){
             console.log("Entered callback:",d);
-            this.chart.arrows[0].setValue(d.data.value);
-            this.chart.axes[0].setBottomText(d.data.value + " человек");
+            this.chart.arrows[0].setValue(d.data[0].value);
+            this.chart.axes[0].setBottomText(d.data[0].value + " человек");
         },
         amconfig: {
             "type": "gauge",
