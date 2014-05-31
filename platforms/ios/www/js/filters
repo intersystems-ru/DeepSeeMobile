@@ -1,0 +1,22 @@
+var filters = [];
+var filter_opts = {
+    username:opts.username,
+    password:opts.password,
+    type:"GET", 
+    url:"http://37.139.4.54/tfoms/FilterValues/QueueCube",
+    success: function(d){
+        if(d) { 
+            var d = JSON.parse(d) || d;
+            filters = d.children.slice(0);
+        }
+        for(var i=0;i<filters.length;i++){
+            $('.filter-list').append('\
+                <li class="table-view-cell">\
+                    <a class="navigate-right" data-path='+filters[i].path+'>\
+                        '+filters[i].name+'\
+                    </a>\
+                </li>');
+        };
+    }
+};
+$.ajax(filter_opts)

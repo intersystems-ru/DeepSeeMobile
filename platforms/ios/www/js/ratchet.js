@@ -44,6 +44,7 @@
       if (modal && modal.classList.contains('modal')) {
         modal.classList.toggle('active');
       }
+        $(window).trigger("modalOpened",  {smth:modal});
       event.preventDefault(); // prevents rewriting url (apps can still use hash values in url)
     }
   });

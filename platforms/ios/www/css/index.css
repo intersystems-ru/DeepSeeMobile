@@ -13,8 +13,12 @@
 header.bar.bar-nav{
     margin-top:17px;
 }
+.modal .bar-nav ~ .content{
+margin-top: 61px;
+    padding-top: 0;
+}
 .bar-nav ~ .content {
-padding-top: 61px !important;
+padding-top: 61px;
 }
 /*end fix*/
 .slide{

@@ -13,9 +13,6 @@ define(['FiltersList'], function (FiltersList) {
                 data: self.datasource.data
             }]);
         }
-        this.requestFilters = function(){
-             mc.publish("filters_requested", ["widget" + self.id]);
-        }
         var callback = config.callback || function (d) {
             this.amcharts_config.dataProvider = d.data;
             this.render();
@@ -27,17 +24,8 @@ define(['FiltersList'], function (FiltersList) {
                 subscriber: this,
                 callback: callback
             });
-            mc.subscribe("widget" + this.id + "_filters_acquired", {
-                subscriber:this,
-                callback:function(d){
-                    console.log("filters available:", d);
-                    this.filtersAvailable = d.data;
-                }
-            });
         }
-        //Selected Filters
-        this.filters = new FiltersList({filters:config.filters, onSetFilter:this.requestData, container:"#widget" + self.id});
-        this.filtersAvailable = [];
+        this.filters = new FiltersList({filters:config.filters, onSetFilter:this.requestData});
         //Creating datasource property
         var _datasource = {};
         Object.defineProperty(this, 'datasource', {
@@ -47,8 +35,8 @@ define(['FiltersList'], function (FiltersList) {
                     var _filters = self.filters.getAll();
                     console.log("%cFILTERS:", "color:blue",_filters);
                     for (var i in _filters) {
-                        if(_filters[i].value !='')
-                        retVal += ' %FILTER ' + _filters[i].path +"."+ _filters[i].value;
+                        if (_filters[i] == "") continue;
+                        retVal += ' ' + _filters[i];
                     }
                 }
                 return {
@@ -69,7 +57,7 @@ define(['FiltersList'], function (FiltersList) {
             data: {}
         };
 
-        
+
         this.render = function () {
             var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
             require(["text!../Widget.html"], function (html) {
@@ -85,13 +73,12 @@ define(['FiltersList'], function (FiltersList) {
                     }
                 }
                 if (self.filters.hasFilters()) {   
-                    self.filters.render();
+                    self.filters.render("#widget" + self.id);
                     };
                 console.log("[Render]Finished: " + self.name);
             });
 
         }
-        this.requestFilters();
     }
 
 })
