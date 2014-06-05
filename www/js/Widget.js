@@ -13,8 +13,8 @@ define(['FiltersList'], function (FiltersList) {
                 data: self.datasource.data
             }]);
         }
-        this.requestFilters = function(){
-             mc.publish("filters_requested", ["widget" + self.id]);
+        this.requestFilters = function () {
+            mc.publish("filters_requested", ["widget" + self.id]);
         }
         var callback = config.callback || function (d) {
             this.amcharts_config.dataProvider = d.data;
@@ -28,15 +28,19 @@ define(['FiltersList'], function (FiltersList) {
                 callback: callback
             });
             mc.subscribe("widget" + this.id + "_filters_acquired", {
-                subscriber:this,
-                callback:function(d){
+                subscriber: this,
+                callback: function (d) {
                     console.log("filters available:", d);
                     this.filtersAvailable = d.data;
                 }
             });
         }
         //Selected Filters
-        this.filters = new FiltersList({filters:config.filters, onSetFilter:this.requestData, container:"#widget" + self.id});
+        this.filters = new FiltersList({
+            filters: config.filters,
+            onSetFilter: this.requestData,
+            container: "#widget" + self.id
+        });
         this.filtersAvailable = [];
         //Creating datasource property
         var _datasource = {};
@@ -45,10 +49,10 @@ define(['FiltersList'], function (FiltersList) {
                 var retVal = _datasource.data.MDX;
                 if (self.filters.hasFilters()) {
                     var _filters = self.filters.getAll();
-                    console.log("%cFILTERS:", "color:blue",_filters);
+                    console.log("%cFILTERS:", "color:blue", _filters);
                     for (var i in _filters) {
-                        if(_filters[i].value !='')
-                        retVal += ' %FILTER ' + _filters[i].path +"."+ _filters[i].value;
+                        if (_filters[i].value != '')
+                            retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
                     }
                 }
                 return {
@@ -64,12 +68,12 @@ define(['FiltersList'], function (FiltersList) {
 
 
         });
-        
+
         this.datasource = config.datasource || {
             data: {}
         };
 
-        
+
         this.render = function () {
             var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
             require(["text!../Widget.html"], function (html) {
@@ -81,12 +85,12 @@ define(['FiltersList'], function (FiltersList) {
                     var w_selector = "widget" + self.id || "";
                     if (AmCharts) {
                         self.chart = AmCharts.makeChart(w_selector, self.amcharts_config);
-                        
+
                     }
                 }
-                if (self.filters.hasFilters()) {   
+                if (self.filters.hasFilters()) {
                     self.filters.render();
-                    };
+                };
                 console.log("[Render]Finished: " + self.name);
             });
 

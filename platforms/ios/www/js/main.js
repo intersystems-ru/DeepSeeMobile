@@ -50,7 +50,7 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
             }
         },
-        filters:{"Тестовый фильтр":"%FILTER [status].[H1].[status].&[0]"}
+        filters:[{name:"Тестовый фильтр",path:"[status].[H1].[status]", value:"&[0]"}]
     });
     a.addWidget({
         title: "Топ 5 МО по размеру очереди",
@@ -76,10 +76,10 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
         },
         datasource: {
             data: {
-                MDX: 'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube] %FILTER [status].[H1].[status].&[0]'
+                MDX: 'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube]'
             }
         },
-        filters:{"Тестовый фильтр":"%FILTER [status].[H1].[status].&[0]"}
+        filters:[{name:"Тестовый фильтр",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]"}]
     });
     a.addWidget({
         title: "Человек в очереди",

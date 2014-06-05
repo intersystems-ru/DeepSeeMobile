@@ -2,6 +2,8 @@ define([], function () {
     return function MessageCenter() {
         this.subscriptions = [];
         this.subscribe = function (message, subscriber) {
+            console.log(subscriber);
+            console.log('%c[Message Center]' + subscriber.subscriber + ' subscribed to:' + message, 'background: #222; color: #bada55')
             var i = 0;
             var l = this.subscriptions.length
             for (; i < l; i++) {
@@ -25,7 +27,7 @@ define([], function () {
 
         }
         this.publish = function (message, args) {
-            console.log('%c[Message Center]:'+message,'background: #222; color: #bada55')
+            console.log('%c[Message Center] Published:' + message, 'background: #222; color: #bada55')
             var i = 0,
                 l = this.subscriptions.length
             for (; i < l; i++) {
@@ -36,8 +38,11 @@ define([], function () {
                     j = 0;
                 for (; j < l; j++) {
                     var s = this.subscriptions[i].subscribers[j];
-                    window.test={s:s,args:args}
-                    s.callback.call(s.subscriber,args);
+                    window.test = {
+                        s: s,
+                        args: args
+                    }
+                    s.callback.call(s.subscriber, args);
 
                 }
             }
