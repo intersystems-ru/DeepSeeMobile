@@ -8,7 +8,16 @@
 .slide>div{
     height:100%;
 }
-
+.filter{
+    width:40px;
+    height:40px;
+    z-index: 10000;
+    top: 5px;
+    position:absolute;
+    background:white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    border-radius:20px;
+}
 /* Fix for iOS top panel */
 header.bar.bar-nav{
     margin-top:17px;

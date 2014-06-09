@@ -38,6 +38,7 @@ define(['Filter'], function (Filter) {
 
             if (options.onSetFilter && !dontRender) options.onSetFilter();
         };
+        //Setting up filters from options
         if (options.filters) {
             for (var f = 0; f < options.filters.length; f++) {
                 this.setFilter(options.filters[f], true);

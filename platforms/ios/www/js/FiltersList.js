@@ -19,24 +19,16 @@ define(['Filter'], function (Filter) {
         };
         this.addFilterInfo = function (d) {
             _filters[d.name].valueList = d.data;
+            _filters[d.name].valueList.push({name:"Выкл",value:""});
             this.render();
 
         };
         this.setFilter = function (filter, dontRender) {
-            console.log(filter);
             var name = filter.name || '',
                 value = filter.value || '';
             if (!_filters[name]) _filters[name] = new Filter(filter);
-            console.log(_filters[name]);
-            if (value == "") {
-                curId--;
-                delete _filters[name];
-            } else {
                 _filters[name].value = value;
-
-            }
             if (!_filters[name] || !_filters[name].valueList) {
-                console.log("Нету _filters[name].valueList");
                 mc.subscribe("filter_list_acquired" + _filters[name].path, {
                     subscriber: this,
                     callback: this.addFilterInfo
@@ -59,24 +51,21 @@ define(['Filter'], function (Filter) {
                     $(container).find("select").remove();
                     $(container).prepend(_html);
                     for (var f in _filters)
-                        if (_filters[f].valueList)
-                        {
-                            $(container).find("select > *").remove();
+                        if (_filters[f].valueList) {
+                            $(container).find("select optgroup > *").remove();
                             for (var v = 0; v < _filters[f].valueList.length; v++) {
-                                var selected = _filters[f].value == _filters[f].valueList[v].value ?" selected":"";
-                                var html = "<option"+ selected+" value='" + _filters[f].valueList[v].value + "'>" + _filters[f].valueList[v].name + "</option>";
-                                console.log("HTML:", html);
-                                console.log($(container).find("select"));
-                                $(container).find("select").append(html)
-                                    .change(function () {
-                                        console.log(1);
-                                        self.setFilter({
-                                            name: 'Тестовый фильтр',
-                                            value: this.value,
-                                        });
-                                    });
+                                var selected = _filters[f].value == _filters[f].valueList[v].value ? " selected" : "";
+                                var html = "<option" + selected + " value='" + _filters[f].valueList[v].value + "'>" + _filters[f].valueList[v].name + "</option>";
+                                $(container).find("select optgroup").append(html);
+
                             }
-                            
+                            $(container).find("select").change(function () {
+                                self.setFilter({
+                                    name: f,
+                                    value: this.value,
+                                });
+                            });
+
                         }
 
                 }

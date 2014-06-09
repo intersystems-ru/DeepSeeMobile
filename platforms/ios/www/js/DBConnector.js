@@ -6,8 +6,7 @@ define([], function () {
         }
         this.acquireData = function (args) {
             var requester = args[0];
-            console.log("We got params:", args);
-            console.log("We got opts:", args[1]);
+            console.log("[DBConnector]Got args:", args);
 
             var opts = $.extend({
                 url: "http://37.139.4.54/tfoms/MDX",
@@ -60,7 +59,6 @@ define([], function () {
         this.acquireFilterList = function(args){
             var path = args[0],
                 name=args[1];
-            console.log("FL data:", path,name, args);
             var filter_list_opts = {
             username: defaults.username,
                 password: defaults.password,

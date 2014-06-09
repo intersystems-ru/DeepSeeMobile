@@ -37,8 +37,8 @@
       return document.querySelector(modalToggle.hash);
     }
   };
-
-  window.addEventListener('touchend', function (event) {
+    
+    var openModal = function (event) {
     var modal = getModal(event);
     if (modal) {
       if (modal && modal.classList.contains('modal')) {
@@ -47,8 +47,11 @@
         $(window).trigger("modalOpened",  {smth:modal});
       event.preventDefault(); // prevents rewriting url (apps can still use hash values in url)
     }
-  });
-}());
+  };
+//Added click for desktop compatibility
+      window.addEventListener('click', openModal);
+  window.addEventListener('touchend', openModal);
+})();
 
 /* ========================================================================
  * Ratchet: popovers.js v2.0.2

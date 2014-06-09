@@ -1,6 +1,6 @@
 requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, MessageCenter, DBConnector) {
     window.mc = new MessageCenter();
-    window.a = new Dashboard();
+    window.a = new Dashboard({holder:"body > .content"});
     window.db = new DBConnector();
     a.addWidget({
         title: "Очередь пациентов по профилям",
@@ -50,7 +50,7 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"Тестовый фильтр",path:"[status].[H1].[status]", value:"&[0]"}]
+        filters:[{name:"Статус",path:"[status].[H1].[status]", value:"&[0]"}]
     });
     a.addWidget({
         title: "Топ 5 МО по размеру очереди",
@@ -70,7 +70,8 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
             "balloon": {},
             "legend": {
                 "align": "center",
-                "markerType": "circle"
+                "markerType": "circle",
+                valueWidth:20
             },
             "titles": []
         },
@@ -79,12 +80,11 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
                 MDX: 'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"Тестовый фильтр",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]"}]
+        filters:[{name:"Пол",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]"}]
     });
     a.addWidget({
         title: "Человек в очереди",
         callback: function (d) {
-            console.log("Entered callback:", d);
             this.chart.arrows[0].setValue(d.data[0].value);
             this.chart.axes[0].setBottomText(d.data[0].value + " человек");
         },
@@ -146,51 +146,3 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
     a.render();
    
 });
-
-//var filters = [];
-//var filter_opts = {
-//    username:opts.username,
-//    password:opts.password,
-//    type:"GET", 
-//    url:"http://37.139.4.54/tfoms/FilterValues/QueueCube",
-//    success: function(d){
-//        if(d) { 
-//            var d = JSON.parse(d) || d;
-//            filters = d.children.slice(0);
-//        }
-//        for(var i=0;i<filters.length;i++){
-//            $('.filter-list').append('\
-//                <li class="table-view-cell">\
-//                    <a class="navigate-right select-filter" data-paths="'+filters[i].path+'">\
-//                        '+filters[i].name+'\
-//                    </a>\
-//                </li>');
-//        };
-//        $(".select-filter").on('tap', function(e){
-//            var path = $(e.target).data("paths");
-//            filter_opts.oldUrl = filter_opts.url;
-//            filter_opts.url = filter_opts.oldUrl + "/"+path;
-//            filter_opts.oldSuccess = filter_opts.success;
-//            filter_opts.success = function(d){
-//                if(d) { 
-//                    var d = JSON.parse(d) || d;
-//                }
-//                $(".filter-list > *").remove();
-//                for(var i=0;i<d.children.length;i++){
-//                    $('.filter-list').append('\
-//                    <li class="table-view-cell">\
-//                    <a class="navigate-right select-filter-value" data-value="'+d.children[i].value+'">\
-//                        '+d.children[i].name+'\
-//                    </a>\
-//                </li>');
-//                };
-//                filter_opts.url=filter_opts.oldUrl;
-//                filter_opts.success = filter_opts.oldSuccess;
-//            
-//            }
-//            $.ajax(filter_opts);
-//        });
-//    }
-//};
-//$.ajax(filter_opts)
-//$(window).on("modalOpened", function(e,m){console.log(e,m);})
