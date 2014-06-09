@@ -1,8 +1,8 @@
-define([], function () {
+//Todo - do this a singleton!
+define(['Utils'], function (Utils) {
     return function MessageCenter() {
         this.subscriptions = [];
         this.subscribe = function (message, subscriber) {
-            console.log(subscriber);
             console.log('%c[Message Center]' + subscriber.subscriber + ' subscribed to:' + message, 'background: #222; color: #bada55')
             var i = 0;
             var l = this.subscriptions.length
@@ -45,6 +45,7 @@ define([], function () {
                         args: args
                     }
                     s.callback.call(s.subscriber, args);
+                    if(s.once) delete s;
 
                 }
             }

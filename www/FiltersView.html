@@ -1,5 +1,11 @@
 <ul class="table-view filter-list">
-    <li class="table-view-cell filter-list-item" >
-                {{filterName}}
+    <li class="table-view-cell filter-list-item">
+        <a class="navigate-right">
+            {{filterName}}<br>
+            <small>{{filterValue}}</small>
+            <div class="toggle">
+                <div class="toggle-handle"></div>
+            </div>
+        </a>
     </li>
 </ul>

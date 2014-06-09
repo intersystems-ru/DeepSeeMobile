@@ -874,11 +874,13 @@
 
     start     = { pageX : e.touches[0].pageX - offset, pageY : e.touches[0].pageY };
     touchMove = false;
+      e.preventDefault();
+      return false;
   });
 
   window.addEventListener('touchmove', function (e) {
     e = e.originalEvent || e;
-
+      e.preventDefault();
     if (e.touches.length > 1) {
       return; // Exit if a pinch
     }
@@ -912,9 +914,11 @@
     handle.style.webkitTransform = 'translate3d(' + distanceX + 'px,0,0)';
 
     toggle.classList[(distanceX > (toggleWidth / 2 - handleWidth / 2)) ? 'add' : 'remove']('active');
+      return false;
   });
 
   window.addEventListener('touchend', function (e) {
+      e.preventDefault();
     if (!toggle) {
       return;
     }
@@ -935,7 +939,7 @@
 
     e = new CustomEvent('toggle', {
       detail: { isActive: slideOn },
-      bubbles: true,
+      bubbles: false,
       cancelable: true
     });
 
@@ -943,6 +947,8 @@
 
     touchMove = false;
     toggle    = false;
+      
+      return false;
   });
 
 }());

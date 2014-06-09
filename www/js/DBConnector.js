@@ -1,5 +1,6 @@
 define([], function () {
     return function DBConnector() {
+        this.toString = function(){ return "DBConnector" };
         var defaults = {
             username: "_SYSTEM",
             password: "159eAe72a79539f32acb15b305030060",
@@ -37,7 +38,6 @@ define([], function () {
 
         }
         this.acquireFilters = function (args) {
-            var requester = args[0];
             var filter_opts = {
                 username: defaults.username,
                 password: defaults.password,
@@ -47,7 +47,7 @@ define([], function () {
                     if (d) {
                         var d = JSON.parse(d) || d;
                         filters = d.children.slice(0);
-                        mc.publish(requester + "_filters_acquired", {
+                        mc.publish("filters_acquired", {
                             data: filters
                         });
                     }

@@ -1,7 +1,9 @@
-requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, MessageCenter, DBConnector) {
+requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], function (MessageCenter, DBConnector, Dashboard,FiltersView,Utils) {
+    window.utils = Utils;
     window.mc = new MessageCenter();
-    window.a = new Dashboard({holder:"body > .content"});
     window.db = new DBConnector();
+    window.FV = new FiltersView();
+    window.a = new Dashboard({holder:"body > .content"});
     a.addWidget({
         title: "Очередь пациентов по профилям",
         amconfig: {
@@ -50,7 +52,7 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"Статус",path:"[status].[H1].[status]", value:"&[0]"}]
+        filters:[{name:"status",path:"[status].[H1].[status]", value:"&[0]"}]
     });
     a.addWidget({
         title: "Топ 5 МО по размеру очереди",
@@ -144,5 +146,6 @@ requirejs(['Dashboard', 'MessageCenter', 'DBConnector'], function (Dashboard, Me
         }
     });
     a.render();
+    
    
 });
