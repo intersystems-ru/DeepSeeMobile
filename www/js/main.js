@@ -52,7 +52,7 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"status",path:"[status].[H1].[status]", value:"&[0]"}]
+        filters:[{name:"status",path:"[status].[H1].[status]", value:"&[0]", valueName:"0"}]
     });
     a.addWidget({
         title: "Топ 5 МО по размеру очереди",
@@ -82,7 +82,7 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
                 MDX: 'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"Пол",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]"}]
+        filters:[{name:"Пол",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]", valueName:"Мужской"}]
     });
     a.addWidget({
         title: "Человек в очереди",

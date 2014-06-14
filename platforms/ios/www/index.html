@@ -33,6 +33,7 @@
     <!-- Include the compiled Ratchet JS -->
     <script src="js/ratchet.js"></script>
     <script src="js/phonegap.js"></script>
+    <script src="js/iscroll.js"></script>
 
 </head>
 
@@ -55,8 +56,8 @@
             <span class="tab-label">Home</span>
         </a>
         <a class="tab-item" href="#filters" data-transition="slide-in">
-            <span class="icon icon-plus"></span>
-            <span class="tab-label">Add Filter</span>
+            <span class="icon icon-list"></span>
+            <span class="tab-label">Filters</span>
         </a>
         <a class="tab-item" href="#">
             <span class="icon icon-gear"></span>
@@ -71,30 +72,11 @@
 <div id="filters" class="modal">
     <header class="bar bar-nav">
         <a class="icon icon-close pull-right" href="#filters"></a>
-        <h1 class="title">Modal</h1>
+        <h1 class="title">Filters</h1>
     </header>
 
     <div class="content">
-        <ul class="table-view">
-            <li class="table-view-cell">
-                Item 1
-                <div class="toggle">
-                    <div class="toggle-handle"></div>
-                </div>
-            </li>
-            <li class="table-view-cell">
-                Item 2
-                <div class="toggle active">
-                    <div class="toggle-handle"></div>
-                </div>
-            </li>
-            <li class="table-view-cell">
-                Item 3
-                <div class="toggle">
-                    <div class="toggle-handle"></div>
-                </div>
-            </li>
-        </ul>
+        
     </div>
 </div>
         <script data-main="js/main" src="js/require.js"></script>

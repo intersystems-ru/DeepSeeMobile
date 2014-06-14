@@ -1,6 +1,6 @@
 //FiltersView Class Declaration
 
-define(['Utils', 'iscroll'], function (Utils, IScroll) {
+define(['Utils'], function (Utils) {
     return function FiltersView() {
         var self = this;
         this.toString = function () {
@@ -28,8 +28,7 @@ define(['Utils', 'iscroll'], function (Utils, IScroll) {
                     listItem.data("filter", a.filters[i]);
 
                     if (a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name) != "") {
-                        var fv = a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name).valueName || a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name).value;
-                        listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
+                        listItem.html(listItem.html().replace(/{{filterValue}}/, a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name).value));
                         listItem.find(".toggle").addClass("active");
 
                     } else {
@@ -95,13 +94,12 @@ define(['Utils', 'iscroll'], function (Utils, IScroll) {
                         .replace(/{{filterValueValue}}/, d.data[i].value)
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
-                    li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
+                    li.data("name", d.name).data("value", d.data[i].value);
                     li.on('tap', function () {
                         console.log($(this).data("name"));
                         a.widgets[a.activeWidget].filters.setFilter({
                             name: $(this).data("name"),
-                            value: $(this).data("value"),
-                            valueName: $(this).data("valueName")
+                            value: $(this).data("value")
                         });
                         $("#filters").removeClass("active");
                     });

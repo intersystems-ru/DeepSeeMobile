@@ -37,8 +37,8 @@
       return document.querySelector(modalToggle.hash);
     }
   };
-
-  window.addEventListener('touchend', function (event) {
+    
+    var openModal = function (event) {
     var modal = getModal(event);
     if (modal) {
       if (modal && modal.classList.contains('modal')) {
@@ -47,8 +47,11 @@
         $(window).trigger("modalOpened",  {smth:modal});
       event.preventDefault(); // prevents rewriting url (apps can still use hash values in url)
     }
-  });
-}());
+  };
+//Added click for desktop compatibility
+      window.addEventListener('click', openModal);
+  window.addEventListener('touchend', openModal);
+})();
 
 /* ========================================================================
  * Ratchet: popovers.js v2.0.2
@@ -871,11 +874,13 @@
 
     start     = { pageX : e.touches[0].pageX - offset, pageY : e.touches[0].pageY };
     touchMove = false;
+      e.preventDefault();
+      return false;
   });
 
   window.addEventListener('touchmove', function (e) {
     e = e.originalEvent || e;
-
+      e.preventDefault();
     if (e.touches.length > 1) {
       return; // Exit if a pinch
     }
@@ -909,9 +914,11 @@
     handle.style.webkitTransform = 'translate3d(' + distanceX + 'px,0,0)';
 
     toggle.classList[(distanceX > (toggleWidth / 2 - handleWidth / 2)) ? 'add' : 'remove']('active');
+      return false;
   });
 
   window.addEventListener('touchend', function (e) {
+      e.preventDefault();
     if (!toggle) {
       return;
     }
@@ -932,7 +939,7 @@
 
     e = new CustomEvent('toggle', {
       detail: { isActive: slideOn },
-      bubbles: true,
+      bubbles: false,
       cancelable: true
     });
 
@@ -940,6 +947,8 @@
 
     touchMove = false;
     toggle    = false;
+      
+      return false;
   });
 
 }());
