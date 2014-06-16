@@ -1,9 +1,20 @@
-requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], function (MessageCenter, DBConnector, Dashboard,FiltersView,Utils) {
-    window.utils = Utils;
-    window.mc = new MessageCenter();
-    window.db = new DBConnector();
-    window.FV = new FiltersView();
-    window.a = new Dashboard({holder:"body > .content"});
+/**
+ * @fileOverview
+ * Entry point for DeepSeeMobile application
+ * @author Shmidt Ivan
+ * @version 0.0.1
+ */
+require.config({
+    baseUrl: './js/',
+    paths: {
+        text: "lib/text",
+        jquery: "http://code.jquery.com/jquery-2.1.1"
+    }
+});
+requirejs(['MessageCenter', 'DBConnector', 'Dashboard', 'FiltersView', 'Utils', 'jquery'], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils, $) {
+    window.a = new Dashboard({
+        holder: "body > .content"
+    });
     a.addWidget({
         title: "Очередь пациентов по профилям",
         amconfig: {
@@ -52,7 +63,12 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"status",path:"[status].[H1].[status]", value:"&[0]", valueName:"0"}]
+        filters: [{
+            name: "status",
+            path: "[status].[H1].[status]",
+            value: "&[0]",
+            valueName: "0"
+        }]
     });
     a.addWidget({
         title: "Топ 5 МО по размеру очереди",
@@ -73,7 +89,7 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
             "legend": {
                 "align": "center",
                 "markerType": "circle",
-                valueWidth:20
+                valueWidth: 20
             },
             "titles": []
         },
@@ -82,7 +98,12 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
                 MDX: 'SELECT NON EMPTY HEAD(ORDER([MUFULLProrfle].[H1].[MU].Members,Measures.[%COUNT],BDESC),5) ON 1 FROM [QueueCube]'
             }
         },
-        filters:[{name:"Пол",path:"[SEXNAM].[H1].[SEXNAM]", value:"&[Мужской]", valueName:"Мужской"}]
+        filters: [{
+            name: "Пол",
+            path: "[SEXNAM].[H1].[SEXNAM]",
+            value: "&[Мужской]",
+            valueName: "Мужской"
+        }]
     });
     a.addWidget({
         title: "Человек в очереди",
@@ -146,6 +167,6 @@ requirejs(['MessageCenter','DBConnector','Dashboard','FiltersView','Utils'], fun
         }
     });
     a.render();
-    
-   
+
+
 });

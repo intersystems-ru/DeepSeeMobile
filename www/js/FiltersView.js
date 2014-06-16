@@ -1,7 +1,9 @@
 //FiltersView Class Declaration
 
-define(['Utils', 'iscroll'], function (Utils, IScroll) {
-    return function FiltersView() {
+define(['Utils', 'lib/iscroll','jquery',"MessageCenter"], function (Utils, IScroll,$,mc) {
+    function FiltersView() {
+        if(FiltersView.prototype._instance){ return FiltersView.prototype._instance;}
+        FiltersView.prototype._instance = this;
         var self = this;
         this.toString = function () {
             return "FiltersView"
@@ -54,24 +56,19 @@ define(['Utils', 'iscroll'], function (Utils, IScroll) {
                 }
                 if (IScroll) {
                     new IScroll('#filters .content', {
-                        snap: true,
-                        momentum: false,
-                        hScrollbar: false,
-                        vScrollbar: false,
-                        lockDirection: true,
                         tap: true
                     });
                 }
             });
 
-        }
+        };
         this.showFilterInfo = function (d) {
-            mc.subscribe("filter_list_acquired" + self.selectedFilter.path, {
+            mc.subscribe("filter_values_acquired" + self.selectedFilter.path, {
                 subscriber: self,
                 callback: self.renderInfo,
                 once: true
             });
-            mc.publish("filter_list_requested", [self.selectedFilter.path, self.selectedFilter.name]);
+            mc.publish("filter_values_requested", [self.selectedFilter.path, self.selectedFilter.name]);
 
 
 
@@ -109,13 +106,8 @@ define(['Utils', 'iscroll'], function (Utils, IScroll) {
 
 
                 }
-                 if (IScroll) {
+                if (IScroll) {
                     new IScroll('#filters .content', {
-                        snap: true,
-                        momentum: false,
-                        hScrollbar: false,
-                        vScrollbar: false,
-                        lockDirection: true,
                         tap: true
                     });
                 }
@@ -132,6 +124,7 @@ define(['Utils', 'iscroll'], function (Utils, IScroll) {
             subscriber: this,
             callback: this.render
         }); //TODO: - what comes first - this one or in DashBoard?
-        $("a[href='#filters']").on('tap', this.render);
-    }
+        $("#filters").on('modalOpened', this.render);
+    };
+    return new FiltersView();
 });

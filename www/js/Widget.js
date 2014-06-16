@@ -1,6 +1,6 @@
 //Widget class definition
 
-define(['FiltersList','Utils'], function (FiltersList,Utils) {
+define(['FiltersList','Utils','MessageCenter'], function (FiltersList,Utils,mc) {
     return function Widget(config) {
         var self = this;
         this.id = config.id;

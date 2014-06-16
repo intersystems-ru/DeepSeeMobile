@@ -22,9 +22,11 @@ define(['Filter'], function (Filter) {
         };
         this.setFilter = function (filter,silent) {
             var name = filter.name || '',
-                value = filter.value || '';
+                value = filter.value || '',
+                valueName = filter.valueName || '';
             if (!_filters[name]) _filters[name] = new Filter(filter);
                 _filters[name].value = value;
+                _filters[name].valueName = valueName;
             if (options.onSetFilter && !silent) options.onSetFilter();
         };
         //Setting up filters from options

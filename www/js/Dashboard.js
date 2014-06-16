@@ -1,13 +1,63 @@
-define(['DashboardConfig', 'Widget', 'Filter'], function (DashboardConfiguration, Widget, Filter) {
-    return function Dashboard() {
+/**
+ * @fileOverview
+ * Dashboard module<br>
+ * @author Shmidt Ivan
+ * @version 0.0.3
+ * @module Dashboard
+ * @requires DashboardConfig
+ * @requires Widget
+ * @requires Filter
+ * @requires MessageCenter
+ * @requires jQuery
+ * @todo Delete jQuery dependency
+ */
+define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], function (DashboardConfiguration, Widget, Filter,mc,$) {
+    'use strict';
+    /**
+     * @class
+     * @name Dashboard
+     * @alias module:Dashboard
+     * @return {Dashboard} New dashboard object
+     */
+    function Dashboard() {
+        /**@lends module:Dashboard#*/
+        /**
+         * @name module:Dashboard#toString
+         * @function
+         * @return {String} Module name
+         */
         this.toString = function(){ return "Dashboard";};
-        this.toString = function(){ return "Dashboard";};
+        /**
+        * Array of Widget objects
+         * @var {Array<module:Widget>}
+         * @name module:Dashboard#widgets
+         * @todo Make this one private
+        */
         this.widgets = [];
+        /** 
+         * Flag, that shows current active widget
+         * @var {number} module:Dashboard#activeWidget
+         * @public
+        */
         this.activeWidget = null;
-        this.filters = []; //just array of Filter objects
+        /**
+         * Array of Filter objects
+         * @var {Array<module:Filter>}
+         * @name module:Dashboard#filters
+         * @todo Make this one private
+         */
+        this.filters = [];
+         /**
+         * Dashboard config
+         * @var {module:DashboardConfig} module:Dashboard#config
+         */
         this.config = new DashboardConfiguration();
+        /**
+         * Renders up the whole dashboard with its widgets and so on.
+         * @function module:Dashboard#render
+         */
         this.render = function () {
-            var holder = this.config.holder || "body";
+            var holder = (this.config&&this.config.holder)?this.config.holder : "body";
             require(['text!../Dashboard.html'], function (html) {
                 $(holder + " > *").remove();
                 $(holder).append(html);
@@ -28,8 +78,69 @@ define(['DashboardConfig', 'Widget', 'Filter'], function (DashboardConfiguration
             });
             return this;
         };
+        /**
+         * Renders up the whole dashboard with its widgets and so on.
+         * @function module:Dashboard#addWidget
+         * @param config {Object}  Configuration object for Widget
+         * @example
+         *  a.addWidget({
+        title: "Очередь пациентов по профилям",
+        amconfig: {
+            "type": "serial",
+            "pathToImages": "http://cdn.amcharts.com/lib/3/images/",
+            "categoryField": "category",
+            "rotate": true,
+            "startDuration": 1,
+            "categoryAxis": {
+                "autoRotateCount": -5,
+                "gridPosition": "start",
+                "inside": true
+            },
+            "trendLines": [],
+            "graphs": [
+                {
+                    "balloonText": "[[title]] of [[category]]:[[value]]",
+                    "fillAlphas": 1,
+                    "id": "AmGraph-1",
+                    "title": "",
+                    "type": "column",
+                    "valueField": "value"
+      }
+     ],
+            "guides": [],
+            "valueAxes": [
+                {
+                    "axisTitleOffset": -7,
+                    "id": "ValueAxis-1",
+                    "title": "Кол-во человек"
+      }
+     ],
+            "allLabels": [],
+            "balloon": {},
+            "titles": [
+                {
+                    "id": "Title-1",
+                    "size": 15,
+                    "text": ""
+      }
+     ],
+
+        },
+        datasource: {
+            data: {
+                MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
+            }
+        },
+        filters: [{
+            name: "status",
+            path: "[status].[H1].[status]",
+            value: "&[0]",
+            valueName: "0"
+        }]
+    });
+         */
         this.addWidget = function (config) {
-            config = config || {};
+            var config = config || {};
             config.dashboard = this;
             config.id = this.widgets.length;
             var widget = new Widget(config);
@@ -51,7 +162,8 @@ define(['DashboardConfig', 'Widget', 'Filter'], function (DashboardConfiguration
         }
 
 
-    }
+    };
+    return Dashboard;
 
 
 })
