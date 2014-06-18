@@ -3,7 +3,7 @@
  * Implements ajax data fetching from Cache back-end
  * @module DBConnector
  */
-define(['jquery', 'MessageCenter'], function ($, mc) {
+define([ 'MessageCenter'], function (mc) {
     "use strict";
     /**
      * @constructor
@@ -68,8 +68,8 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
                             if (typeof d == "object" && d.length != 0) {
                                 for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                     transformedData.push({
-                                        category: d.axes[1].tuples[i].caption,
-                                        value: d.cells[i]
+                                        name: d.axes[1].tuples[i].caption,
+                                        data: [d.cells[i]]
                                     });
                                 }
                             }

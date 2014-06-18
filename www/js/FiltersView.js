@@ -16,10 +16,8 @@
 define([
     'Utils',
     'lib/iscroll',
-    'jquery',
-    "MessageCenter",
-    'lib/jquery.tap'
-], function (Utils, IScroll, $, mc, tap) {
+    "MessageCenter"
+], function (Utils, IScroll, mc) {
     'use strict';
     /**
      * Creates or returns existing FiltersView object

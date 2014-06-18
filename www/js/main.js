@@ -7,8 +7,8 @@
 requirejs.config({
     baseUrl: 'js/',
     paths: {
-        text: "lib/text",
-        jquery: "lib/jquery-2.1.1"
+        text: "lib/text"
+//        jquery: "lib/jquery-2.1.1"
     }
 });
 require([
@@ -17,54 +17,36 @@ require([
     'Dashboard', 
     'FiltersView', 
     'Utils', 
-    'jquery'
-], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils, $) {
-    window.a = new Dashboard({
+], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils) {
+    
+
+  window.a = new Dashboard({
         holder: "body > .content"
     })
                 .addWidget({
-        title: "Очередь пациентов по профилям",
         amconfig: {
-            "type": "serial",
-            "pathToImages": "http://cdn.amcharts.com/lib/3/images/",
-            "categoryField": "category",
-            "rotate": true,
-            "startDuration": 1,
-            "categoryAxis": {
-                "autoRotateCount": -5,
-                "gridPosition": "start",
-                "inside": true
-            },
-            "trendLines": [],
-            "graphs": [
-                {
-                    "balloonText": "[[title]] of [[category]]:[[value]]",
-                    "fillAlphas": 1,
-                    "id": "AmGraph-1",
-                    "title": "",
-                    "type": "column",
-                    "valueField": "value"
-      }
-     ],
-            "guides": [],
-            "valueAxes": [
-                {
-                    "axisTitleOffset": -7,
-                    "id": "ValueAxis-1",
-                    "title": "Кол-во человек"
-      }
-     ],
-            "allLabels": [],
-            "balloon": {},
-            "titles": [
-                {
-                    "id": "Title-1",
-                    "size": 15,
-                    "text": ""
-      }
-     ],
-
+        chart: {
+            type: 'bar',
+            events:{
+                tap:function(e){
+                    console.log(e);
+                return true;
+                }
+            }
         },
+        title: {
+            text: "Очередь пациентов по профилям",
+        },
+        xAxis: {
+            categories: ['Профиль']
+        },
+        yAxis: {
+            title: {
+                text: 'Людей'
+            }
+        },
+        series: []
+    },
         datasource: {
             data: {
                 MDX: 'SELECT NON EMPTY {TOPPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),80),%LABEL(SUM(BOTTOMPERCENT(ORDER([ProfileMODep].[H1].[Profile].Members,Measures.[%COUNT],BDESC),20)),"Другой",,,,"font-style:italic;")} ON 1 FROM [QueueCube]'
@@ -77,6 +59,7 @@ require([
             valueName: "0"
         }]
     })
+
                 .addWidget({
         title: "Топ 5 МО по размеру очереди",
         amconfig: {
@@ -112,68 +95,69 @@ require([
             valueName: "Мужской"
         }]
     })
-                .addWidget({
-        title: "Человек в очереди",
-        callback: function (d) {
-            this.chart.arrows[0].setValue(d.data[0].value);
-            this.chart.axes[0].setBottomText(d.data[0].value + " человек");
-        },
-        amconfig: {
-            "type": "gauge",
-            "pathToImages": "http://cdn.amcharts.com/lib/3/images/",
-            "theme": "default",
-            "arrows": [
-                {
-                    "id": "GaugeArrow-1",
-      }
-     ],
-            "axes": [
-                {
-                    "bottomText": "0  человек",
-                    "bottomTextYOffset": -20,
-                    "endValue": 30000,
-                    "id": "GaugeAxis-1",
-                    "valueInterval": 3000,
-                    "bands": [
-                        {
-                            "color": "#00CC00",
-                            "endValue": 10000,
-                            "id": "GaugeBand-1",
-                            "startValue": 0
-        },
-                        {
-                            "color": "#ffac29",
-                            "endValue": 20000,
-                            "id": "GaugeBand-2",
-                            "startValue": 10000
-        },
-                        {
-                            "color": "#ea3838",
-                            "endValue": 30000,
-                            "id": "GaugeBand-3",
-                            "innerRadius": "95%",
-                            "startValue": 20000
-        }
-       ]
-      }
-     ],
-            "allLabels": [],
-            "balloon": {},
-            "titles": [
-                {
-                    "id": "Title-1",
-                    "size": 15,
-                    "text": ""
-      }
-     ]
-        },
-        datasource: {
-            data: {
-                MDX: 'SELECT NON EMPTY {%LABEL([status].[H1].[status].&[0],"В очереди",""),%LABEL([Measures].[%COUNT],"Всего","")} ON 0 FROM [QueueCube]'
-            }
-        }
-    })
-                .render();
+                  .render();
+//                .addWidget({
+//        title: "Человек в очереди",
+//        callback: function (d) {
+//            this.chart.arrows[0].setValue(d.data[0].value);
+//            this.chart.axes[0].setBottomText(d.data[0].value + " человек");
+//        },
+//        amconfig: {
+//            "type": "gauge",
+//            "pathToImages": "http://cdn.amcharts.com/lib/3/images/",
+//            "theme": "default",
+//            "arrows": [
+//                {
+//                    "id": "GaugeArrow-1",
+//      }
+//     ],
+//            "axes": [
+//                {
+//                    "bottomText": "0  человек",
+//                    "bottomTextYOffset": -20,
+//                    "endValue": 30000,
+//                    "id": "GaugeAxis-1",
+//                    "valueInterval": 3000,
+//                    "bands": [
+//                        {
+//                            "color": "#00CC00",
+//                            "endValue": 10000,
+//                            "id": "GaugeBand-1",
+//                            "startValue": 0
+//        },
+//                        {
+//                            "color": "#ffac29",
+//                            "endValue": 20000,
+//                            "id": "GaugeBand-2",
+//                            "startValue": 10000
+//        },
+//                        {
+//                            "color": "#ea3838",
+//                            "endValue": 30000,
+//                            "id": "GaugeBand-3",
+//                            "innerRadius": "95%",
+//                            "startValue": 20000
+//        }
+//       ]
+//      }
+//     ],
+//            "allLabels": [],
+//            "balloon": {},
+//            "titles": [
+//                {
+//                    "id": "Title-1",
+//                    "size": 15,
+//                    "text": ""
+//      }
+//     ]
+//        },
+//        datasource: {
+//            data: {
+//                MDX: 'SELECT NON EMPTY {%LABEL([status].[H1].[status].&[0],"В очереди",""),%LABEL([Measures].[%COUNT],"Всего","")} ON 0 FROM [QueueCube]'
+//            }
+//        }
+//    })
+//                .render();
 
 
 });

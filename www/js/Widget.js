@@ -63,7 +63,7 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
          * @private
          */
         var onDataAcquired = config.callback || function (d) {
-            this.amcharts_config.dataProvider = d.data;
+            this.amcharts_config.series = d.data;
             this.render();
         };
 
@@ -134,7 +134,9 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
                 if (self.amcharts_config) {
                     var w_selector = "widget" + self.id || "";
                     if (AmCharts) {
-                        self.chart = AmCharts.makeChart(w_selector, self.amcharts_config);
+                        $(function () { 
+    $('body .content').highcharts(self.amcharts_config);
+});
 
                     }
                 }

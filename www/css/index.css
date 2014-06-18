@@ -20,7 +20,9 @@ input, textarea {
     -webkit-focus-ring-color: rgba(0,0,0,0);
     outline: none;
 }
-
+.content{
+    bottom:50px;
+}
 .alert{
     text-align: center;
     margin-top: 100px;

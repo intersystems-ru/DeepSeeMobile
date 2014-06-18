@@ -15,9 +15,8 @@ define([
     'DashboardConfig', 
     'Widget', 
     'Filter', 
-    'MessageCenter', 
-    'jquery'
-], function (DashboardConfiguration, Widget, Filter, mc, $) {
+    'MessageCenter'
+], function (DashboardConfiguration, Widget, Filter, mc) {
     'use strict';
     /**
      * @class
