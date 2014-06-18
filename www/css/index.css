@@ -21,6 +21,10 @@ input, textarea {
     outline: none;
 }
 
+.alert{
+    text-align: center;
+    margin-top: 100px;
+}
 
 .slider{
     background-color:transparent !important;

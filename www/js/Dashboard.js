@@ -2,7 +2,7 @@
  * @fileOverview
  * Dashboard module<br>
  * @author Shmidt Ivan
- * @version 0.0.3
+ * @version 0.0.1
  * @module Dashboard
  * @requires DashboardConfig
  * @requires Widget
@@ -11,7 +11,13 @@
  * @requires jQuery
  * @todo Delete jQuery dependency
  */
-define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], function (DashboardConfiguration, Widget, Filter,mc,$) {
+define([
+    'DashboardConfig', 
+    'Widget', 
+    'Filter', 
+    'MessageCenter', 
+    'jquery'
+], function (DashboardConfiguration, Widget, Filter, mc, $) {
     'use strict';
     /**
      * @class
@@ -26,19 +32,21 @@ define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], functio
          * @function
          * @return {String} Module name
          */
-        this.toString = function(){ return "Dashboard";};
+        this.toString = function () {
+            return "Dashboard";
+        };
         /**
-        * Array of Widget objects
+         * Array of Widget objects
          * @var {Array<module:Widget>}
          * @name module:Dashboard#widgets
          * @todo Make this one private
-        */
+         */
         this.widgets = [];
         /** 
          * Flag, that shows current active widget
          * @var {number} module:Dashboard#activeWidget
          * @public
-        */
+         */
         this.activeWidget = null;
         /**
          * Array of Filter objects
@@ -47,7 +55,7 @@ define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], functio
          * @todo Make this one private
          */
         this.filters = [];
-         /**
+        /**
          * Dashboard config
          * @var {module:DashboardConfig} module:Dashboard#config
          */
@@ -57,7 +65,7 @@ define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], functio
          * @function module:Dashboard#render
          */
         this.render = function () {
-            var holder = (this.config&&this.config.holder)?this.config.holder : "body";
+            var holder = (this.config && this.config.holder) ? this.config.holder : "body";
             require(['text!../Dashboard.html'], function (html) {
                 $(holder + " > *").remove();
                 $(holder).append(html);
@@ -148,6 +156,7 @@ define(['DashboardConfig', 'Widget', 'Filter','MessageCenter','jquery'], functio
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
             }
+            return this;
         }
         if (mc) {
             mc.subscribe("filters_acquired", {

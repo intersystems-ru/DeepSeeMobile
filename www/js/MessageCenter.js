@@ -124,6 +124,7 @@ define(['Utils'], function (Utils) {
                 }
             }
         };
+        this.getSubs = function(){return subscriptions;}
     };
     return new MessageCenter();
 })

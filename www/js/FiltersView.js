@@ -1,6 +1,6 @@
 //FiltersView Class Declaration
 
-define(['Utils', 'lib/iscroll','jquery',"MessageCenter"], function (Utils, IScroll,$,mc) {
+define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], function (Utils, IScroll,$,mc,tap) {
     function FiltersView() {
         if(FiltersView.prototype._instance){ return FiltersView.prototype._instance;}
         FiltersView.prototype._instance = this;
@@ -46,7 +46,7 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter"], function (Utils, IScro
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
                             self.showFilterInfo();
-                            a.widgets[a.activeWidget].filters.setFilter(self.selectedFilter);
+                            a.widgets[a.activeWidget].filters.setFilter(self.selectedFilter,true);
                         } else {
                             a.widgets[a.activeWidget].filters.remove($(this).parent().parent().data("filter").name);
                         }
@@ -93,7 +93,7 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter"], function (Utils, IScro
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
-                    li.on('tap', function () {
+                    li.one('tap', function () {
                         console.log($(this).data("name"));
                         a.widgets[a.activeWidget].filters.setFilter({
                             name: $(this).data("name"),

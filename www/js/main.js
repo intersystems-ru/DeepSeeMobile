@@ -11,11 +11,18 @@ require.config({
         jquery: "http://code.jquery.com/jquery-2.1.1"
     }
 });
-requirejs(['MessageCenter', 'DBConnector', 'Dashboard', 'FiltersView', 'Utils', 'jquery'], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils, $) {
+requirejs([
+    'MessageCenter', 
+    'DBConnector', 
+    'Dashboard', 
+    'FiltersView', 
+    'Utils', 
+    'jquery'
+], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils, $) {
     window.a = new Dashboard({
         holder: "body > .content"
-    });
-    a.addWidget({
+    })
+                .addWidget({
         title: "Очередь пациентов по профилям",
         amconfig: {
             "type": "serial",
@@ -69,8 +76,8 @@ requirejs(['MessageCenter', 'DBConnector', 'Dashboard', 'FiltersView', 'Utils', 
             value: "&[0]",
             valueName: "0"
         }]
-    });
-    a.addWidget({
+    })
+                .addWidget({
         title: "Топ 5 МО по размеру очереди",
         amconfig: {
             "type": "pie",
@@ -104,8 +111,8 @@ requirejs(['MessageCenter', 'DBConnector', 'Dashboard', 'FiltersView', 'Utils', 
             value: "&[Мужской]",
             valueName: "Мужской"
         }]
-    });
-    a.addWidget({
+    })
+                .addWidget({
         title: "Человек в очереди",
         callback: function (d) {
             this.chart.arrows[0].setValue(d.data[0].value);
@@ -165,8 +172,8 @@ requirejs(['MessageCenter', 'DBConnector', 'Dashboard', 'FiltersView', 'Utils', 
                 MDX: 'SELECT NON EMPTY {%LABEL([status].[H1].[status].&[0],"В очереди",""),%LABEL([Measures].[%COUNT],"Всего","")} ON 0 FROM [QueueCube]'
             }
         }
-    });
-    a.render();
+    })
+                .render();
 
 
 });

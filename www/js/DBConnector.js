@@ -56,18 +56,24 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
                         var chartData,
                             transformedData = [];
                         if (d) {
-                            try {
-                                d = JSON.parse(d) || d;
-                            } catch (e) {
-                                throw new Error("Incorrect data from server");
+                            var parse = function (d) {
+                                try {
+                                    d = JSON.parse(d)
+                                } catch (e) {
+                                    d = undefined
+                                };
+                                return d;
                             }
-                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
-                                transformedData.push({
-                                    category: d.axes[1].tuples[i].caption,
-                                    value: d.cells[i]
-                                });
+                            d = parse(d) || d;    
+                            if (typeof d == "object" && d.length != 0) {
+                                for (var i = 0; i < d.axes[1].tuples.length; i++) {
+                                    transformedData.push({
+                                        category: d.axes[1].tuples[i].caption,
+                                        value: d.cells[i]
+                                    });
+                                }
                             }
-                            chartData = transformedData;
+                            chartData = transformedData || [];
                         }
                         mc.publish(requester + "_data_acquired", {
                             data: chartData
