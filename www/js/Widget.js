@@ -1,22 +1,68 @@
-//Widget class definition
-
+/**
+ * @fileOverview
+ * Widget module<br>
+ * @author Shmidt Ivan
+ * @version 0.0.1
+ * @module Widget
+ * @requires FiltersList
+ * @requires Utils
+ * @requires MessageCenter
+ */
 define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, mc) {
-    return function Widget(config) {
+    /**
+     * Creates new Widget object
+     * @alias module:Widget
+     * @constructor Widget
+     * @param config Configuration object
+     * @listens module:MessageCenter#widget*_data_acquired
+     * @return {module:Widget} new Widget object
+     * @example
+     *<caption>Creating new widget</caption>
+     * new Widget(config);
+     */
+    function Widget(config) {
+        /** @lends module:Widget#*/
+        'use strict';
         var self = this;
+        /**
+         * @var {number} module:Widget#id ID of widget in dashboard
+         */
         this.id = config.id;
         this.toString = function () {
             return "Widget" + this.id;
-        }
+        };
+        /**
+         * @var {string} module:Widget#name Name of widget (title)
+         */
         this.name = config.title || "Widget" + this.id;
+        /**
+         * @var {module:Dashboard} module:Widget#dashboard Parent dashboard object
+         */
         this.dashboard = config.dashboard || "";
+        /**
+         * @var {Object} module:Widget#amcharts_config AmCharts config object
+         */
         this.amcharts_config = config.amconfig || {};
+        /**
+         * @var {Object} module:Widget#chart Amcharts object, created after rendering
+         */
         this.chart = '';
+        /**
+         * Request data from module:MessageCenter
+         * @function module:Widget#requestData
+         * @fires module:MessageCenter#data_requested
+         */
         this.requestData = function () {
             mc.publish("data_requested", ["widget" + self.id, {
                 data: self.datasource.data
             }]);
         }
-        var callback = config.callback || function (d) {
+        /**
+         * Callback, fired when data acquired
+         * @function module:Widget#onDataAcquired
+         * @private
+         */
+        var onDataAcquired = config.callback || function (d) {
             this.amcharts_config.dataProvider = d.data;
             this.render();
         };
@@ -25,24 +71,20 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
         if (mc) {
             mc.subscribe("widget" + this.id + "_data_acquired", {
                 subscriber: this,
-                callback: callback
+                callback: onDataAcquired
             });
-/*            mc.subscribe("widget" + this.id + "_filters_acquired", {
-                subscriber: this,
-                callback: function (d) {
-                    console.log("filters available:", d);
-                    this.filtersAvailable = d.data;
-                }
-            }); */
         }
-        //Selected Filters
+        /**
+         * @var {module:FiltersList} module:Widget#filters Selected filters list
+         */
         this.filters = new FiltersList({
             filters: config.filters,
             onSetFilter: this.requestData,
             container: "#widget" + self.id
         });
-        //        this.filtersAvailable = [];
-        //Creating datasource property
+        /**
+         * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
+         */
         var _datasource = {};
         Object.defineProperty(this, 'datasource', {
             get: function () {
@@ -69,11 +111,15 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
 
         });
 
+        //Set up datasource using setter
         this.datasource = config.datasource || {
             data: {}
         };
 
-
+        /**
+         * Simply renders widget
+         *@function module:Widget#render
+         */
         this.render = function () {
             var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
 
@@ -97,9 +143,6 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
             return this;
 
         }
-
-
-
-    }
-
+    };
+    return Widget;
 })

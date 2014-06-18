@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Documentation Module: DBConnector</title>
+	<title>Documentation Module: Widget</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,12 +86,12 @@
 					
 
 
-	<h1 class="page-title">Module: DBConnector</h1>
+	<h1 class="page-title">Module: Widget</h1>
 <section>
 
 <header>
     <h2>
-    DBConnector
+    Widget
     </h2>
     
 </header>
@@ -102,8 +102,7 @@
 
     
         
-            <div class="description">Database connector module<br>
-Implements ajax data fetching from Cache back-end</div>
+            <div class="description">Widget module<br></div>
         
 
         
@@ -111,13 +110,27 @@ Implements ajax data fetching from Cache back-end</div>
 	
 
 	
-
+	<dt class="tag-version">Version:</dt>
+	<dd class="tag-version">
+		<ul class="dummy">
+			<li>0.0.1</li>
+		</ul>
+	</dd>
 	
 
 	
 
 	
 
+	
+
+	
+	<dt class="tag-author">Author:</dt>
+	<dd class="tag-author">
+		<ul>
+			<li>Shmidt Ivan</li>
+			</ul>
+	</dd>
 	
 
 	
@@ -147,7 +160,24 @@ Implements ajax data fetching from Cache back-end</div>
     
 
     
+        <h3 class="subsection-title">Requires</h3>
 
+        <ul>
+            <li>module:FiltersList</li>
+        
+            <li>module:Utils</li>
+        
+            <li><a href="module-MessageCenter.html">module:MessageCenter</a></li>
+        </ul>
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="module-Widget-Widget.html">Widget</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
@@ -158,14 +188,14 @@ Implements ajax data fetching from Cache back-end</div>
         <dl>
             
 <dt>
-    <h4 class="name" id="defaults"><span class="type-signature">&lt;private> </span>defaults<code><span class="type-signature"> :Object</span></code></h4>
+    <h4 class="name" id="amcharts_config"><span class="type-signature"></span>amcharts_config<code><span class="type-signature"> :Object</span></code></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Default settings for DBConnector
+        AmCharts config object
     </div>
     
     
@@ -185,79 +215,370 @@ Implements ajax data fetching from Cache back-end</div>
 <dl class="details">
 	
 
-	<h5 class="subsection-title">Properties:</h5>
-
-	<dl>
-
-<table class="props table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
 	
-
-        <tr>
-            
-                <td class="name"><code>username</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Username to connect to DB</td>
-        </tr>
 
 	
 
-        <tr>
-            
-                <td class="name"><code>password</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Password to connect to DB</td>
-        </tr>
+	
 
 	
-	</tbody>
-</table>
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
 </dl>
 
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="chart"><span class="type-signature"></span>chart<code><span class="type-signature"> :Object</span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Amcharts object, created after rendering
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="dashboard"><span class="type-signature"></span>dashboard<code><span class="type-signature"> :<a href="module-Dashboard.html">module:Dashboard</a></span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Parent dashboard object
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="module-Dashboard.html">module:Dashboard</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="datasource"><span class="type-signature"></span>datasource<code><span class="type-signature"> :object</span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Object with getter and setter, represents Widget's data source
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="filters"><span class="type-signature"></span>filters<code><span class="type-signature"> :module:FiltersList</span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Selected filters list
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">module:FiltersList</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="id"><span class="type-signature"></span>id<code><span class="type-signature"> :number</span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        ID of widget in dashboard
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="name"><span class="type-signature"></span>name<code><span class="type-signature"> :string</span></code></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Name of widget (title)
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
 	
 
 	
@@ -301,7 +622,7 @@ Implements ajax data fetching from Cache back-end</div>
             
 <tr>
     <td>
-    <h4 class="name" id="acquireData"><span class="type-signature"></span>acquireData<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="onDataAcquired"><span class="type-signature">&lt;private> </span>onDataAcquired<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
     </td>
@@ -309,7 +630,143 @@ Implements ajax data fetching from Cache back-end</div>
     
     
     <div class="description">
-        Does ajax request for data from server
+        Callback, fired when data acquired
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    </td>
+</tr>
+
+        
+            
+<tr>
+    <td>
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+    </td>
+<td>
+    
+    
+    <div class="description">
+        Simply renders widget
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    </td>
+</tr>
+
+        
+            
+<tr>
+    <td>
+    <h4 class="name" id="requestData"><span class="type-signature"></span>requestData<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+    </td>
+<td>
+    
+    
+    <div class="description">
+        Request data from module:MessageCenter
     </div>
     
 
@@ -353,266 +810,18 @@ Implements ajax data fetching from Cache back-end</div>
     
     
     <h5>Fires:</h5>
-    <ul>
-        <li>module:MessageCenter#event:*_data_acquired</li>
-    </ul>
-    
-
-    
-    <h5>Listens to Events:</h5>
     <ul>
         <li>module:MessageCenter#event:data_requested</li>
     </ul>
     
 
     
-    
-    
-    
-    
-    
-    
-    </td>
-</tr>
-
-        
-            
-<tr>
-    <td>
-    <h4 class="name" id="acquireFilters"><span class="type-signature"></span>acquireFilters<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-    
-    </td>
-<td>
-    
-    
-    <div class="description">
-        Acquires filter list for cube from server
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-    <h5>Fires:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filters_acquired</li>
-    </ul>
-    
-
-    
-    <h5>Listens to Events:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filters_requested</li>
-    </ul>
-    
-
-    
-    
-    
-    
-    
-    
-    
-    </td>
-</tr>
-
-        
-            
-<tr>
-    <td>
-    <h4 class="name" id="acquireFilterValues"><span class="type-signature"></span>acquireFilterValues<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-    
-    </td>
-<td>
-    
-    
-    <div class="description">
-        Acquire possible values for selected filter
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
 
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-    <h5>Fires:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filter_list_acquired[path]</li>
-    </ul>
-    
-
-    
-    <h5>Listens to Events:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filter_list_requested</li>
-    </ul>
-    
-
-    
-    
-    
-    
-    
-    
-    
-    </td>
-</tr>
-
-        
-            
-<tr>
-    <td>
-    <h4 class="name" id="toString"><span class="type-signature"></span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-    
-    
-    </td>
-<td>
-    
-    
-
-    
-    
     
     
     
     
     
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    Module name
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">String</span>
-
-
-	</dd>
-</dl>
-
-
-        
     
     
     </td>

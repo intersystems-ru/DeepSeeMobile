@@ -21,8 +21,10 @@ define([
     'use strict';
     /**
      * @class
-     * @name Dashboard
+     * @class Dashboard
      * @alias module:Dashboard
+     * @listens module:MessageCenter#filters_acquired
+     * @fires module:MessageCenter#filters_requested
      * @return {Dashboard} New dashboard object
      */
     function Dashboard() {

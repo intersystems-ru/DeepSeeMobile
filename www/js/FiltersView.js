@@ -1,15 +1,58 @@
-//FiltersView Class Declaration
-
-define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], function (Utils, IScroll,$,mc,tap) {
+/**
+ * @fileOverview
+ * FiltersView module<br>
+ * Responsible for rendering filters page<br>
+ * Singleton
+ * @author Shmidt Ivan
+ * @version 0.0.1
+ * @module FiltersView
+ * @requires Utils
+ * @requires lib/iscroll
+ * @requires MessageCenter
+ * @requires lib/jquery.tap
+ * @requires jQuery
+ * @todo Delete high dependency with window.a = dashboard
+ */
+define([
+    'Utils',
+    'lib/iscroll',
+    'jquery',
+    "MessageCenter",
+    'lib/jquery.tap'
+], function (Utils, IScroll, $, mc, tap) {
+    'use strict';
+    /**
+     * Creates or returns existing FiltersView object
+     * @alias module:FiltersView
+     * @constructor FiltersView
+     * @listens module:MessageCenter#set_active_widget
+     * @listens module:MessageCenter#filters_acquired
+     */
     function FiltersView() {
-        if(FiltersView.prototype._instance){ return FiltersView.prototype._instance;}
+        /** @lends module:FiltersView#*/
+        if (FiltersView.prototype._instance) {
+            return FiltersView.prototype._instance;
+        }
         FiltersView.prototype._instance = this;
         var self = this;
-        this.toString = function () {
-            return "FiltersView"
-        };
         this.holder = "#filters .content";
+        /**
+        @var {Object} module:FiltersView#selectedFilter Filter, that you selects in filterView
+        */
         this.selectedFilter = null;
+        /**
+        Simply returns module name
+        *@function module:FiltersView#toString
+        *@return {string} Module name
+        */
+        this.toString = function () {
+            return "FiltersView";
+        };
+
+        /**
+         * Does rendering of filters
+         * @function module:FiltersView#render
+         */
         this.render = function () {
             require(['text!../FiltersView.html'], function (html) {
 
@@ -40,13 +83,13 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], funct
                     listItem.on('tap', function (e) {
                         if (e.originalEvent.target != this) return;
                         self.selectedFilter = $(this).data("filter");
-                        self.showFilterInfo();
+                        self.getFilterInfo();
                     });
                     listItem.find(".toggle").on("toggle", function (e) {
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
-                            self.showFilterInfo();
-                            a.widgets[a.activeWidget].filters.setFilter(self.selectedFilter,true);
+                            self.getFilterInfo();
+                            a.widgets[a.activeWidget].filters.setFilter(self.selectedFilter, true);
                         } else {
                             a.widgets[a.activeWidget].filters.remove($(this).parent().parent().data("filter").name);
                         }
@@ -62,7 +105,13 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], funct
             });
 
         };
-        this.showFilterInfo = function (d) {
+        /**
+         Fetching data via module:MessageCenter
+         *@function module:FiltersView#getFilterInfo
+         * @listens module:MessageCenter#filter_values_acquired
+         * @fires module:MessageCenter#filter_values_requested
+         */
+        this.getFilterInfo = function (d) {
             mc.subscribe("filter_values_acquired" + self.selectedFilter.path, {
                 subscriber: self,
                 callback: self.renderInfo,
@@ -72,7 +121,11 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], funct
 
 
 
-        }
+        };
+        /**
+         * Does rendering of selected filter's values
+         * @function module:FiltersView#renderInfo
+         */
         this.renderInfo = function (d) {
 
             require(['text!../FiltersViewInfo.html'], function (html) {
@@ -116,6 +169,7 @@ define(['Utils', 'lib/iscroll','jquery',"MessageCenter",'lib/jquery.tap'], funct
 
 
         };
+
         mc.subscribe("set_active_widget", {
             subscriber: this,
             callback: this.render

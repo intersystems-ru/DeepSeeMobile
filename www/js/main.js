@@ -4,14 +4,14 @@
  * @author Shmidt Ivan
  * @version 0.0.1
  */
-require.config({
-    baseUrl: './js/',
+requirejs.config({
+    baseUrl: 'js/',
     paths: {
         text: "lib/text",
-        jquery: "http://code.jquery.com/jquery-2.1.1"
+        jquery: "lib/jquery-2.1.1"
     }
 });
-requirejs([
+require([
     'MessageCenter', 
     'DBConnector', 
     'Dashboard', 

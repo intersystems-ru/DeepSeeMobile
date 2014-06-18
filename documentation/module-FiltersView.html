@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Documentation Module: DBConnector</title>
+	<title>Documentation Module: FiltersView</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,12 +86,12 @@
 					
 
 
-	<h1 class="page-title">Module: DBConnector</h1>
+	<h1 class="page-title">Module: FiltersView</h1>
 <section>
 
 <header>
     <h2>
-    DBConnector
+    FiltersView
     </h2>
     
 </header>
@@ -102,8 +102,9 @@
 
     
         
-            <div class="description">Database connector module<br>
-Implements ajax data fetching from Cache back-end</div>
+            <div class="description">FiltersView module<br>
+Responsible for rendering filters page<br>
+Singleton</div>
         
 
         
@@ -111,7 +112,12 @@ Implements ajax data fetching from Cache back-end</div>
 	
 
 	
-
+	<dt class="tag-version">Version:</dt>
+	<dd class="tag-version">
+		<ul class="dummy">
+			<li>0.0.1</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -121,6 +127,15 @@ Implements ajax data fetching from Cache back-end</div>
 	
 
 	
+	<dt class="tag-author">Author:</dt>
+	<dd class="tag-author">
+		<ul>
+			<li>Shmidt Ivan</li>
+			</ul>
+	</dd>
+	
+
+	
 
 	
 
@@ -134,6 +149,13 @@ Implements ajax data fetching from Cache back-end</div>
 
 	
 
+	
+	<dt class="tag-todo">To Do:</dt>
+	<dd class="tag-todo">
+		<ul>
+			<li>Delete high dependency with window.a = dashboard</li>
+			</ul>
+	</dd>
 	
 </dl>
 
@@ -147,7 +169,28 @@ Implements ajax data fetching from Cache back-end</div>
     
 
     
+        <h3 class="subsection-title">Requires</h3>
 
+        <ul>
+            <li>module:Utils</li>
+        
+            <li>module:lib/iscroll</li>
+        
+            <li><a href="module-MessageCenter.html">module:MessageCenter</a></li>
+        
+            <li>module:lib/jquery.tap</li>
+        
+            <li>module:jQuery</li>
+        </ul>
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="module-FiltersView-FiltersView.html">FiltersView</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
@@ -158,14 +201,14 @@ Implements ajax data fetching from Cache back-end</div>
         <dl>
             
 <dt>
-    <h4 class="name" id="defaults"><span class="type-signature">&lt;private> </span>defaults<code><span class="type-signature"> :Object</span></code></h4>
+    <h4 class="name" id="selectedFilter"><span class="type-signature"></span>selectedFilter<code><span class="type-signature"> :Object</span></code></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Default settings for DBConnector
+        Filter, that you selects in filterView
     </div>
     
     
@@ -183,81 +226,6 @@ Implements ajax data fetching from Cache back-end</div>
 
     
 <dl class="details">
-	
-
-	<h5 class="subsection-title">Properties:</h5>
-
-	<dl>
-
-<table class="props table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>username</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Username to connect to DB</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>password</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Password to connect to DB</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-</dl>
-
 	
 
 	
@@ -301,7 +269,7 @@ Implements ajax data fetching from Cache back-end</div>
             
 <tr>
     <td>
-    <h4 class="name" id="acquireData"><span class="type-signature"></span>acquireData<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getFilterInfo"><span class="type-signature"></span>getFilterInfo<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
     </td>
@@ -309,7 +277,7 @@ Implements ajax data fetching from Cache back-end</div>
     
     
     <div class="description">
-        Does ajax request for data from server
+        Fetching data via module:MessageCenter
     </div>
     
 
@@ -354,14 +322,14 @@ Implements ajax data fetching from Cache back-end</div>
     
     <h5>Fires:</h5>
     <ul>
-        <li>module:MessageCenter#event:*_data_acquired</li>
+        <li>module:MessageCenter#event:filter_values_requested</li>
     </ul>
     
 
     
     <h5>Listens to Events:</h5>
     <ul>
-        <li>module:MessageCenter#event:data_requested</li>
+        <li>module:MessageCenter#event:filter_values_acquired</li>
     </ul>
     
 
@@ -379,7 +347,7 @@ Implements ajax data fetching from Cache back-end</div>
             
 <tr>
     <td>
-    <h4 class="name" id="acquireFilters"><span class="type-signature"></span>acquireFilters<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
     </td>
@@ -387,7 +355,7 @@ Implements ajax data fetching from Cache back-end</div>
     
     
     <div class="description">
-        Acquires filter list for cube from server
+        Does rendering of filters
     </div>
     
 
@@ -430,17 +398,7 @@ Implements ajax data fetching from Cache back-end</div>
 
     
     
-    <h5>Fires:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filters_acquired</li>
-    </ul>
-    
 
-    
-    <h5>Listens to Events:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filters_requested</li>
-    </ul>
     
 
     
@@ -457,7 +415,7 @@ Implements ajax data fetching from Cache back-end</div>
             
 <tr>
     <td>
-    <h4 class="name" id="acquireFilterValues"><span class="type-signature"></span>acquireFilterValues<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="renderInfo"><span class="type-signature"></span>renderInfo<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
     </td>
@@ -465,7 +423,7 @@ Implements ajax data fetching from Cache back-end</div>
     
     
     <div class="description">
-        Acquire possible values for selected filter
+        Does rendering of selected filter's values
     </div>
     
 
@@ -508,17 +466,7 @@ Implements ajax data fetching from Cache back-end</div>
 
     
     
-    <h5>Fires:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filter_list_acquired[path]</li>
-    </ul>
-    
 
-    
-    <h5>Listens to Events:</h5>
-    <ul>
-        <li>module:MessageCenter#event:filter_list_requested</li>
-    </ul>
     
 
     
@@ -535,12 +483,16 @@ Implements ajax data fetching from Cache back-end</div>
             
 <tr>
     <td>
-    <h4 class="name" id="toString"><span class="type-signature"></span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="toString"><span class="type-signature"></span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
     
     
     </td>
 <td>
     
+    
+    <div class="description">
+        Simply returns module name
+    </div>
     
 
     
@@ -605,7 +557,7 @@ Implements ajax data fetching from Cache back-end</div>
 	</dt>
 	<dd>
 		
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
 	</dd>
