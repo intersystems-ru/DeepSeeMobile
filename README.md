@@ -4,4 +4,4 @@ Installation
     * http://www.nodejs.org  
     * http://www.phonegap.com  
 2. Run <code>phonegap build ios</code> in Terminal / Windows cmd
-3. For documentation rebuilding use <code>jsdoc -p www/js/ -t documentation/template -d documentation/</code> 
+3. For documentation rebuilding use <code>jsdoc -c documentation/conf.json</code> 

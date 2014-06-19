@@ -59,7 +59,7 @@ require([
             var retVal = [];
             for (var d = 0; d < data.length; d++) {
                 retVal.push([data[d].name, data[d].data[0]]);
-            }
+            };
             return retVal;
         },
         //title: "Топ 5 МО по размеру очереди",

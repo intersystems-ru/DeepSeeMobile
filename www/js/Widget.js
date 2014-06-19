@@ -8,7 +8,11 @@
  * @requires Utils
  * @requires MessageCenter
  */
-define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, mc) {
+define([
+    'FiltersList',
+    'Utils',
+    'MessageCenter'
+], function (FiltersList, Utils, mc) {
     /**
      * Creates new Widget object
      * @alias module:Widget
@@ -24,6 +28,12 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
         /** @lends module:Widget#*/
         'use strict';
         var self = this;
+        this.active = false;
+        /** 
+         * If defined, would be used for data convertion
+         * @function module:Widget#convertor
+         * @return ConvertedData
+         */
         this.convertor = config.convertor || undefined;
         /**
          * @var {number} module:Widget#id ID of widget in dashboard
@@ -41,11 +51,12 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
          */
         this.dashboard = config.dashboard || "";
         /**
-         * @var {Object} module:Widget#amcharts_config AmCharts config object
+         * @var {Object} module:Widget#chartConfig Chart config object
          */
         this.chartConfig = config.chartConfig || {};
         /**
          * @var {Object} module:Widget#chart Amcharts object, created after rendering
+         *@deprecated
          */
         this.chart = '';
         /**
@@ -64,11 +75,10 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
          * @private
          */
         var onDataAcquired = config.callback || function (d) {
-            if(this.chartConfig.series[0] && this.chartConfig.series[0].data && this.convertor){
+            if (this.chartConfig.series[0] && this.chartConfig.series[0].data && this.convertor) {
                 this.chartConfig.series[0].data = this.convertor(d.data);
-            }
-            else {
-            this.chartConfig.series =  d.data;
+            } else {
+                this.chartConfig.series = d.data;
             }
             this.render();
         };
@@ -78,6 +88,14 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
             mc.subscribe("widget" + this.id + "_data_acquired", {
                 subscriber: this,
                 callback: onDataAcquired
+            });
+            //Add re-render when isActive
+            mc.subscribe("set_active_widget", {
+                subscriber: this,
+                callback: function (d) {
+                    this.active = (d.id == this.id);
+                    if (this.active) this.render()
+                }
             });
         }
         /**
@@ -127,6 +145,7 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
          *@function module:Widget#render
          */
         this.render = function () {
+            //if (!this.active) return this;
             var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
 
             require(["text!../Widget.html"], function (html) {
@@ -140,9 +159,9 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
                 if (self.chartConfig) {
                     var w_selector = "#widget" + self.id || "";
                     if (Highcharts) {
-                        $(function () {
-                            $(w_selector).highcharts(self.chartConfig);
-                        });
+
+                        self.chart = $(w_selector).highcharts(self.chartConfig);
+
 
                     }
                 }

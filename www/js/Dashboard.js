@@ -71,7 +71,9 @@ define([
                 $(holder + " > *").remove();
                 $(holder).append(html);
             });
-
+            if(mc&&this.widgets.length){
+                mc.publish("set_active_filter",{id:1});
+            } 
             for (var i = 0; i < this.widgets.length; i++) {
                 this.widgets[i].render()
             }
@@ -85,6 +87,7 @@ define([
                     });
                 }
             });
+            
             return this;
         };
         /**
