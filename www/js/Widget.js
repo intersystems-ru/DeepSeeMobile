@@ -24,6 +24,7 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
         /** @lends module:Widget#*/
         'use strict';
         var self = this;
+        this.convertor = config.convertor || undefined;
         /**
          * @var {number} module:Widget#id ID of widget in dashboard
          */
@@ -42,7 +43,7 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
         /**
          * @var {Object} module:Widget#amcharts_config AmCharts config object
          */
-        this.amcharts_config = config.amconfig || {};
+        this.chartConfig = config.chartConfig || {};
         /**
          * @var {Object} module:Widget#chart Amcharts object, created after rendering
          */
@@ -63,7 +64,12 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
          * @private
          */
         var onDataAcquired = config.callback || function (d) {
-            this.amcharts_config.series = d.data;
+            if(this.chartConfig.series[0] && this.chartConfig.series[0].data && this.convertor){
+                this.chartConfig.series[0].data = this.convertor(d.data);
+            }
+            else {
+            this.chartConfig.series =  d.data;
+            }
             this.render();
         };
 
@@ -127,16 +133,16 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
                 html = html.replace("{{title}}", Utils.trim(self.name))
                     .replace("{{id}}", self.id);
                 if ($("#widget" + self.id)[0] == undefined) $(widget_holder).append(html);
-                if (self.amcharts_config.dataProvider && self.amcharts_config.dataProvider.length == 0) {
+                /*if (self.amcharts_config.dataProvider && self.amcharts_config.dataProvider.length == 0) {
                     $("#widget" + self.id).empty().append("<p class='alert'>Cannot visuallize data! Change datasource</p>");
                     return;
-                };
-                if (self.amcharts_config) {
-                    var w_selector = "widget" + self.id || "";
-                    if (AmCharts) {
-                        $(function () { 
-    $('body .content').highcharts(self.amcharts_config);
-});
+                };*/
+                if (self.chartConfig) {
+                    var w_selector = "#widget" + self.id || "";
+                    if (Highcharts) {
+                        $(function () {
+                            $(w_selector).highcharts(self.chartConfig);
+                        });
 
                     }
                 }
