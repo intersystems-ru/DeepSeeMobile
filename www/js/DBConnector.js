@@ -69,7 +69,7 @@ define([ 'MessageCenter'], function (mc) {
                                 for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                     transformedData.push({
                                         name: d.axes[1].tuples[i].caption,
-                                        data: [d.cells[i]]
+                                        data: d.cells[i]
                                     });
                                 }
                             }

@@ -68,18 +68,16 @@ define([
             mc.publish("data_requested", ["widget" + self.id, {
                 data: self.datasource.data
             }]);
-        }
+        };
         /**
          * Callback, fired when data acquired
          * @function module:Widget#onDataAcquired
          * @private
+         * @todo Route which field data would be kept
          */
         var onDataAcquired = config.callback || function (d) {
-            if (this.chartConfig.series[0] && this.chartConfig.series[0].data && this.convertor) {
-                this.chartConfig.series[0].data = this.convertor(d.data);
-            } else {
-                this.chartConfig.series = d.data;
-            }
+
+            this.chartConfig.series = d.data;
             this.render();
         };
 
@@ -90,14 +88,14 @@ define([
                 callback: onDataAcquired
             });
             //Add re-render when isActive
-            mc.subscribe("set_active_widget", {
+            /*mc.subscribe("set_active_widget", {
                 subscriber: this,
                 callback: function (d) {
                     this.active = (d.id == this.id);
-                    if (this.active) this.render()
+                    if (this.active) this.render();
                 }
-            });
-        }
+            });*/
+        };
         /**
          * @var {module:FiltersList} module:Widget#filters Selected filters list
          */
