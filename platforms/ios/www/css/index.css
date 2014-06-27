@@ -20,6 +20,10 @@ input, textarea {
     -webkit-focus-ring-color: rgba(0,0,0,0);
     outline: none;
 }
+
+header{
+   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+}
 .content{
     bottom:50px;
 }
@@ -62,4 +66,27 @@ padding-top: 61px;
 /*end fix*/
 .slide{
 /*    padding-bottom:50px;*/
+}
+nav.bar.bar-tab{
+display: flex;
+flex-direction: row;
+}
+nav.bar.bar-tab a.tab-item{
+display: block;
+width:100%;
+}
+@media only screen 
+    and (orientation : landscape){
+        nav.bar.bar-tab{
+            flex-direction: column;
+        width: 50px;
+        height: 100%;
+            left:0;
+            top:60px;
+            border-right: 1px solid #ddd;
+        }
+        .content{
+            bottom:0;left:50px;
+        }
+
 }

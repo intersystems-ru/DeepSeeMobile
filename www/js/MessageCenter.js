@@ -64,7 +64,9 @@ define(['Utils'], function (Utils) {
          * @example
          * MessageCenter.subscribe("someEvent", { subscriber:this, callback:function(){} });
          */
-        this.subscribe = function (message, subscriber) {
+        this.subscribe = function subscribe_f (message, subscriber) {
+            
+            
             console.log('%c[Message Center]' + subscriber.subscriber + ' subscribed to:' + message, 'background: #222; color: #bada55')
             var i = 0;
             var l = subscriptions.length

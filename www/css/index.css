@@ -67,3 +67,26 @@ padding-top: 61px;
 .slide{
 /*    padding-bottom:50px;*/
 }
+nav.bar.bar-tab{
+display: flex;
+flex-direction: row;
+}
+nav.bar.bar-tab a.tab-item{
+display: block;
+width:100%;
+}
+@media only screen 
+    and (orientation : landscape){
+        nav.bar.bar-tab{
+            flex-direction: column;
+        width: 50px;
+        height: 100%;
+            left:0;
+            top:60px;
+            border-right: 1px solid #ddd;
+        }
+        .content{
+            bottom:0;left:50px;
+        }
+
+}

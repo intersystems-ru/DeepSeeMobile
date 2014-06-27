@@ -4,11 +4,10 @@
  * @author Shmidt Ivan
  * @version 0.0.1
  */
-requirejs.config({
+require.config({
     baseUrl: 'js/',
     paths: {
         text: "lib/text"
-        //        jquery: "lib/jquery-2.1.1"
     }
 });
 require([
@@ -16,10 +15,9 @@ require([
     'DBConnector',
     'Dashboard',
     'FiltersView',
-    'Utils',
+    'Utils'
 ], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils) {
-
-
+    window.m=MessageCenter;
     window.a = new Dashboard({
         holder: "body > .content"
     })
@@ -28,11 +26,14 @@ require([
                 var data = data.data;
                 var retVal = [];
                 for (var d = 0; d < data.length; d++) {
-                    retVal.push({name:data[d].name, data: [data[d].data]});
+                    retVal.push({
+                        name: data[d].name,
+                        data: [data[d].data]
+                    });
                 };
                 this.chartConfig.series = retVal;
                 this.render();
-          
+
             },
             chartConfig: {
                 chart: {
@@ -61,7 +62,7 @@ require([
                 path: "[status].[H1].[status]",
                 value: "&[0]",
                 valueName: "0"
-        }]
+                    }]
         })
         .addWidget({
             callback: function (data) {
@@ -70,7 +71,7 @@ require([
                 for (var d = 0; d < data.length; d++) {
                     retVal.push([data[d].name, data[d].data]);
                 };
-                
+
                 this.chartConfig.series[0].data = retVal;
                 this.render();
             },
@@ -99,19 +100,19 @@ require([
                     type: 'pie',
                     name: 'Очередь',
                     data: [
-                ['Firefox', 45.0],
-                ['IE', 26.8],
+                            ['Firefox', 45.0],
+                            ['IE', 26.8],
                         {
                             name: 'Chrome',
                             y: 12.8,
                             sliced: true,
                             selected: true
-                },
-                ['Safari', 8.5],
-                ['Opera', 6.2],
-                ['Others', 0.7]
-            ]
-        }]
+                            },
+                            ['Safari', 8.5],
+                            ['Opera', 6.2],
+                            ['Others', 0.7]
+                        ]
+                    }]
             },
             datasource: {
                 data: {
@@ -123,13 +124,11 @@ require([
                 path: "[SEXNAM].[H1].[SEXNAM]",
                 value: "&[Мужской]",
                 valueName: "Мужской"
-        }]
+                    }]
         })
         .addWidget({
             callback: function (d) {
-                
-                console.log(d);
-                chart = $('#widget'+this.id).highcharts();
+                chart = $('#widget' + this.id).highcharts();
                 if (chart) {
                     var point = chart.series[0].points[0],
                         newVal;
@@ -170,10 +169,10 @@ require([
                     max: 30000,
 
                     stops: [
-    [0.1, '#55BF3B'], // green
-          [0.5, '#ffff00'], // yellow
-          [0.9, '#DF5353'] // red
-   ],
+                [0.1, '#55BF3B'], // green
+                      [0.5, '#ffff00'], // yellow
+                      [0.9, '#DF5353'] // red
+               ],
                     lineWidth: 0,
                     minorTickInterval: null,
                     tickPixelInterval: 400,
@@ -212,7 +211,7 @@ require([
                     tooltip: {
                         valueSuffix: 'человек'
                     }
-     }]
+                 }]
 
             },
             datasource: {
