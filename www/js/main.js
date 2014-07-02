@@ -7,7 +7,8 @@
 require.config({
     baseUrl: 'js/',
     paths: {
-        text: "lib/text"
+        text: "lib/text",
+        underscore: "lib/underscore"
     }
 });
 require([
@@ -17,11 +18,14 @@ require([
     'FiltersView',
     'Utils'
 ], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils) {
-    window.m=MessageCenter;
+    window.App = {};
+    window.m = MessageCenter;
     window.a = new Dashboard({
         holder: "body > .content"
     })
         .addWidget({
+
+            type: "highcharts",
             callback: function (data) {
                 var data = data.data;
                 var retVal = [];
@@ -65,6 +69,7 @@ require([
                     }]
         })
         .addWidget({
+            type: "highcharts",
             callback: function (data) {
                 var data = data.data;
                 var retVal = [];
@@ -127,6 +132,7 @@ require([
                     }]
         })
         .addWidget({
+            type: "highcharts",
             callback: function (d) {
                 chart = $('#widget' + this.id).highcharts();
                 if (chart) {

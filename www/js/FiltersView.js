@@ -66,7 +66,7 @@ define([
                 for (var i = 0; i < filtersNum; i++) {
                     var listItem = $(html).find(".filter-list-item").clone();
                     listItem.html(
-                        listItem.html().replace(/{{filterName}}/, Utils.trim(a.filters[i].name)) //todo: a.filters is BAAAD
+                        listItem.html().replace(/{{filterName}}/, a.filters[i].name) //todo: a.filters is BAAAD
                     );
                     listItem.data("filter", a.filters[i]);
 

@@ -27,7 +27,7 @@ define(['Filter'], function (Filter) {
             if (!_filters[name]) _filters[name] = new Filter(filter);
                 _filters[name].value = value;
                 _filters[name].valueName = valueName;
-            if (options.onSetFilter && !silent) options.onSetFilter();
+            if (options.onSetFilter && !silent) options.onSetFilter.call(options.w_obj);
         };
         //Setting up filters from options
         if (options.filters) {
