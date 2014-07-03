@@ -15,7 +15,7 @@ define(['Filter'], function (Filter) {
         };
         this.remove = function(name){
             delete _filters[name];
-            if(options.onSetFilter) options.onSetFilter();
+            if(options.onSetFilter) options.onSetFilter.call(options.w_obj);
         }
         this.getAll = function () {
             return _filters;

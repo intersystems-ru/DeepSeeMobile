@@ -78,12 +78,15 @@ define([
                     } else {
                         listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
                     }
-                    listItem.on('tap', function (e) {
+                    listItem.find("a").off("tap").on('tap', function (e) {
+                        e.preventDefault();
                         if (e.originalEvent.target != this) return;
-                        self.selectedFilter = $(this).data("filter");
+                        if (!$(this).find(".toggle").hasClass("active")) return;
+                        self.selectedFilter = $(this).parent().data("filter");
                         self.getFilterInfo();
+                        return false;
                     });
-                    listItem.find(".toggle").on("toggle", function (e) {
+                    listItem.find(".toggle").off("toggle").on("toggle", function (e) {
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
                             self.getFilterInfo();
