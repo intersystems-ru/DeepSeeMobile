@@ -12,11 +12,12 @@
  * @todo Delete jQuery dependency
  */
 define([
-    'DashboardConfig', 
-    'Widget', 
-    'Filter', 
-    'MessageCenter'
-], function (DashboardConfiguration, Widget, Filter, mc) {
+    'DashboardConfig',
+    'Widget',
+    'Filter',
+    'MessageCenter',
+    "WidgetMap"
+], function (DashboardConfiguration, Widget, Filter, mc, WidgetMap) {
     'use strict';
     /**
      * @class
@@ -26,8 +27,9 @@ define([
      * @fires module:MessageCenter#filters_requested
      * @return {Dashboard} New dashboard object
      */
-    function Dashboard() {
+    function Dashboard(dashName) {
         /**@lends module:Dashboard#*/
+        var self=this;
         /**
          * @name module:Dashboard#toString
          * @function
@@ -56,6 +58,19 @@ define([
          * @todo Make this one private
          */
         this.filters = [];
+        this.onDashboardDataAcquired = function(d){
+            
+        
+            var widgets = d.children;
+            _.each(widgets,function(widget){
+                var widget_config =WidgetMap[widget.type];
+                    widget_config.datasource = {data:{MDX:widget.mdx}};
+                    widget_config.chartConfig.title= {text: widget.title};
+                self.addWidget(widget_config).render();
+            });
+        };
+        mc.subscribe("data_acquired:dashboard", {subscriber:this, callback:this.onDashboardDataAcquired});
+        mc.publish("data_requested:dashboard",dashName);
         /**
          * Dashboard config
          * @var {module:DashboardConfig} module:Dashboard#config
@@ -71,9 +86,11 @@ define([
                 $(holder + " > *").remove();
                 $(holder).append(html);
             });
-            if(mc&&this.widgets.length){
-                mc.publish("set_active_filter",{id:1});
-            } 
+            if (mc && this.widgets.length) {
+                mc.publish("set_active_filter", {
+                    id: 1
+                });
+            }
             for (var i = 0; i < this.widgets.length; i++) {
                 this.widgets[i].render()
             }
@@ -87,7 +104,7 @@ define([
                     });
                 }
             });
-            
+
             return this;
         };
         /**
@@ -162,17 +179,15 @@ define([
             }
             return this;
         }
-        if (mc) {
-            mc.subscribe("filters_acquired", {
+        mc.subscribe("filters_acquired", {
                 subscriber: this,
                 callback: function (d) {
-                    for (var i = 0; i < d.data.length; i++) {
-                        this.filters.push(new Filter(d.data[i]));
+                    for (var i = 0; i < d.data.data.length; i++) {
+                        this.filters.push(new Filter(d.data.data[i]));
                     }
                 }
             });
-            mc.publish("filters_requested");
-        }
+        mc.publish("filters_requested");
 
 
     };

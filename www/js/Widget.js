@@ -16,9 +16,8 @@ define([
     'FiltersList',
     'Utils',
     'MessageCenter',
-    'underscore',
     'HighchartsWidget',
-], function (FiltersList, Utils, mc, _, HighchartsWidget) {
+], function (FiltersList, Utils, mc, HighchartsWidget) {
     /**
      * Creates new Widget object
      * @alias module:Widget
@@ -41,24 +40,24 @@ define([
          * @function module:Widget#convertor
          * @return ConvertedData
          */
-        this.convertor = _.has(config,'convertor') ? config.convertor : null;
+        this.convertor = _.has(config, 'convertor') ? config.convertor : null;
         /**
          * @var {number} module:Widget#id ID of widget in dashboard
          */
-        this.id = _.has(config,'id') ? config.id : null;
+        this.id = _.has(config, 'id') ? config.id : null;
 
         /**
          * @var {string} module:Widget#name Name of widget (title)
          */
-        this.name = _.has(config,'title') ? config.title : "Widget"+this.id;
+        this.name = _.has(config, 'title') ? config.title : "Widget" + this.id;
         /**
          * @var {module:Dashboard} module:Widget#dashboard Parent dashboard object
          */
-        this.dashboard = _.has(config,'dashboard') ? config.dashboard : null;
+        this.dashboard = _.has(config, 'dashboard') ? config.dashboard : null;
         /**
          * @var {Object} module:Widget#chartConfig Chart config object
          */
-        this.chartConfig = _.has(config,'chartConfig') ? config.chartConfig : {};
+        this.chartConfig = _.has(config, 'chartConfig') ? config.chartConfig : {};
         /**
          * @var {Object} module:Widget#chart Amcharts object, created after rendering
          *@deprecated
@@ -72,9 +71,9 @@ define([
          * @todo Route which field data would be kept
          */
         this.onDataAcquired = config.callback || function (d) {
-
+            console.log("GOT DATA:", this);
             this.chartConfig.series = d.data;
-            this.render();
+            this.renderWidget();
         };
         /**
          * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
@@ -110,30 +109,28 @@ define([
 
         });
         this.filters = "";
-        
-        var typesMap={
+
+        var typesMap = {
             'highcharts': HighchartsWidget
         };
         //Render for differend Widgets
-        if(_.has(config, 'type') && _.has(typesMap,config.type)){
-            _.extend(this,new typesMap[config.type](this))
+        if (_.has(config, 'type') && _.has(typesMap, config.type)) {
+            _.extend(this, new typesMap[config.type](this))
         }
         //When created widget, must subscribe to widget[i] data acquired
         this.init(config);
+        return this;
     };
 
     Widget.prototype.toString = function () {
         return "Widget" + this.id;
     };
     Widget.prototype.init = function (config) {
-        if (mc) {
-            mc.subscribe("widget" + this.id + "_data_acquired", {
-                subscriber: this,
-                callback: this.onDataAcquired
-            });
+        mc.subscribe("data_acquired:widget" + this.id , {
+            subscriber: this,
+            callback: this.onDataAcquired
+        });
 
-        };
-        var self=this;
         /**
          * @var {module:FiltersList} module:Widget#filters Selected filters list
          */
@@ -141,7 +138,7 @@ define([
             filters: config.filters,
             onSetFilter: this.requestData,
             container: "#widget" + this.id,
-            w_obj:this
+            w_obj: this
         });
 
         this.requestData();
@@ -157,9 +154,11 @@ define([
         require(["text!../Widget.html"], function (html) {
             html = html.replace("{{title}}", self.name)
                 .replace("{{id}}", self.id);
-            if ($("#widget" + self.id)[0] == undefined) $(widget_holder).append(html);
-           self.renderWidget();
-            console.log("[Render]Finished: " + self.name);
+            if ($("#widget" + self.id)[0] == undefined) {
+                $(widget_holder).append(html);
+                self.renderWidget();
+                console.log("[Render]Finished: " + self.name);
+            }
         });
         return this;
 
@@ -170,9 +169,9 @@ define([
      * @fires module:MessageCenter#data_requested
      */
     Widget.prototype.requestData = function () {
-        mc.publish("data_requested", ["widget" + this.id, {
+        mc.publish("data_requested:widget" + this.id, {
             data: this.datasource.data
-            }]);
+            });
     };
     return Widget;
 })

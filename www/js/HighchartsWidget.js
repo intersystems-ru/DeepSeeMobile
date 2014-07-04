@@ -1,4 +1,4 @@
-define(['underscore'], function (_) {
+define([], function () {
     function HighchartsWidget() {
         this.renderWidget = function () {
             if (this.chartConfig) {
