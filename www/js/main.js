@@ -12,11 +12,12 @@ require.config({
 });
 require([
     'MessageCenter',
+    'LoadingSpinner',
     'DBConnector',
     'Dashboard',
     'FiltersView',
     'Utils'
-], function (MessageCenter, DBConnector, Dashboard, FiltersView, Utils) {
+], function (MessageCenter,LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils) {
     window.App = {};
     App.m = MessageCenter;
     //App.m.subscribe("data_acquired", {subscriber:this, callback:function(d){console.log("DATA ACQUIRED:",d)}})

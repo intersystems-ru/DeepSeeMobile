@@ -45,7 +45,7 @@ define([
          * @var {number} module:Widget#id ID of widget in dashboard
          */
         this.id = _.has(config, 'id') ? config.id : null;
-
+        this.callback = config.callback || undefined;
         /**
          * @var {string} module:Widget#name Name of widget (title)
          */
@@ -70,7 +70,9 @@ define([
          * @private
          * @todo Route which field data would be kept
          */
-        this.onDataAcquired = config.callback || function (d) {
+        this.onDataAcquired = function (d) {
+            if (!d || d.data.length == 0){$("#widget"+this.id).html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>"); return;}
+            if(this.callback){ this.callback(d); return;}
             console.log("GOT DATA:", this);
             this.chartConfig.series = d.data;
             this.renderWidget();

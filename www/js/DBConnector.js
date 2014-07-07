@@ -47,7 +47,9 @@ define(['MessageCenter'], function (mc) {
          */
         this.acquireData = function (args) {
             var requester = args.target;
-            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            //Calling wrong function
+            if( requester==="dashboard") return;
+//            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
             var opts = $.extend({
                     url: "http://37.139.4.54/tfoms/MDX",
                     type: "POST",
@@ -126,6 +128,14 @@ define(['MessageCenter'], function (mc) {
         this.acquireFilterValues = function (args) {
             var path = args.target,
                 name = args.data;
+            if(sessionStorage.getItem("filterValues:"+path)) {
+            mc.publish("filter_values_acquired:" + path, {
+                            data: JSON.parse(sessionStorage.getItem("filterValues:"+path)),
+                            path: path,
+                            name: name
+                        });
+                return;
+            }
             var filter_list_opts = {
                 username: defaults.username,
                 password: defaults.password,
@@ -134,9 +144,10 @@ define(['MessageCenter'], function (mc) {
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
-                            filters = d.children.slice(0);
+                            filterValues = d.children.slice(0);
+                        sessionStorage.setItem("filterValues:"+path, JSON.stringify(filterValues))
                         mc.publish("filter_values_acquired:" + path, {
-                            data: filters,
+                            data: filterValues,
                             path: path,
                             name: name
                         });
@@ -148,7 +159,7 @@ define(['MessageCenter'], function (mc) {
         };
 
         this.acquireDashboardData = function (args) {
-            var dashName = args.data;
+            var dashName = args;
             var dash_opts = {
                 username: defaults.username,
                 password: defaults.password,
@@ -178,6 +189,8 @@ define(['MessageCenter'], function (mc) {
                 subscriber: this,
                 callback: this.acquireFilterValues
             });
+//        mc.subscribe("data_requested:dashboard_list", {subscriber:this, callback:this.acquireDashboardList});
+        mc.subscribe("data_requested:dashboard", {subscriber:this, callback:this.acquireDashboardData});
     };
     return new DBConnector();
 });
