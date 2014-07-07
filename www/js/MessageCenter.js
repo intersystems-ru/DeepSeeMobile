@@ -18,7 +18,7 @@
  * //All you do is inform MessageCenter and waiting for info from MessageCenter.
  * @example
  * <caption>Event:target</caption>
- * //You have message data_requested.
+ * //You have message data_acquired.
  * //But you also have obj1, obj2, obj3, which all wants to subscribe to their own data_acquired
  * //And you also have a module LoadingSpinner, which wants to subscribe to ALL data_requested and data_acquired and show Spinner till they'd be resolved.
  *
@@ -38,7 +38,7 @@
  * @module MessageCenter
  */
 define([], function () {
-    'use strict';
+    //    'use strict';
     /**
      * @constructor
      * @alias module:MessageCenter
@@ -47,7 +47,6 @@ define([], function () {
      */
     function MessageCenter() {
         /**@lends module:MessageCenter#*/
-
         if (MessageCenter.prototype._instance) {
             return MessageCenter.prototype._instance;
         }
@@ -80,7 +79,6 @@ define([], function () {
          * @example
          * MessageCenter.subscribe("someEvent", { subscriber:this, callback:function(){} });
          */
-
         this.subscribe = function (message, subscriber) {
             var insertSubscription = function () {
                 if (!(_.has(subscriptions, _event))) {
@@ -142,8 +140,8 @@ define([], function () {
             }
             var _event = result[1],
                 _target = result[2];
-            var txtArgs = (args) ? ", args:" + JSON.stringify(args) : "";
-            console.log('%c[Message Center]Published:' + message + txtArgs, 'background: #222; color: #bada55')
+            //            var txtArgs = (args) ? ", args:" + JSON.stringify(args) : "";
+            console.log('%c[Message Center]Published:' + message, 'background: #222; color: #bada55', args || "");
 
             if (_.has(subscriptions, _event)) {
                 _.each(subscriptions[_event].subscribers, function (s, i) {
@@ -163,6 +161,12 @@ define([], function () {
 
             }
         };
+        /**
+         * Development-time function.<br> 
+         * @memberof module:MessageCenter
+         * @function getSubs
+         * @return {Array<subscriptions>}
+        */
         this.getSubs = function () {
             return subscriptions;
         }

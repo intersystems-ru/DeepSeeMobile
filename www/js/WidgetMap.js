@@ -1,3 +1,9 @@
+/**
+ * Hash-table<br>
+ * Connects widget types from DeepSee to mobile realization.<br>
+ * E.g. DeepSee has "barChart", which we interpret as Widget with type "highcharts" and subtype "bar" (which gets into HighcharstWidget with type "bar")
+ * @module WidgetMap
+ */
 define([], function () {
     return {
         "barChart": {
@@ -29,13 +35,7 @@ define([], function () {
                     }
                 },
                 series: []
-            },
-            filters: [{
-                name: "status",
-                path: "[status].[H1].[status]",
-                value: "&[0]",
-                valueName: "0"
-                    }]
+            }
         },
         "pieChart": {
             type: "highcharts",
@@ -84,13 +84,7 @@ define([], function () {
                             ['Others', 0.7]
                         ]
                     }]
-            },
-            filters: [{
-                name: "Пол",
-                path: "[SEXNAM].[H1].[SEXNAM]",
-                value: "&[Мужской]",
-                valueName: "Мужской"
-                    }]
+            }
         },
         "speedometer": {
             type: "highcharts",

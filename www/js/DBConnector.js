@@ -17,6 +17,7 @@ define(['MessageCenter'], function (mc) {
             return DBConnector.prototype._instance;
         }
         DBConnector.prototype._instance = this;
+        var self=this;
         /**
          * Default settings for DBConnector
          * @var {Object}
@@ -45,8 +46,9 @@ define(['MessageCenter'], function (mc) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
-            var requester = args.target,
-                opts = $.extend({
+            var requester = args.target;
+            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            var opts = $.extend({
                     url: "http://37.139.4.54/tfoms/MDX",
                     type: "POST",
                     data: {},
@@ -146,7 +148,7 @@ define(['MessageCenter'], function (mc) {
         };
 
         this.acquireDashboardData = function (args) {
-            var dashName = args;
+            var dashName = args.data;
             var dash_opts = {
                 username: defaults.username,
                 password: defaults.password,
@@ -156,6 +158,7 @@ define(['MessageCenter'], function (mc) {
                     if (d) {
                         var d = JSON.parse(d) || d;
                         mc.publish("data_acquired:dashboard", d);
+                        
                     }
 
                 }
@@ -163,24 +166,18 @@ define(['MessageCenter'], function (mc) {
             $.ajax(dash_opts);
         };
         /* Subscriptions */
-        if (mc) {
-            mc.subscribe("data_requested", {
+        mc.subscribe("data_requested", {
                 subscriber: this,
                 callback: this.acquireData
             });
-            mc.subscribe("filters_requested", {
+        mc.subscribe("filters_requested", {
                 subscriber: this,
                 callback: this.acquireFilters
             });
-            mc.subscribe("filter_values_requested", {
+        mc.subscribe("filter_values_requested", {
                 subscriber: this,
                 callback: this.acquireFilterValues
             });
-            mc.subscribe("data_requested:dashboard", {
-                subscriber: this,
-                callback: this.acquireDashboardData
-            });
-        };
     };
     return new DBConnector();
 });

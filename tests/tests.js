@@ -5,7 +5,7 @@ requirejs.config({
         jquery: "lib/jquery-2.1.1"
     }
 });
-
+require(['jquery','lib/highcharts.src','lib/underscore'],function(){});
 QUnit.asyncTest("MessageCenter creating", function (assert) {
   var r = 0;
 
@@ -26,6 +26,7 @@ QUnit.asyncTest("Dashboard creating", function (assert) {
     require(['Dashboard'], function (d) {
             assert.ok(d, "Constructor exists!");
             var dash = new d();
+            console.log(dash);
             assert.ok(dash, "Creates new object!");
             assert.ok(dash.render, "Has render method!");
             QUnit.start();

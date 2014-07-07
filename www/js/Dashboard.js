@@ -29,15 +29,7 @@ define([
      */
     function Dashboard(dashName) {
         /**@lends module:Dashboard#*/
-        var self=this;
-        /**
-         * @name module:Dashboard#toString
-         * @function
-         * @return {String} Module name
-         */
-        this.toString = function () {
-            return "Dashboard";
-        };
+        var self = this;
         /**
          * Array of Widget objects
          * @var {Array<module:Widget>}
@@ -50,7 +42,7 @@ define([
          * @var {number} module:Dashboard#activeWidget
          * @public
          */
-        this.activeWidget = null;
+        this.activeWidget = undefined;
         /**
          * Array of Filter objects
          * @var {Array<module:Filter>}
@@ -58,19 +50,35 @@ define([
          * @todo Make this one private
          */
         this.filters = [];
-        this.onDashboardDataAcquired = function(d){
-            
-        
+        this.onDashboardDataAcquired = function (d) {
             var widgets = d.children;
-            _.each(widgets,function(widget){
-                var widget_config =WidgetMap[widget.type];
-                    widget_config.datasource = {data:{MDX:widget.mdx}};
-                    widget_config.chartConfig.title= {text: widget.title};
+            _.each(widgets, function (widget) {
+                var widget_config = WidgetMap[widget.type];
+                widget_config.datasource = {
+                    data: {
+                        MDX: widget.mdx
+                    }
+                };
+                widget_config.filters = [];
+                _.each(widget.children, function (filter) {
+                    widget_config.filters.push({
+                        name: filter.label,
+                        path: filter.path,
+                        value: filter.value
+                    });
+                });
+
+                widget_config.chartConfig.title = {
+                    text: widget.title
+                };
                 self.addWidget(widget_config).render();
             });
         };
-        mc.subscribe("data_acquired:dashboard", {subscriber:this, callback:this.onDashboardDataAcquired});
-        mc.publish("data_requested:dashboard",dashName);
+        mc.subscribe("data_acquired:dashboard", {
+            subscriber: this,
+            callback: this.onDashboardDataAcquired
+        });
+        mc.publish("data_requested:dashboard", dashName);
         /**
          * Dashboard config
          * @var {module:DashboardConfig} module:Dashboard#config
@@ -86,11 +94,6 @@ define([
                 $(holder + " > *").remove();
                 $(holder).append(html);
             });
-            if (mc && this.widgets.length) {
-                mc.publish("set_active_filter", {
-                    id: 1
-                });
-            }
             for (var i = 0; i < this.widgets.length; i++) {
                 this.widgets[i].render()
             }
@@ -180,16 +183,24 @@ define([
             return this;
         }
         mc.subscribe("filters_acquired", {
-                subscriber: this,
-                callback: function (d) {
-                    for (var i = 0; i < d.data.data.length; i++) {
-                        this.filters.push(new Filter(d.data.data[i]));
-                    }
+            subscriber: this,
+            callback: function (d) {
+                for (var i = 0; i < d.data.data.length; i++) {
+                    this.filters.push(new Filter(d.data.data[i]));
                 }
-            });
+            }
+        });
         mc.publish("filters_requested");
 
 
+    };
+    /**
+     * @name module:Dashboard#toString
+     * @function
+     * @return {String} Module name
+     */
+    Dashboard.prototype.toString = function () {
+        return "Dashboard";
     };
     return Dashboard;
 
