@@ -3,7 +3,7 @@
  * Implements ajax data fetching from Cache back-end
  * @module DBConnector
  */
-define([ 'MessageCenter'], function (mc) {
+define(['MessageCenter'], function (mc) {
     "use strict";
     /**
      * @constructor
@@ -17,6 +17,7 @@ define([ 'MessageCenter'], function (mc) {
             return DBConnector.prototype._instance;
         }
         DBConnector.prototype._instance = this;
+        var self=this;
         /**
          * Default settings for DBConnector
          * @var {Object}
@@ -45,8 +46,9 @@ define([ 'MessageCenter'], function (mc) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
-            var requester = args[0],
-                opts = $.extend({
+            var requester = args.target;
+            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            var opts = $.extend({
                     url: "http://37.139.4.54/tfoms/MDX",
                     type: "POST",
                     data: {},
@@ -64,7 +66,7 @@ define([ 'MessageCenter'], function (mc) {
                                 };
                                 return d;
                             }
-                            d = parse(d) || d;    
+                            d = parse(d) || d;
                             if (typeof d == "object" && d.length != 0) {
                                 for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                     transformedData.push({
@@ -75,12 +77,12 @@ define([ 'MessageCenter'], function (mc) {
                             }
                             chartData = transformedData || [];
                         }
-                        mc.publish(requester + "_data_acquired", {
+                        mc.publish("data_acquired:"+requester, {
                             data: chartData
                         });
                         return 1;
                     }
-                }, args[1]);
+                }, args.data);
             $.ajax(opts);
 
         }
@@ -122,8 +124,8 @@ define([ 'MessageCenter'], function (mc) {
          * @listens module:MessageCenter#filter_list_requested
          */
         this.acquireFilterValues = function (args) {
-            var path = args[0],
-                name = args[1];
+            var path = args.target,
+                name = args.data;
             var filter_list_opts = {
                 username: defaults.username,
                 password: defaults.password,
@@ -133,7 +135,7 @@ define([ 'MessageCenter'], function (mc) {
                     if (d) {
                         var d = JSON.parse(d) || d,
                             filters = d.children.slice(0);
-                        mc.publish("filter_values_acquired" + path, {
+                        mc.publish("filter_values_acquired:" + path, {
                             data: filters,
                             path: path,
                             name: name
@@ -144,21 +146,38 @@ define([ 'MessageCenter'], function (mc) {
             }
             $.ajax(filter_list_opts);
         };
+
+        this.acquireDashboardData = function (args) {
+            var dashName = args.data;
+            var dash_opts = {
+                username: defaults.username,
+                password: defaults.password,
+                type: "GET",
+                url: "http://37.139.4.54/tfoms/widgets/?w=" + dashName,
+                success: function (d) {
+                    if (d) {
+                        var d = JSON.parse(d) || d;
+                        mc.publish("data_acquired:dashboard", d);
+                        
+                    }
+
+                }
+            };
+            $.ajax(dash_opts);
+        };
         /* Subscriptions */
-        if (mc) {
-            mc.subscribe("data_requested", {
+        mc.subscribe("data_requested", {
                 subscriber: this,
                 callback: this.acquireData
             });
-            mc.subscribe("filters_requested", {
+        mc.subscribe("filters_requested", {
                 subscriber: this,
                 callback: this.acquireFilters
             });
-            mc.subscribe("filter_values_requested", {
+        mc.subscribe("filter_values_requested", {
                 subscriber: this,
                 callback: this.acquireFilterValues
             });
-        };
     };
     return new DBConnector();
 });

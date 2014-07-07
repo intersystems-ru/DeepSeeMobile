@@ -62,34 +62,37 @@ define([
                 $(holder).append(list);
                 var infoItem = $(html).find(".filter-list-info-item").clone();
                 $(holder).find(".filter-list-info").append(infoItem);
-                var filtersNum = a.filters.length;
+                var filtersNum = App.a.filters.length;
                 for (var i = 0; i < filtersNum; i++) {
                     var listItem = $(html).find(".filter-list-item").clone();
                     listItem.html(
-                        listItem.html().replace(/{{filterName}}/, Utils.trim(a.filters[i].name)) //todo: a.filters is BAAAD
+                        listItem.html().replace(/{{filterName}}/, App.a.filters[i].name) //todo: a.filters is BAAAD
                     );
-                    listItem.data("filter", a.filters[i]);
+                    listItem.data("filter", App.a.filters[i]);
 
-                    if (a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name) != "") {
-                        var fv = a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name).valueName || a.widgets[a.activeWidget].filters.getFilter(a.filters[i].name).value;
+                    if (App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path) != "") {
+                        var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).value;
                         listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
                         listItem.find(".toggle").addClass("active");
 
                     } else {
                         listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
                     }
-                    listItem.on('tap', function (e) {
+                    listItem.find("a").off("tap").on('tap', function (e) {
+                        e.preventDefault();
                         if (e.originalEvent.target != this) return;
-                        self.selectedFilter = $(this).data("filter");
+                        if (!$(this).find(".toggle").hasClass("active")) return;
+                        self.selectedFilter = $(this).parent().data("filter");
                         self.getFilterInfo();
+                        return false;
                     });
-                    listItem.find(".toggle").on("toggle", function (e) {
+                    listItem.find(".toggle").off("toggle").on("toggle", function (e) {
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
                             self.getFilterInfo();
-                            a.widgets[a.activeWidget].filters.setFilter(self.selectedFilter, true);
+                            App.a.widgets[App.a.activeWidget].filters.setFilter(self.selectedFilter, true);
                         } else {
-                            a.widgets[a.activeWidget].filters.remove($(this).parent().parent().data("filter").name);
+                            App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").name);
                         }
                     });
 
@@ -110,12 +113,12 @@ define([
          * @fires module:MessageCenter#filter_values_requested
          */
         this.getFilterInfo = function (d) {
-            mc.subscribe("filter_values_acquired" + self.selectedFilter.path, {
+            mc.subscribe("filter_values_acquired:" + self.selectedFilter.path, {
                 subscriber: self,
                 callback: self.renderInfo,
                 once: true
             });
-            mc.publish("filter_values_requested", [self.selectedFilter.path, self.selectedFilter.name]);
+            mc.publish("filter_values_requested:"+self.selectedFilter.path, [self.selectedFilter.name]);
 
 
 
@@ -125,7 +128,7 @@ define([
          * @function module:FiltersView#renderInfo
          */
         this.renderInfo = function (d) {
-
+            var self=this;
             require(['text!../FiltersViewInfo.html'], function (html) {
 
                 var holder = "#filters .content";
@@ -143,11 +146,13 @@ define([
                         .replace(/{{filterValueValue}}/, d.data[i].value)
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
+                    var wf = App.a.widgets[App.a.activeWidget].filters.getFilter(self.selectedFilter.path);
+                    if(wf.value == d.data[i].value) {li.addClass("active"); console.log("A+DS",li);}
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
                     li.one('tap', function () {
-                        console.log($(this).data("name"));
-                        a.widgets[a.activeWidget].filters.setFilter({
+                        App.a.widgets[App.a.activeWidget].filters.setFilter({
                             name: $(this).data("name"),
+                            path: self.selectedFilter.path,
                             value: $(this).data("value"),
                             valueName: $(this).data("valueName")
                         });
@@ -172,10 +177,10 @@ define([
             subscriber: this,
             callback: this.render
         });
-        mc.subscribe("filters_acquired", {
+        /*mc.subscribe("filters_acquired", {
             subscriber: this,
             callback: this.render
-        }); //TODO: - what comes first - this one or in DashBoard?
+        }); //TODO: - what comes first - this one or in DashBoard?*/
         $("#filters").on('modalOpened', this.render);
     };
     return new FiltersView();

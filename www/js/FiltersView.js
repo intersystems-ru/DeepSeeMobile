@@ -92,7 +92,7 @@ define([
                             self.getFilterInfo();
                             App.a.widgets[App.a.activeWidget].filters.setFilter(self.selectedFilter, true);
                         } else {
-                            App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").name);
+                            App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").path);
                         }
                     });
 
