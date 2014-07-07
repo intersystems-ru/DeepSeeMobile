@@ -70,8 +70,8 @@ define([
                     );
                     listItem.data("filter", App.a.filters[i]);
 
-                    if (App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].name) != "") {
-                        var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].name).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].name).value;
+                    if (App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path) != "") {
+                        var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).value;
                         listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
                         listItem.find(".toggle").addClass("active");
 
@@ -128,7 +128,7 @@ define([
          * @function module:FiltersView#renderInfo
          */
         this.renderInfo = function (d) {
-
+            var self=this;
             require(['text!../FiltersViewInfo.html'], function (html) {
 
                 var holder = "#filters .content";
@@ -146,10 +146,13 @@ define([
                         .replace(/{{filterValueValue}}/, d.data[i].value)
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
+                    var wf = App.a.widgets[App.a.activeWidget].filters.getFilter(self.selectedFilter.path);
+                    if(wf.value == d.data[i].value) {li.addClass("active"); console.log("A+DS",li);}
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
                     li.one('tap', function () {
                         App.a.widgets[App.a.activeWidget].filters.setFilter({
                             name: $(this).data("name"),
+                            path: self.selectedFilter.path,
                             value: $(this).data("value"),
                             valueName: $(this).data("valueName")
                         });

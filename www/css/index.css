@@ -90,3 +90,16 @@ width:100%;
         }
 
 }
+.filter-value {
+    text-overflow: ellipsis;
+    font-size:70%;
+    white-space: nowrap; 
+    overflow: hidden; 
+}
+
+.filter-item {
+    padding-right:110px !important;
+}
+.filter-list-item.active {
+background: #f5f5f5;
+}
