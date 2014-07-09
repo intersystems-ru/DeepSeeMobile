@@ -15,13 +15,23 @@ require([
     'LoadingSpinner',
     'DBConnector',
     'Dashboard',
-    'FiltersView',
-    'Utils'
-], function (MessageCenter,LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils) {
+    'ctrls/Filters',
+    'Utils',
+    'lib/iscroll',
+    'ViewManager'
+], function (MessageCenter,LoadingSpinner, DBConnector, Dashboard, FiltersView,Utils, IScroll, ViewManager) {
     window.App = {};
     App.m = MessageCenter;
+    App.v = ViewManager;
+    
+    MessageCenter.publish("viewchange:DashboardList",{holder:"body > .content"});
+    $("a.nav-home").off('tap').on('tap', function(e){
+        e.preventDefault();
+        MessageCenter.publish('viewchange:DashboardList', {holder:"body> .content"});
+        return false;
+    });
     //App.m.subscribe("data_acquired", {subscriber:this, callback:function(d){console.log("DATA ACQUIRED:",d)}})
-    App.a = new Dashboard("TEST/Mobiles.dashboard").render();
+    //App.a = new Dashboard("TEST/Mobiles.dashboard").render();
 
 
 });

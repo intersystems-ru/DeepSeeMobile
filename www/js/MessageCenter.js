@@ -169,6 +169,9 @@ define([], function () {
         */
         this.getSubs = function () {
             return subscriptions;
+        };
+        this.remove = function(name){
+        delete subscriptions[name];
         }
     };
     return new MessageCenter();

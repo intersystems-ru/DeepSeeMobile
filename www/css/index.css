@@ -66,7 +66,8 @@ header.bar.bar-nav {
     padding-top: 0;
 }
 .bar-nav ~ .content {
-    padding-top: 61px;
+    margin-top: 61px;
+    padding-top:0px;
 }
 /*end fix*/
 
@@ -114,4 +115,39 @@ nav.bar.bar-tab a.tab-item {
     white-space: normal;
     text-align: center;
     margin-top: 100px;
+}
+
+.dashboard-item {
+    padding-right:15px;
+    text-overflow: ellipsis;   
+}
+
+.dashboard-item.active i{
+    color: #428bca;
+}
+.dashboard-item h3{
+    font-size:1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 0;   
+}
+.dashboard-item small{
+    font-size:0.7em;
+}
+.content > .table-view:first-child {
+margin-top: -1px;
+margin-bottom: -1px;
+}
+.bar-tab{
+padding: 2px;
+}
+
+#reload {
+    position:fixed;
+    top:20px;
+    left:10px;
+    width:20px;
+    height:20px;
+    z-index:10000;
 }

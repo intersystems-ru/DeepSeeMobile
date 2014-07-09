@@ -174,6 +174,13 @@ define([], function () {
 
             },
 
+        },
+        "null":{
+            type:"none",
+            callback:function(d){ console.log (d);},
+            title:"Not implemented",
+            chartConfig:{},
+            filters:[]
         }
     };
 });

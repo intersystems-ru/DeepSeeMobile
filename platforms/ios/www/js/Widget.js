@@ -75,7 +75,7 @@ define([
             if(this.callback){ this.callback(d); return;}
             console.log("GOT DATA:", this);
             this.chartConfig.series = d.data;
-            this.renderWidget();
+            if (this.renderWidget) this.renderWidget();
         };
         /**
          * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
@@ -153,12 +153,12 @@ define([
         //if (!this.active) return this;
         var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
         var self = this;
-        require(["text!../Widget.html"], function (html) {
+        require(["text!../views/Widget.html"], function (html) {
             html = html.replace("{{title}}", self.name)
                 .replace("{{id}}", self.id);
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
-                self.renderWidget();
+                if (self.renderWidget) self.renderWidget();
                 console.log("[Render]Finished: " + self.name);
             }
         });

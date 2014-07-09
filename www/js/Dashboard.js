@@ -52,8 +52,9 @@ define([
         this.filters = [];
         this.onDashboardDataAcquired = function (d) {
             var widgets = d.children;
-            _.each(widgets, function (widget) {
+            _.each(widgets, function (widget,i) {
                 var widget_config = WidgetMap[widget.type];
+                if(!widget_config) {widget_config = WidgetMap["null"]}
                 widget_config.datasource = {
                     data: {
                         MDX: widget.mdx
@@ -90,7 +91,7 @@ define([
          */
         this.render = function () {
             var holder = (this.config && this.config.holder) ? this.config.holder : "body";
-            require(['text!../Dashboard.html'], function (html) {
+            require(['text!../views/Dashboard.html'], function (html) {
                 $(holder + " > *").remove();
                 $(holder).append(html);
             });

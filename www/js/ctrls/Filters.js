@@ -52,7 +52,7 @@ define([
          * @function module:FiltersView#render
          */
         this.render = function () {
-            require(['text!../FiltersView.html'], function (html) {
+            require(['text!../views/Filters.html'], function (html) {
 
                 var holder = "#filters .content";
                 $(holder).empty();
@@ -129,7 +129,7 @@ define([
          */
         this.renderInfo = function (d) {
             var self=this;
-            require(['text!../FiltersViewInfo.html'], function (html) {
+            require(['text!../views/FiltersInfo.html'], function (html) {
 
                 var holder = "#filters .content";
                 $(holder).empty();
@@ -147,7 +147,7 @@ define([
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
                     var wf = App.a.widgets[App.a.activeWidget].filters.getFilter(self.selectedFilter.path);
-                    if(wf.value == d.data[i].value) {li.addClass("active"); console.log("A+DS",li);}
+                    if(wf.value == d.data[i].value) {li.addClass("active");}
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
                     li.one('tap', function () {
                         App.a.widgets[App.a.activeWidget].filters.setFilter({

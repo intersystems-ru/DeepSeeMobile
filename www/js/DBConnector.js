@@ -17,7 +17,7 @@ define(['MessageCenter'], function (mc) {
             return DBConnector.prototype._instance;
         }
         DBConnector.prototype._instance = this;
-        var self=this;
+        var self = this;
         /**
          * Default settings for DBConnector
          * @var {Object}
@@ -48,43 +48,44 @@ define(['MessageCenter'], function (mc) {
         this.acquireData = function (args) {
             var requester = args.target;
             //Calling wrong function
-            if( requester==="dashboard") return;
-//            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            if (requester === "dashboard") return;
+            if (requester === "dashboard_list") return;
+            //            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
             var opts = $.extend({
-                    url: "http://37.139.4.54/tfoms/MDX",
-                    type: "POST",
-                    data: {},
-                    username: "_SYSTEM",
-                    password: "159eAe72a79539f32acb15b305030060",
-                    success: function (d) {
-                        var chartData,
-                            transformedData = [];
-                        if (d) {
-                            var parse = function (d) {
-                                try {
-                                    d = JSON.parse(d)
-                                } catch (e) {
-                                    d = undefined
-                                };
-                                return d;
-                            }
-                            d = parse(d) || d;
-                            if (typeof d == "object" && d.length != 0) {
-                                for (var i = 0; i < d.axes[1].tuples.length; i++) {
-                                    transformedData.push({
-                                        name: d.axes[1].tuples[i].caption,
-                                        data: d.cells[i]
-                                    });
-                                }
-                            }
-                            chartData = transformedData || [];
+                url: "http://37.139.4.54/tfoms/MDX",
+                type: "POST",
+                data: {},
+                username: "_SYSTEM",
+                password: "159eAe72a79539f32acb15b305030060",
+                success: function (d) {
+                    var chartData,
+                        transformedData = [];
+                    if (d) {
+                        var parse = function (d) {
+                            try {
+                                d = JSON.parse(d)
+                            } catch (e) {
+                                d = undefined
+                            };
+                            return d;
                         }
-                        mc.publish("data_acquired:"+requester, {
-                            data: chartData
-                        });
-                        return 1;
+                        d = parse(d) || d;
+                        if (typeof d == "object" && d.length != 0) {
+                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
+                                transformedData.push({
+                                    name: d.axes[1].tuples[i].caption,
+                                    data: d.cells[i]
+                                });
+                            }
+                        }
+                        chartData = transformedData || [];
                     }
-                }, args.data);
+                    mc.publish("data_acquired:" + requester, {
+                        data: chartData
+                    });
+                    return 1;
+                }
+            }, args.data);
             $.ajax(opts);
 
         }
@@ -128,12 +129,12 @@ define(['MessageCenter'], function (mc) {
         this.acquireFilterValues = function (args) {
             var path = args.target,
                 name = args.data;
-            if(sessionStorage.getItem("filterValues:"+path)) {
-            mc.publish("filter_values_acquired:" + path, {
-                            data: JSON.parse(sessionStorage.getItem("filterValues:"+path)),
-                            path: path,
-                            name: name
-                        });
+            if (sessionStorage.getItem("filterValues:" + path)) {
+                mc.publish("filter_values_acquired:" + path, {
+                    data: JSON.parse(sessionStorage.getItem("filterValues:" + path)),
+                    path: path,
+                    name: name
+                });
                 return;
             }
             var filter_list_opts = {
@@ -145,7 +146,7 @@ define(['MessageCenter'], function (mc) {
                     if (d) {
                         var d = JSON.parse(d) || d,
                             filterValues = d.children.slice(0);
-                        sessionStorage.setItem("filterValues:"+path, JSON.stringify(filterValues))
+                        sessionStorage.setItem("filterValues:" + path, JSON.stringify(filterValues))
                         mc.publish("filter_values_acquired:" + path, {
                             data: filterValues,
                             path: path,
@@ -169,7 +170,24 @@ define(['MessageCenter'], function (mc) {
                     if (d) {
                         var d = JSON.parse(d) || d;
                         mc.publish("data_acquired:dashboard", d);
-                        
+
+                    }
+
+                }
+            };
+            $.ajax(dash_opts);
+        };
+        this.acquireDashboardList = function (args) {
+            var dash_opts = {
+                username: defaults.username,
+                password: defaults.password,
+                type: "GET",
+                url: "http://37.139.4.54/tfoms/dashboards/",
+                success: function (d) {
+                    if (d) {
+                        var d = JSON.parse(d) || d;
+                        mc.publish("data_acquired:dashboard_list", d);
+
                     }
 
                 }
@@ -178,19 +196,22 @@ define(['MessageCenter'], function (mc) {
         };
         /* Subscriptions */
         mc.subscribe("data_requested", {
-                subscriber: this,
-                callback: this.acquireData
-            });
+            subscriber: this,
+            callback: this.acquireData
+        });
         mc.subscribe("filters_requested", {
-                subscriber: this,
-                callback: this.acquireFilters
-            });
+            subscriber: this,
+            callback: this.acquireFilters
+        });
         mc.subscribe("filter_values_requested", {
-                subscriber: this,
-                callback: this.acquireFilterValues
-            });
-//        mc.subscribe("data_requested:dashboard_list", {subscriber:this, callback:this.acquireDashboardList});
-        mc.subscribe("data_requested:dashboard", {subscriber:this, callback:this.acquireDashboardData});
+            subscriber: this,
+            callback: this.acquireFilterValues
+        });
+        mc.subscribe("data_requested:dashboard_list", {subscriber:this, callback:this.acquireDashboardList});
+        mc.subscribe("data_requested:dashboard", {
+            subscriber: this,
+            callback: this.acquireDashboardData
+        });
     };
     return new DBConnector();
 });
