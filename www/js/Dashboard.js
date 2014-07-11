@@ -29,7 +29,6 @@ define([
      */
     function Dashboard(dashName) {
         /**@lends module:Dashboard#*/
-        var self = this;
         /**
          * Array of Widget objects
          * @var {Array<module:Widget>}
@@ -43,16 +42,21 @@ define([
          * @public
          */
         this.activeWidget = undefined;
+        
+        this.subs = [];
         /**
          * Array of Filter objects
          * @var {Array<module:Filter>}
          * @name module:Dashboard#filters
          * @todo Make this one private
          */
-        this.filters = [];
+       // this.filters = [];
         this.onDashboardDataAcquired = function (d) {
             var widgets = d.children;
-            _.each(widgets, function (widget,i) {
+            var self= this;
+            for(var i=0; i< widgets.length;i++){
+                
+                var widget = widgets[i];
                 var widget_config = WidgetMap[widget.type];
                 if(!widget_config) {widget_config = WidgetMap["null"]}
                 widget_config.datasource = {
@@ -68,17 +72,21 @@ define([
                         value: filter.value
                     });
                 });
+                
 
                 widget_config.chartConfig.title = {
                     text: widget.title
                 };
                 self.addWidget(widget_config).render();
-            });
+                widget = null;
+                widget_config = null;
+            };
+            self=null;
         };
-        mc.subscribe("data_acquired:dashboard", {
+        this.subs.push(mc.subscribe("data_acquired:dashboard", {
             subscriber: this,
             callback: this.onDashboardDataAcquired
-        });
+        }));
         mc.publish("data_requested:dashboard", dashName);
         /**
          * Dashboard config
@@ -181,18 +189,29 @@ define([
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
             }
+            widget=null;
             return this;
         }
-        mc.subscribe("filters_acquired", {
-            subscriber: this,
-            callback: function (d) {
-                for (var i = 0; i < d.data.data.length; i++) {
-                    this.filters.push(new Filter(d.data.data[i]));
-                }
-            }
-        });
-        mc.publish("filters_requested");
-
+        this.removeRefs = function(){
+            var self=this;
+            for(var i=0;i<this.subs.length;i++)
+            {
+                console.log(this.subs[i]);
+                mc.remove(this.subs[i]);
+                self.subs[i] = null;
+            };
+            this.subs = [];
+            self= null;
+            for(var k in this){
+                delete this[k];
+            };
+            
+        };
+        
+        mc.subscribe("clear:dashboard",{subscriber:this, callback:this.removeRefs, once:true});
+       
+        //mc.publish("filters_requested");
+        
 
     };
     /**

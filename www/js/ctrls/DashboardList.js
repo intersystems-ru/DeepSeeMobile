@@ -11,7 +11,7 @@ define(['lib/iscroll','MessageCenter','Dashboard'], function(IScroll,MessageCent
                 e.preventDefault();
                 final.find("> *").removeClass("active"); 
                 $(this).addClass("active");
-                delete App.a;
+//                delete App.a;
                 App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                 return false;
             });

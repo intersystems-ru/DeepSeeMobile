@@ -14,10 +14,9 @@
  * @todo Delete high dependency with window.a = dashboard
  */
 define([
-    'Utils',
     'lib/iscroll',
     "MessageCenter"
-], function (Utils, IScroll, mc) {
+], function (IScroll, mc) {
     'use strict';
     /**
      * Creates or returns existing FiltersView object
@@ -62,16 +61,16 @@ define([
                 $(holder).append(list);
                 var infoItem = $(html).find(".filter-list-info-item").clone();
                 $(holder).find(".filter-list-info").append(infoItem);
-                var filtersNum = App.a.filters.length;
+                var filtersNum = App.filters.length;
                 for (var i = 0; i < filtersNum; i++) {
                     var listItem = $(html).find(".filter-list-item").clone();
                     listItem.html(
-                        listItem.html().replace(/{{filterName}}/, App.a.filters[i].name) //todo: a.filters is BAAAD
+                        listItem.html().replace(/{{filterName}}/, App.filters[i].name) //todo: a.filters is BAAAD
                     );
-                    listItem.data("filter", App.a.filters[i]);
+                    listItem.data("filter", App.filters[i]);
 
-                    if (App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path) != "") {
-                        var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.a.filters[i].path).value;
+                    if (App.a && (App.a.widgets[App.a.activeWidget].filters.getFilter(App.filters[i].path) != "")) {
+                        var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.filters[i].path).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.filters[i].path).value;
                         listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
                         listItem.find(".toggle").addClass("active");
 
@@ -118,7 +117,7 @@ define([
                 callback: self.renderInfo,
                 once: true
             });
-            mc.publish("filter_values_requested:"+self.selectedFilter.path, [self.selectedFilter.name]);
+            mc.publish("filter_values_requested:" + self.selectedFilter.path, [self.selectedFilter.name]);
 
 
 
@@ -128,7 +127,7 @@ define([
          * @function module:FiltersView#renderInfo
          */
         this.renderInfo = function (d) {
-            var self=this;
+            var self = this;
             require(['text!../views/FiltersInfo.html'], function (html) {
 
                 var holder = "#filters .content";
@@ -147,7 +146,9 @@ define([
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
                     var wf = App.a.widgets[App.a.activeWidget].filters.getFilter(self.selectedFilter.path);
-                    if(wf.value == d.data[i].value) {li.addClass("active");}
+                    if (wf.value == d.data[i].value) {
+                        li.addClass("active");
+                    }
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
                     li.one('tap', function () {
                         App.a.widgets[App.a.activeWidget].filters.setFilter({
@@ -172,7 +173,6 @@ define([
 
 
         };
-
         mc.subscribe("set_active_widget", {
             subscriber: this,
             callback: this.render

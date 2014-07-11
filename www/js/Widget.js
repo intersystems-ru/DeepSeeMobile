@@ -33,7 +33,6 @@ define([
         config = config || {};
         /** @lends module:Widget#*/
         'use strict';
-        var self = this;
         this.active = false;
         /** 
          * If defined, would be used for data convertion
@@ -63,7 +62,7 @@ define([
          *@deprecated
          */
         this.chart = '';
-
+        this.subs = [];
         /**
          * Callback, fired when data acquired
          * @function module:Widget#onDataAcquired
@@ -89,9 +88,8 @@ define([
         Object.defineProperty(this, 'datasource', {
             get: function () {
                 var retVal = _datasource.data.MDX;
-                if (self.filters.hasFilters()) {
-                    var _filters = self.filters.getAll();
-                    //                    console.log("%cFILTERS:", "color:blue", _filters);
+                if (this.filters.hasFilters()) {
+                    var _filters = this.filters.getAll();
                     for (var i in _filters) {
                         if (_filters[i].value != '')
                             retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
@@ -105,7 +103,7 @@ define([
             },
             set: function (value) {
                 _datasource = value;
-                self.requestData();
+                this.requestData();
             }
 
 
@@ -118,7 +116,20 @@ define([
         //Render for differend Widgets
         if (_.has(config, 'type') && _.has(typesMap, config.type)) {
             _.extend(this, new typesMap[config.type](this))
-        }
+        };
+        this.removeRefs = function(){
+            var self=this;
+            _.each(this.subs, function(sub,i){
+                mc.remove(sub);
+                sub = null;
+                self.subs.splice(i,1);
+            });
+            this.subs = [];
+            self= null;
+            for(var k in this){
+                delete this[k];
+            }
+        };
         //When created widget, must subscribe to widget[i] data acquired
         this.init(config);
         return this;
@@ -130,15 +141,14 @@ define([
     Widget.prototype.init = function (config) {
         
         
-        mc.subscribe("data_acquired:widget" + this.id , {
+        this.subs.push(mc.subscribe("data_acquired:widget" + this.id , {
             subscriber: this,
             callback: this.onDataAcquired
-        });
-
+        }));
+        mc.subscribe("clear:widgets",{subscriber:this, callback:this.removeRefs, once:true});
         /**
          * @var {module:FiltersList} module:Widget#filters Selected filters list
          */
-        console.log(config);
         this.filters = new FiltersList({
             filters: config.filters || [],
             onSetFilter: this.requestData,
@@ -161,10 +171,13 @@ define([
                 .replace("{{id}}", self.id);
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
-                if (self.renderWidget) self.renderWidget();
+                
                 console.log("[Render]Finished: " + self.name);
             }
+            if (self.renderWidget) self.renderWidget();
+            self=null;
         });
+        
         return this;
 
     };

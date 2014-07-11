@@ -25,7 +25,7 @@ define(['MessageCenter'], function (mc) {
                 });
             }
         };
-        
+
         mc.subscribe('data_requested', {
             subscriber: this,
             callback: this.show
@@ -44,5 +44,8 @@ define(['MessageCenter'], function (mc) {
         });
 
     };
+    LoadingSpinner.prototype.toString = function () {
+        return "LoadingSpinner";
+    }
     return new LoadingSpinner();
 });
