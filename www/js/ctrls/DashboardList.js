@@ -23,7 +23,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                 var pullDownEl = document.getElementById('pullDown'),
                     pullDownOffset = pullDownEl.offsetHeight;
                 var myScroll = new IScroll('body > .content', {
-                    probeType: 2
+                    probeType: 1
                 });
                 myScroll.on('scroll', function () {
                     if (this.y > 5 && !pullDownEl.className.match('flip')) {

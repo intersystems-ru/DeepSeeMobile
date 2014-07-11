@@ -10,11 +10,17 @@
 	height:40px;
 	line-height:40px;
 	padding:5px 10px;
+    margin-top:-40px;
 	border-bottom:1px solid #ccc;
 	font-weight:bold;
 	font-size:14px;
 	color:#888;
+    -webkit-transition:margin-top 0.1s;
 }
+    #pullDown.flip{
+    margin-top:0px !important;
+    
+    }
 #pullDown .pullDownIcon{
 	display:block; float:left;
 	width:40px; height:40px;
@@ -31,12 +37,14 @@
 	-webkit-transform:rotate(-180deg) translateZ(0);
 }
 
-
+#pullDown.loading{
+    margin-top:-40px;
+}
 #pullDown.loading .pullDownIcon{
 	background-position:0 100%;
 	-webkit-transform:rotate(0deg) translateZ(0);
 	-webkit-transition-duration:0ms;
-
+    
 	-webkit-animation-name:loading;
 	-webkit-animation-duration:2s;
 	-webkit-animation-iteration-count:infinite;
@@ -118,7 +126,7 @@
         
     </div>
 </div>
-    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>
+<!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
     <i class="fa fa-refresh" ontouchend="javascript:location.reload()" id="reload"></i>
 </body>
