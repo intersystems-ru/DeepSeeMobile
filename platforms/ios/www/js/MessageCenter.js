@@ -80,26 +80,6 @@ define([], function () {
          * MessageCenter.subscribe("someEvent", { subscriber:this, callback:function(){} });
          */
         this.subscribe = function (message, subscriber) {
-            var insertSubscription = function () {
-                if (!(_.has(subscriptions, _event))) {
-                    subscriptions[_event] = {
-                        children: {},
-                        subscribers: []
-                    };
-                };
-                if (!(_.has(subscriptions[_event].children, _target))) {
-                    subscriptions[_event].children[_target] = {
-                        subscribers: []
-                    };
-                };
-                //Got all data from closure
-                if (!_target) {
-                    //Only namespace == TOP LEVEL
-                    subscriptions[_event].subscribers.push(subscriber);
-                } else {
-                    subscriptions[_event].children[_target].subscribers.push(subscriber);
-                }
-            };
             var re = /([^:]+):?([\s\S]*)/;
             var result = message.match(re);
             if (!result && !(result[1])) {
@@ -109,7 +89,25 @@ define([], function () {
             var _event = result[1],
                 _target = result[2];
             console.log('%c[Message Center]' + subscriber.subscriber + ' subscribed to:' + message, 'background: #222; color: #55b6da')
-            insertSubscription();
+            if (!(_.has(subscriptions, _event))) {
+                subscriptions[_event] = {
+                    children: {},
+                    subscribers: []
+                };
+            };
+            if (!(_.has(subscriptions[_event].children, _target))) {
+                subscriptions[_event].children[_target] = {
+                    subscribers: []
+                };
+            };
+            //Got all data from closure
+            if (!_target) {
+                //Only namespace == TOP LEVEL
+                subscriptions[_event].subscribers.push(subscriber);
+            } else {
+                subscriptions[_event].children[_target].subscribers.push(subscriber);
+            }
+            return subscriber;
 
         };
         /**
@@ -162,17 +160,27 @@ define([], function () {
             }
         };
         /**
-         * Development-time function.<br> 
+         * Development-time function.<br>
          * @memberof module:MessageCenter
          * @function getSubs
          * @return {Array<subscriptions>}
-        */
+         */
         this.getSubs = function () {
             return subscriptions;
         };
-        this.remove = function(name){
-        delete subscriptions[name];
-        }
+        this.remove = function (subscriber) {
+            _.each(subscriptions, function (subscription, i) {
+                _.each(subscription.subscribers, function (sub1, j) {
+                    if (sub1 === subscriber) { delete subscriptions[i].subscribers[j]; subscriptions[i].subscribers.splice(j,1); }
+                });
+                _.each(subscription.children, function (child, k) {
+                    _.each(child.subscribers, function (sub2, j) {
+                        if (sub2 === subscriber) { delete subscriptions[i].children[k].subscribers[j]; subscriptions[i].children[k].subscribers.splice(j,1); }
+                    });
+                });
+
+            })
+        };
     };
     return new MessageCenter();
 })

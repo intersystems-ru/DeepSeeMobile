@@ -29,7 +29,6 @@ define([
      */
     function Dashboard(dashName) {
         /**@lends module:Dashboard#*/
-        var self = this;
         /**
          * Array of Widget objects
          * @var {Array<module:Widget>}
@@ -43,18 +42,23 @@ define([
          * @public
          */
         this.activeWidget = undefined;
+        
+        this.subs = [];
         /**
          * Array of Filter objects
          * @var {Array<module:Filter>}
          * @name module:Dashboard#filters
          * @todo Make this one private
          */
-        this.filters = [];
+       // this.filters = [];
         this.onDashboardDataAcquired = function (d) {
             var widgets = d.children;
-            _.each(widgets, function (widget) {
+            var self= this;
+            for(var i=0; i< widgets.length;i++){
+                
+                var widget = widgets[i];
                 var widget_config = WidgetMap[widget.type];
-                if(!widget_config) {self.addWidget({title:"Not implemented"}).render(); return;}
+                if(!widget_config) {widget_config = WidgetMap["null"]}
                 widget_config.datasource = {
                     data: {
                         MDX: widget.mdx
@@ -68,17 +72,21 @@ define([
                         value: filter.value
                     });
                 });
+                
 
                 widget_config.chartConfig.title = {
                     text: widget.title
                 };
                 self.addWidget(widget_config).render();
-            });
+                widget = null;
+                widget_config = null;
+            };
+            self=null;
         };
-        mc.subscribe("data_acquired:dashboard", {
+        this.subs.push(mc.subscribe("data_acquired:dashboard", {
             subscriber: this,
             callback: this.onDashboardDataAcquired
-        });
+        }));
         mc.publish("data_requested:dashboard", dashName);
         /**
          * Dashboard config
@@ -100,7 +108,7 @@ define([
             }
             var self = this;
             //Handling active widget change
-            $(this.config.holder).on("slide", function (e) {
+            $(this.config.holder).off("slide").on("slide", function (e) {
                 if (self.activeWidget != e.originalEvent.detail.slideNumber) {
                     self.activeWidget = e.originalEvent.detail.slideNumber;
                     if (mc) mc.publish("set_active_widget", {
@@ -181,18 +189,25 @@ define([
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
             }
+            widget=null;
             return this;
         }
-        mc.subscribe("filters_acquired", {
-            subscriber: this,
-            callback: function (d) {
-                for (var i = 0; i < d.data.data.length; i++) {
-                    this.filters.push(new Filter(d.data.data[i]));
-                }
-            }
-        });
-        mc.publish("filters_requested");
-
+        this.removeRefs = function(){
+            var self=this;
+            for(var i=0;i<this.subs.length;i++)
+            {
+                mc.remove(this.subs[i]);
+                self.subs[i] = null;
+            };
+            this.subs = [];
+            self= null;
+            
+        };
+        
+        mc.subscribe("clear:dashboard",{subscriber:this, callback:this.removeRefs, once:true});
+       
+        //mc.publish("filters_requested");
+        
 
     };
     /**
