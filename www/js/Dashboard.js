@@ -108,7 +108,7 @@ define([
             }
             var self = this;
             //Handling active widget change
-            $(this.config.holder).on("slide", function (e) {
+            $(this.config.holder).off("slide").on("slide", function (e) {
                 if (self.activeWidget != e.originalEvent.detail.slideNumber) {
                     self.activeWidget = e.originalEvent.detail.slideNumber;
                     if (mc) mc.publish("set_active_widget", {
@@ -196,7 +196,6 @@ define([
             var self=this;
             for(var i=0;i<this.subs.length;i++)
             {
-                console.log(this.subs[i]);
                 mc.remove(this.subs[i]);
                 self.subs[i] = null;
             };

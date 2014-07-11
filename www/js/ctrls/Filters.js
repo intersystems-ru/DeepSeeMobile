@@ -77,14 +77,7 @@ define([
                     } else {
                         listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
                     }
-                    listItem.find("a").off("tap").on('tap', function (e) {
-                        e.preventDefault();
-                        if (e.originalEvent.target != this) return;
-                        if (!$(this).find(".toggle").hasClass("active")) return;
-                        self.selectedFilter = $(this).parent().data("filter");
-                        self.getFilterInfo();
-                        return false;
-                    });
+                    
                     listItem.find(".toggle").off("toggle").on("toggle", function (e) {
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
@@ -97,6 +90,14 @@ define([
 
                     $(holder).find(".filter-list").append(listItem);
                 }
+                $(holder).find("a").off('tap').on('tap', function (e) {
+                        e.preventDefault();
+                        if (e.originalEvent.target != this) return;
+                        if (!$(this).find(".toggle").hasClass("active")) return;
+                        self.selectedFilter = $(this).parent().data("filter");
+                        self.getFilterInfo();
+                        return false;
+                    });
                 if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
@@ -112,13 +113,21 @@ define([
          * @fires module:MessageCenter#filter_values_requested
          */
         this.getFilterInfo = function (d) {
+            var fv = sessionStorage.getItem("filters_values_"+self.selectedFilter.path);
+            if (!fv){
+                
+                
+            
             mc.subscribe("filter_values_acquired:" + self.selectedFilter.path, {
                 subscriber: self,
                 callback: self.renderInfo,
                 once: true
             });
             mc.publish("filter_values_requested:" + self.selectedFilter.path, [self.selectedFilter.name]);
-
+            }
+            else{
+                self.renderInfo(JSON.parse(fv));
+            }
 
 
         };
@@ -128,6 +137,8 @@ define([
          */
         this.renderInfo = function (d) {
             var self = this;
+            var fv = sessionStorage.getItem("filters_values_"+self.selectedFilter.path);
+            if(!fv){sessionStorage.setItem("filters_values_"+self.selectedFilter.path, JSON.stringify(d))}
             require(['text!../views/FiltersInfo.html'], function (html) {
 
                 var holder = "#filters .content";
