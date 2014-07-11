@@ -120,6 +120,7 @@ nav.bar.bar-tab a.tab-item {
 .dashboard-item {
     padding-right:15px;
     text-overflow: ellipsis;   
+    width:100%;
 }
 
 .dashboard-item.active i{

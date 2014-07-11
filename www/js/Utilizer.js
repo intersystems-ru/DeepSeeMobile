@@ -23,6 +23,7 @@ define(['MessageCenter'], function (mc) {
         });
 
     }
+    Utilizer.prototype.toString = function(){ return "Utilizer"};
     return new Utilizer();
 
 });

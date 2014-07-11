@@ -78,7 +78,21 @@ define([
                         listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
                     }
                     
-                    listItem.find(".toggle").off("toggle").on("toggle", function (e) {
+                    
+
+                    $(holder).find(".filter-list").append(listItem);
+                    listItem = null;
+                };
+                var $holder = $(holder);
+                $holder.find("a").off('tap').on('tap', function (e) {
+                        e.preventDefault();
+                        if (e.originalEvent.target != this) return;
+                        if (!$(this).find(".toggle").hasClass("active")) return;
+                        self.selectedFilter = $(this).parent().data("filter");
+                        self.getFilterInfo();
+                        return false;
+                    });
+                $holder.find(".toggle").off("toggle").on("toggle", function (e) {
                         if (e.originalEvent.detail.isActive) {
                             self.selectedFilter = $(this).parent().parent().data("filter");
                             self.getFilterInfo();
@@ -87,22 +101,11 @@ define([
                             App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").path);
                         }
                     });
-
-                    $(holder).find(".filter-list").append(listItem);
-                }
-                $(holder).find("a").off('tap').on('tap', function (e) {
-                        e.preventDefault();
-                        if (e.originalEvent.target != this) return;
-                        if (!$(this).find(".toggle").hasClass("active")) return;
-                        self.selectedFilter = $(this).parent().data("filter");
-                        self.getFilterInfo();
-                        return false;
-                    });
                 if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
                     });
-                }
+                };
             });
 
         };
