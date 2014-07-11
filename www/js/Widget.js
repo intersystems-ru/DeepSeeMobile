@@ -70,8 +70,14 @@ define([
          * @todo Route which field data would be kept
          */
         this.onDataAcquired = function (d) {
-            if (!d || d.data.length == 0){$("#widget"+this.id).html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>"); return;}
-            if(this.callback){ this.callback(d); return;}
+            if (!d || d.data.length == 0) {
+                $("#widget" + this.id).html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>");
+                return;
+            }
+            if (this.callback) {
+                this.callback(d);
+                return;
+            }
             console.log("GOT DATA:", this);
             this.chartConfig.series = d.data;
             if (this.renderWidget) this.renderWidget();
@@ -117,18 +123,15 @@ define([
         if (_.has(config, 'type') && _.has(typesMap, config.type)) {
             _.extend(this, new typesMap[config.type](this))
         };
-        this.removeRefs = function(){
-            var self=this;
-            _.each(this.subs, function(sub,i){
+        this.removeRefs = function () {
+            var self = this;
+            _.each(this.subs, function (sub, i) {
                 mc.remove(sub);
                 sub = null;
-                self.subs.splice(i,1);
+                self.subs.splice(i, 1);
             });
             this.subs = [];
-            self= null;
-            for(var k in this){
-                delete this[k];
-            }
+            self = null;
         };
         //When created widget, must subscribe to widget[i] data acquired
         this.init(config);
@@ -139,13 +142,17 @@ define([
         return "Widget" + this.id;
     };
     Widget.prototype.init = function (config) {
-        
-        
-        this.subs.push(mc.subscribe("data_acquired:widget" + this.id , {
+
+
+        this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
             subscriber: this,
             callback: this.onDataAcquired
         }));
-        mc.subscribe("clear:widgets",{subscriber:this, callback:this.removeRefs, once:true});
+        mc.subscribe("clear:widgets", {
+            subscriber: this,
+            callback: this.removeRefs,
+            once: true
+        });
         /**
          * @var {module:FiltersList} module:Widget#filters Selected filters list
          */
@@ -171,13 +178,13 @@ define([
                 .replace("{{id}}", self.id);
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
-                
+
                 console.log("[Render]Finished: " + self.name);
             }
             if (self.renderWidget) self.renderWidget();
-            self=null;
+            self = null;
         });
-        
+
         return this;
 
     };
@@ -189,7 +196,7 @@ define([
     Widget.prototype.requestData = function () {
         mc.publish("data_requested:widget" + this.id, {
             data: this.datasource.data
-            });
+        });
     };
     return Widget;
 })

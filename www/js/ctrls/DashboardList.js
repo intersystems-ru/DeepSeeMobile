@@ -10,8 +10,7 @@ define(['lib/iscroll','MessageCenter','Dashboard'], function(IScroll,MessageCent
             final.find("li").off("tap").on('tap', function(e){
                 e.preventDefault();
                 final.find("> *").removeClass("active"); 
-                $(this).addClass("active");
-//                delete App.a;
+                $(this).addClass("active"); 
                 App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                 return false;
             });

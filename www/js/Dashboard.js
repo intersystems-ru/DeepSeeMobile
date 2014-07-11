@@ -202,9 +202,6 @@ define([
             };
             this.subs = [];
             self= null;
-            for(var k in this){
-                delete this[k];
-            };
             
         };
         
