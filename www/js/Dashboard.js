@@ -58,6 +58,7 @@ define([
                 
                 var widget = widgets[i];
                 var widget_config = WidgetMap[widget.type];
+                console.log(i, widget_config);
                 if(!widget_config) {widget_config = WidgetMap["null"]}
                 widget_config.datasource = {
                     data: {
@@ -74,9 +75,7 @@ define([
                 });
                 
 
-                widget_config.chartConfig.title = {
-                    text: widget.title
-                };
+                widget_config.config.title = {text : widget.title};
                 self.addWidget(widget_config).render();
                 widget = null;
                 widget_config = null;

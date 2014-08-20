@@ -48,9 +48,11 @@ define(['MessageCenter'], function (mc) {
         this.acquireData = function (args) {
             var requester = args.target;
             //Calling wrong function
+            //TODO: fix this
             if (requester === "dashboard") return;
             if (requester === "dashboard_list") return;
-            //            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            if (requester === "drilldown") return;
+            if (requester === "drilldown1") requester = "drilldown";
             var opts = $.extend({
                 url: "http://37.139.4.54/tfoms/MDX",
                 type: "POST",
@@ -65,20 +67,25 @@ define(['MessageCenter'], function (mc) {
                             try {
                                 d = JSON.parse(d)
                             } catch (e) {
-                                d = undefined
+                                console.log("Error in parsing data:",d);
+                                d = undefined;
+                                
                             };
                             return d;
                         }
                         d = parse(d) || d;
-                        if (typeof d == "object" && d.length != 0) {
-                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
-                                transformedData.push({
-                                    name: d.axes[1].tuples[i].caption,
-                                    data: d.cells[i]
-                                });
-                            }
-                        }
-                        chartData = transformedData || [];
+//                        if (typeof d == "object" && d.length != 0) {
+//                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
+//                                transformedData.push({
+//                                    name: d.axes[1].tuples[i].caption,
+//                                    path: d.axes[1].tuples[i].path,
+//                                    cube:d.cubeName,
+//                                    data: d.cells[i]
+//                                });
+//                            }
+//                        }
+//                        chartData = transformedData || [];
+                        chartData = d;
                     }
                     mc.publish("data_acquired:" + requester, {
                         data: chartData
@@ -158,6 +165,16 @@ define(['MessageCenter'], function (mc) {
             }
             $.ajax(filter_list_opts);
         };
+        this.acquireDrilldown = function (args){
+            
+            var cubeName = args.cubeName,
+                path = args.path;
+            var MDX = "SELECT NON EMPTY "+path + ".children ON 1 FROM ["+cubeName+"]";
+            args.target = "drilldown1";
+            args.data = {data:{MDX:MDX}};
+            console.log(args);
+            this.acquireData(args);
+        };
 
         this.acquireDashboardData = function (args) {
             var dashName = args;
@@ -212,6 +229,7 @@ define(['MessageCenter'], function (mc) {
             subscriber: this,
             callback: this.acquireDashboardData
         });
+        mc.subscribe("data_requested:drilldown", {subscriber:this,callback:this.acquireDrilldown});
     };
     return new DBConnector();
 });
