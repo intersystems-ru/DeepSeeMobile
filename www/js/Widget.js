@@ -31,6 +31,7 @@ define([
      * new Widget(config);
      */
     function Widget(opts) {
+        console.log("!",opts);
         opts = opts || {};
         /** @lends module:Widget#*/
         'use strict';
@@ -49,7 +50,7 @@ define([
         /**
          * @var {string} module:Widget#name Name of widget (title)
          */
-        this.name = _.has(opts, 'title') ? opts.title : "Widget" + this.id;
+        this.name = _.has(opts, 'config') ? opts.config.title.text : "Widget" + this.id;
         /**
          * @var {module:Dashboard} module:Widget#dashboard Parent dashboard object
          */

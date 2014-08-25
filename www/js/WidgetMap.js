@@ -12,25 +12,26 @@ define([], function () {
             callback: function (data) {
 
                 console.log("HERE:", data);
-                var retVal = [
-//                    {
-//                    name: "Профиль",
-//                    colorByPoint: true,
-//                    data: []
-//                }
-                ];
+                var retVal = [];
 
                 for (var d = 0; d < data.length; d++) {
+                    //this.config.axes[1]
                     retVal.push({
-                        name: data[d].name,
-                        data:[{name:"Профиль",y:data[d].data, drilldown: true,path: data[d].path,
-                        cube: data[d].cube}],
+                        name: this.config.axes[0],
+                        data: [{
+                            name: data[d].name,
+                            y: data[d].data,
+                            drilldown: true,
+                            path: data[d].path,
+                            cube: data[d].cube
+                        }],
                         
-                        
+
+
                     });
+                    this.config.xAxis.categories.push(data[d].name);
                 };
                 this.config.series = retVal;
-                console.log('retval = ', retVal);
                 this.renderWidget();
 
             },
@@ -39,20 +40,18 @@ define([], function () {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-                            console.log(e.point);
-
+                            
                             var chart = this;
-                            //series = drilldowns[e.point.name];
-
+                            console.log("chart=",chart);
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
                             var mc = require("MessageCenter");
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
-                                    //console.log(d);
+                                    console.log('Drilldown data:',d);
                                     var transformedData = [];
-                                    if (typeof d == "object" && (d.length != 0) && d.data!=null && d.data!="null") {
+                                    if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
                                         for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                             transformedData.push({
@@ -64,11 +63,10 @@ define([], function () {
                                         }
                                         d = transformedData;
                                     }
-                                    console.log('afterconv',d);
-                                    var data=d;
+                                    var data = d;
                                     var retVal = [{
-                                            name: "Drilldown",
-                                            data: []
+                                        name: chart.userOptions.axes[0],
+                                        data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
                                         retVal[0].data.push({
@@ -78,7 +76,6 @@ define([], function () {
                                             cube: data[i].cube
                                         });
                                     };
-                                    //console.log(retVal);
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
                                 },
@@ -87,14 +84,17 @@ define([], function () {
                             mc.publish("data_requested:drilldown", {
                                 cubeName: e.point.cube,
                                 path: e.point.path
-                            })
+                                //name: chart.userOptions.axes[0]
+                            });
                             mc = null;
 
                         }
                     }
                 },
                 xAxis: {
-                    categories: ['']
+                   //type:"category",
+                   //showEmpty:false
+                    categories:[]
                 },
 
                 series: [],
@@ -104,6 +104,13 @@ define([], function () {
 
             }
         },
+        
+        
+        
+        
+        
+        
+        
         "pieChart": {
             type: "highcharts",
             callback: function (data) {
@@ -111,9 +118,9 @@ define([], function () {
                 for (var d = 0; d < data.length; d++) {
                     retVal.push([data[d].name, data[d].data]);
                 };
-                console.log("GOT DATA PIE:", this,retVal);
+                console.log("GOT DATA PIE:", this, retVal);
                 this.config.series[0].data = retVal;
-//                this.renderWidget();
+                //                this.renderWidget();
             },
             config: {
                 chart: {
@@ -133,16 +140,19 @@ define([], function () {
                         }
                     }
                 },
-                series: [{type:"pie",data:[]}]
+                series: [{
+                    type: "pie",
+                    data: []
+                }]
             }
         },
         "speedometer": {
             type: "highcharts",
             callback: function (d) {
-                
+
                 chart = $('#widget' + this.id).highcharts();
                 if (!chart) this.renderWidget();
-                if (chart && chart.series && chart.series.length>0) {
+                if (chart && chart.series && chart.series.length > 0) {
                     var point = chart.series[0].points[0],
                         newVal;
 
@@ -211,8 +221,9 @@ define([], function () {
                 },
 
                 series: [{
-	        name: 'Speed',
-	        data: [80]}]
+                    name: 'Speed',
+                    data: [80]
+                }]
 
             },
 
@@ -230,22 +241,28 @@ define([], function () {
             type: "pivot",
             convertor: function (d) {
                 console.log("Pivot Got Data:", d);
-               var transformedData = {data:[],measures:['Count'],rows:["Статус"],cols:["Пол"]};
-                 //TODO: Получать заголовок
-                for (var i = 0; i< d.data.axes[1].tuples.length; i++){
-                    for (var j = 0; j< d.data.axes[0].tuples.length; j++){
-                        transformedData.data.push({
-                        "Статус":d.data.axes[1].tuples[i].caption,
-                        "Пол":d.data.axes[0].tuples[j].caption,
-                        "Count":d.data.cells[i*d.data.axes[1].tuples.length + j]
-                        });
-                    
+                var rowsAxisCaption = d.data.axes[1].caption || "Rows";
+                var transformedData = {
+                    data: [],
+                    measures: ['Count'],
+                    cols: ['Cols'],
+                    rows: [rowsAxisCaption]
                 };
+                //TODO: Получать заголовок
+                for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
+                    for (var j = 0; j < d.data.axes[0].tuples.length; j++) {
+                        var dataEntry = {};
+                        dataEntry[rowsAxisCaption] = d.data.axes[1].tuples[i].caption;
+                        dataEntry["Cols"] = d.data.axes[0].tuples[j].caption;
+                        dataEntry["Count"] = d.data.cells[i * d.data.axes[0].tuples.length + j];
+                        transformedData.data.push(dataEntry);
+
+                    };
                 };
                 return transformedData;
-                        
+
             },
-            callback:function(d){
+            callback: function (d) {
                 this.config = $.extend(this.config, d);
             },
             config: {},

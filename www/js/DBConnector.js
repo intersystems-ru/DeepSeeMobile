@@ -28,7 +28,8 @@ define(['MessageCenter'], function (mc) {
          */
         var defaults = {
             username: "_SYSTEM",
-            password: "159eAe72a79539f32acb15b305030060"
+            password: "159eAe72a79539f32acb15b305030060",
+            cubeName: "Patients"
         };
         /**
          * @name module:DBConnector#toString
@@ -67,24 +68,24 @@ define(['MessageCenter'], function (mc) {
                             try {
                                 d = JSON.parse(d)
                             } catch (e) {
-                                console.log("Error in parsing data:",d);
+                                console.log("Error in parsing data:", d);
                                 d = undefined;
-                                
+
                             };
                             return d;
                         }
                         d = parse(d) || d;
-//                        if (typeof d == "object" && d.length != 0) {
-//                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
-//                                transformedData.push({
-//                                    name: d.axes[1].tuples[i].caption,
-//                                    path: d.axes[1].tuples[i].path,
-//                                    cube:d.cubeName,
-//                                    data: d.cells[i]
-//                                });
-//                            }
-//                        }
-//                        chartData = transformedData || [];
+                        //                        if (typeof d == "object" && d.length != 0) {
+                        //                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
+                        //                                transformedData.push({
+                        //                                    name: d.axes[1].tuples[i].caption,
+                        //                                    path: d.axes[1].tuples[i].path,
+                        //                                    cube:d.cubeName,
+                        //                                    data: d.cells[i]
+                        //                                });
+                        //                            }
+                        //                        }
+                        //                        chartData = transformedData || [];
                         chartData = d;
                     }
                     mc.publish("data_acquired:" + requester, {
@@ -108,7 +109,7 @@ define(['MessageCenter'], function (mc) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube",
+                url: "http://37.139.4.54/tfoms/FilterValues/"+defaults.cubeName,
                 success: function (d) {
                     if (d) {
                         try {
@@ -148,7 +149,7 @@ define(['MessageCenter'], function (mc) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube/" + path,
+                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName + "/" + path,
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
@@ -165,13 +166,17 @@ define(['MessageCenter'], function (mc) {
             }
             $.ajax(filter_list_opts);
         };
-        this.acquireDrilldown = function (args){
-            
+        this.acquireDrilldown = function (args) {
+
             var cubeName = args.cubeName,
                 path = args.path;
-            var MDX = "SELECT NON EMPTY "+path + ".children ON 1 FROM ["+cubeName+"]";
+            var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
             args.target = "drilldown1";
-            args.data = {data:{MDX:MDX}};
+            args.data = {
+                data: {
+                    MDX: MDX
+                }
+            };
             console.log(args);
             this.acquireData(args);
         };
@@ -224,12 +229,18 @@ define(['MessageCenter'], function (mc) {
             subscriber: this,
             callback: this.acquireFilterValues
         });
-        mc.subscribe("data_requested:dashboard_list", {subscriber:this, callback:this.acquireDashboardList});
+        mc.subscribe("data_requested:dashboard_list", {
+            subscriber: this,
+            callback: this.acquireDashboardList
+        });
         mc.subscribe("data_requested:dashboard", {
             subscriber: this,
             callback: this.acquireDashboardData
         });
-        mc.subscribe("data_requested:drilldown", {subscriber:this,callback:this.acquireDrilldown});
+        mc.subscribe("data_requested:drilldown", {
+            subscriber: this,
+            callback: this.acquireDrilldown
+        });
     };
     return new DBConnector();
 });
