@@ -10,7 +10,7 @@ define([], function () {
                 }
             }
         }
-        this.convertor = function (d) {
+      /*  this.convertor = function (d) {
             var transformedData = [];
             this.config.axes=[];
             this.config.axes[0]=d.data.axes[0].caption;
@@ -30,7 +30,7 @@ define([], function () {
             
             return d;
 
-        }
+        } */
     };
     HighchartsWidget.prototype.toString = function () {
         return 'HighchartsWidget'

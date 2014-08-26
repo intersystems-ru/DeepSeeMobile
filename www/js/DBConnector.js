@@ -31,6 +31,11 @@ define(['MessageCenter'], function (mc) {
             password: "159eAe72a79539f32acb15b305030060",
             cubeName: "Patients"
         };
+        this.drillMDX = function(str,path){
+    var row=str.substring(str.indexOf(" ON 0,")+6, str.indexOf(" ON 1"));
+    str = str.replace(row, path +".Children"); 
+    return str;
+}
         /**
          * @name module:DBConnector#toString
          * @function
@@ -169,8 +174,12 @@ define(['MessageCenter'], function (mc) {
         this.acquireDrilldown = function (args) {
 
             var cubeName = args.cubeName,
-                path = args.path;
+                path = args.path,
+                widget = args.widget || null;
+            
             var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
+            console.log(widget);
+            if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
             args.target = "drilldown1";
             args.data = {
                 data: {

@@ -4,34 +4,40 @@
  * E.g. DeepSee has "barChart", which we interpret as Widget with type "highcharts" and subtype "bar" (which gets into HighcharstWidget with type "bar")
  * @module WidgetMap
  */
-define([], function () {
+define(['MessageCenter'], function (mc) {
     return {
         "barChart": {
 
             type: "highcharts",
-            callback: function (data) {
+            callback: function (d) {
 
-                console.log("HERE:", data);
-                var retVal = [];
-
-                for (var d = 0; d < data.length; d++) {
-                    //this.config.axes[1]
-                    retVal.push({
-                        name: this.config.axes[0],
-                        data: [{
-                            name: data[d].name,
-                            y: data[d].data,
-                            drilldown: true,
-                            path: data[d].path,
-                            cube: data[d].cube
-                        }],
-                        
-
-
-                    });
-                    this.config.xAxis.categories.push(data[d].name);
+                console.log("HERE:", d);
+                var data = d.data;
+                //this.config.xAxis.type="category";
+                //this.config.xAxis.showEmpty = false;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
                 };
-                this.config.series = retVal;
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                    data.cells[i] = {
+                        y: data.cells[i],
+                        drilldown: true,
+                        cube: data.cubeName,
+                        path: data.axes[1].tuples[i].path
+                    };
+                };
+
+                this.config.series = [{
+                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+
+                console.log(this.config);
                 this.renderWidget();
 
             },
@@ -40,16 +46,17 @@ define([], function () {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-                            
+
                             var chart = this;
-                            console.log("chart=",chart);
+                            console.log("chart=", chart);
+                            console.log("[pint = ", e.point);
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
                             var mc = require("MessageCenter");
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
-                                    console.log('Drilldown data:',d);
+                                    console.log('Drilldown data:', d);
                                     var transformedData = [];
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
@@ -64,8 +71,9 @@ define([], function () {
                                         d = transformedData;
                                     }
                                     var data = d;
+                                    console.log(chart);
                                     var retVal = [{
-                                        name: chart.userOptions.axes[0],
+                                        name: chart.userOptions.yAxis.title.text,
                                         data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
@@ -92,10 +100,9 @@ define([], function () {
                     }
                 },
                 xAxis: {
-                   //type:"category",
-                   //showEmpty:false
-                    categories:[]
+                    categories: []
                 },
+                yAxis: {},
 
                 series: [],
                 drilldown: {
@@ -104,13 +111,13 @@ define([], function () {
 
             }
         },
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
         "pieChart": {
             type: "highcharts",
             callback: function (data) {
@@ -246,7 +253,8 @@ define([], function () {
                     data: [],
                     measures: ['Count'],
                     cols: ['Cols'],
-                    rows: [rowsAxisCaption]
+                    rows: [rowsAxisCaption],
+
                 };
                 //TODO: Получать заголовок
                 for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
@@ -255,6 +263,7 @@ define([], function () {
                         dataEntry[rowsAxisCaption] = d.data.axes[1].tuples[i].caption;
                         dataEntry["Cols"] = d.data.axes[0].tuples[j].caption;
                         dataEntry["Count"] = d.data.cells[i * d.data.axes[0].tuples.length + j];
+                        dataEntry["rowDrilldown"] = d.data.axes[1].tuples[i].path;
                         transformedData.data.push(dataEntry);
 
                     };
@@ -263,8 +272,19 @@ define([], function () {
 
             },
             callback: function (d) {
-                this.config = $.extend(this.config, d);
-            },
+                    d.onDrillDown = (function(mc,_widget){return function (path) {
+                        mc.subscribe("data_acquired:drilldown",{subscriber:_widget, callback:function(d){this.onDataAcquired(d);},once:true})
+                        mc.publish("data_requested:drilldown", {
+                            cubeName: "HoleFoods",
+                            path: path,
+                            widget:_widget
+                            //name: chart.userOptions.axes[0]
+                        });
+
+                    }; })(mc,this);
+                    this.config = $.extend(this.config, d);
+                    console.log("THIS>CONFIG=", this.config);
+                },
             config: {},
             filters: []
         }
