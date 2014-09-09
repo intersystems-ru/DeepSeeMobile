@@ -10,7 +10,7 @@ define([], function () {
             console.log("PW: ", this.config, w_selector);
             if (Object.keys(this.config).length < 2) return this;
             if (!hasDiv) {
-                $("<div class='pivot-container'>").appendTo(w_selector);
+                $("<div class='pivot-container' width=100%>").appendTo(w_selector);
                 $("<div class='pivot-drilldown-container'>").hide().appendTo(w_selector);
                 $("<div class='drilldown-back-container'>").hide().appendTo(w_selector);
                 hasDiv = true;

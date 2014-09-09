@@ -277,6 +277,7 @@ define(['MessageCenter'], function (mc) {
                         mc.subscribe("data_acquired:drilldown", {
                             subscriber: _widget,
                             callback: function (d) {
+                                if(d && d.data ==null){return;}
                                 this.onDataAcquired(d, true);
                             },
                             once: true
@@ -330,7 +331,7 @@ define(['MessageCenter'], function (mc) {
                     type: 'column',
                     margin: 75,
                     options3d: {
-                        enabled: true,
+                    enabled: true,
                     alpha: 15,
                     beta: 15,
                     viewDistance: 25,

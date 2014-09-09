@@ -343,6 +343,9 @@ define(['MessageCenter'], function (mc) {
                 subtitle: {
                     text: 'Notice the 3D'
                 },
+                legend:{
+                    enabled:false
+                },
                 plotOptions: {
                     column: {
                         depth: 25
@@ -356,6 +359,104 @@ define(['MessageCenter'], function (mc) {
                 },
                 series: []
             }
+        },
+        "lineChart":{
+            type: "highcharts",
+            callback: function (d) {
+
+               
+                var data = d.data;
+                //this.config.xAxis.type="category";
+                //this.config.xAxis.showEmpty = false;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+//                    data.cells[i] = {
+//                        y: data.cells[i],
+//                        cube: data.cubeName,
+//                        path: data.axes[1].tuples[i].path
+//                    };
+                };
+
+                this.config.series = [{
+//                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption,
+                    lineWidth: 4
+                }];
+
+            },
+            config:{
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'It is allowed to use subtitle',
+           
+        },
+        xAxis: {
+            categories: []
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        plotOptions: {
+            series: {
+                lineWidth: 3
+            }
+        },
+        legend: {
+            enabled:false
+        },
+        series: []
+    }
+        },
+        "":{
+            type:"highcharts",
+            callback: function (d) {
+                var data = d.data;
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    data.cells[i] = [data.axes[1].tuples[i].caption.toString(), data.cells[i]];
+                };
+
+                this.config.series = [{
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+                 
+
+                console.log(this.config);
+                //this.renderWidget();
+
+            },
+            config:{
+        chart: {
+            type: 'pyramid',
+            marginRight: 100
+        },
+        title: {
+            text: ''
+        },
+        plotOptions: {
+            series: {
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>({point.y:,.0f})',
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                    softConnector: true
+                }
+            }
+        },
+        
+        series: [{}]
+    }
         }
     };
 });
