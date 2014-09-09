@@ -12,16 +12,16 @@ define([], function () {
             if (!hasDiv) {
                 $("<div class='pivot-container'>").appendTo(w_selector);
                 $("<div class='pivot-drilldown-container'>").hide().appendTo(w_selector);
+                $("<div class='drilldown-back-container'>").hide().appendTo(w_selector);
                 hasDiv = true;
             }
             if (showDrilldown) {
                 $(w_selector).find(pivotSelector).hide();
                 pivotSelector = ".pivot-drilldown-container";
                 $(w_selector).find(pivotSelector).show();
+                $(w_selector).find(".drilldown-back-container").show();
             }
             //if(!this.config.data || (this.config.data[0] === undefined)) return;
-            console.log("Gonna render pivot");
-            try{
             $(w_selector).find(pivotSelector).pivotUI(this.config.data, {
                 rows: this.config.rows,
                 cols: this.config.cols,
@@ -29,12 +29,12 @@ define([], function () {
                 onDrillDown: this.config.onDrillDown
             });
             if (showDrilldown) {
-                $(w_selector).find(".pivot-drilldown-container .pvtTable tr:nth-child(1) > th").first().text("<").one("tap", function () {
+                $(w_selector).find(".drilldown-back-container").text("<").one("tap", function () {
                     $(w_selector).find(".pivot-drilldown-container").hide();
+                    $(w_selector).find(".drilldown-back-container").hide();
                     $(w_selector).find(".pivot-container").show();
                 });
             }
-            } catch(e){};
         }
     }
     PivotWidget.prototype.toString = function () {

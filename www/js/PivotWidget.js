@@ -32,6 +32,7 @@ define([], function () {
                 $(w_selector).find(".drilldown-back-container").text("<").one("tap", function () {
                     $(w_selector).find(".pivot-drilldown-container").hide();
                     $(w_selector).find(".drilldown-back-container").hide();
+                    pivotSelector = ".pivot-container";
                     $(w_selector).find(".pivot-container").show();
                 });
             }

@@ -38,7 +38,7 @@ define(['MessageCenter'], function (mc) {
                 }];
 
                 console.log(this.config);
-                this.renderWidget();
+                //this.renderWidget();
 
             },
             config: {
@@ -48,6 +48,9 @@ define(['MessageCenter'], function (mc) {
                         drilldown: function (e) {
 
                             var chart = this;
+                            console.log(">",this);
+                            var _categories = this.axes[0].categories;
+                            this.axes[0].categories = [];
                             console.log("chart=", chart);
                             console.log("[pint = ", e.point);
                             // Show the loading label
@@ -86,6 +89,7 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
+                                    chart.axes[0].categories = _categories;
                                 },
                                 once: true
                             });
@@ -243,7 +247,7 @@ define(['MessageCenter'], function (mc) {
         "pivot": {
             type: "pivot",
             convertor: function (d) {
-                console.log("Pivot Got Data:", d);
+                
                 var rowsAxisCaption = d.data.axes[1].caption || "Rows";
                 var transformedData = {
                     data: [],

@@ -1,26 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.phonegap.iDeepSee" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>Hello Cordova</name>
-    <description>
-        A sample Apache Cordova application that responds to the deviceready event.
-    </description>
-    <content src="index.html" />
-    <preference name="loglevel" value="DEBUG" />
-    <feature name="App">
-        <param name="android-package" value="org.apache.cordova.App" />
-    </feature>
-    <name>iDeepSee</name>
+    <name>DeepSee</name>
     <description>
         Deep See Mobile visualizer
     </description>
     <author email="support@phonegap.com" href="http://phonegap.com">
-        Shmidt Ivan
+        PhoneGap Team
     </author>
     <feature name="http://api.phonegap.com/1.0/device" />
     <preference name="permissions" value="none" />
     <preference name="orientation" value="default" />
     <preference name="target-device" value="universal" />
-    <preference name="fullscreen" value="false" />
+    <preference name="fullscreen" value="true" />
     <preference name="webviewbounce" value="false" />
     <preference name="prerendered-icon" value="true" />
     <preference name="stay-in-webview" value="false" />

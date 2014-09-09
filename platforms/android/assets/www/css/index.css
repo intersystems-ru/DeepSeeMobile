@@ -262,3 +262,9 @@ table.pvtTable tr:nth-child(even) td {
 .pivot-container{
     padding:0 20px;
 }
+.drilldown-back-container{
+position: absolute;
+top: 50px;
+left: 5px;
+font-weight: bold;
+}
