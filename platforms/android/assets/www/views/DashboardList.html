@@ -1,0 +1,18 @@
+<div id="wrapper">
+
+<div id="pullDown">
+			<span class="pullDownIcon"></span><span class="pullDownLabel">Pull down to refresh...</span>
+</div>
+
+<ul class="table-view dashboard-list">
+    {{#each dashboardList}}
+    <li class="table-view-cell media dashboard-item" data-id="{{@index}}">
+            <i class="fa fa-cube media-object pull-left" style="font-size:2em"></i>
+            <div class="media-body">
+                <h3>{{this.title}}</h3>
+                <small>{{this.path}}</small>
+            </div>
+    </li>
+    {{/each}}
+</ul>
+    </div>

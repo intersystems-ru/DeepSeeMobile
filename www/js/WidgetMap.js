@@ -38,7 +38,7 @@ define(['MessageCenter'], function (mc) {
                 }];
 
                 console.log(this.config);
-                this.renderWidget();
+                //this.renderWidget();
 
             },
             config: {
@@ -48,6 +48,9 @@ define(['MessageCenter'], function (mc) {
                         drilldown: function (e) {
 
                             var chart = this;
+                            console.log(">",this);
+                            var _categories = this.axes[0].categories;
+                            this.axes[0].categories = [];
                             console.log("chart=", chart);
                             console.log("[pint = ", e.point);
                             // Show the loading label
@@ -86,6 +89,7 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
+                                    chart.axes[0].categories = _categories;
                                 },
                                 once: true
                             });
@@ -111,19 +115,14 @@ define(['MessageCenter'], function (mc) {
 
             }
         },
-
-
-
-
-
-
-
         "pieChart": {
             type: "highcharts",
-            callback: function (data) {
+            callback: function (_d) {
+                var data = _d.data;
                 var retVal = [];
-                for (var d = 0; d < data.length; d++) {
-                    retVal.push([data[d].name, data[d].data]);
+                this.config.series[0].name = data.axes[0].caption;
+                for (var d = 0; d < data.axes[1].tuples.length; d++) {
+                    retVal.push([data.axes[1].tuples[d].caption, data.cells[d]]);
                 };
                 console.log("GOT DATA PIE:", this, retVal);
                 this.config.series[0].data = retVal;
@@ -238,7 +237,8 @@ define(['MessageCenter'], function (mc) {
         "null": {
             type: "none",
             callback: function (d) {
-                console.log(d);
+                console.log(d,this);
+                $("#widget"+this.id).parent().parent().find("h1").text("Widget is not yet implemented");
             },
             title: "Not implemented",
             config: {},
@@ -271,20 +271,27 @@ define(['MessageCenter'], function (mc) {
                 return transformedData;
 
             },
-            callback: function (d) {
-                    d.onDrillDown = (function(mc,_widget){return function (path) {
-                        mc.subscribe("data_acquired:drilldown",{subscriber:_widget, callback:function(d){this.onDataAcquired(d);},once:true})
+            callback: function (d, _widget) {
+                d.onDrillDown = (function (mc) {
+                    return function (path) {
+                        mc.subscribe("data_acquired:drilldown", {
+                            subscriber: _widget,
+                            callback: function (d) {
+                                this.onDataAcquired(d, true);
+                            },
+                            once: true
+                        })
                         mc.publish("data_requested:drilldown", {
                             cubeName: "HoleFoods",
                             path: path,
-                            widget:_widget
+                            widget: _widget
                             //name: chart.userOptions.axes[0]
                         });
 
-                    }; })(mc,this);
-                    this.config = $.extend(this.config, d);
-                    console.log("THIS>CONFIG=", this.config);
-                },
+                    };
+                })(mc);
+                this.config = $.extend(this.config, d);
+            },
             config: {},
             filters: []
         }
