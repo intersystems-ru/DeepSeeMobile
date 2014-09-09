@@ -247,7 +247,7 @@ define(['MessageCenter'], function (mc) {
         "pivot": {
             type: "pivot",
             convertor: function (d) {
-                console.log("Pivot Got Data:", d);
+                
                 var rowsAxisCaption = d.data.axes[1].caption || "Rows";
                 var transformedData = {
                     data: [],
