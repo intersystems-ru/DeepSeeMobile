@@ -48,7 +48,7 @@ define(['MessageCenter'], function (mc) {
                         drilldown: function (e) {
 
                             var chart = this;
-                            console.log(">",this);
+                            console.log(">", this);
                             var _categories = this.axes[0].categories;
                             this.axes[0].categories = [];
                             console.log("chart=", chart);
@@ -237,8 +237,8 @@ define(['MessageCenter'], function (mc) {
         "null": {
             type: "none",
             callback: function (d) {
-                console.log(d,this);
-                $("#widget"+this.id).parent().parent().find("h1").text("Widget is not yet implemented");
+                console.log(d, this);
+                $("#widget" + this.id).parent().parent().find("h1").text("Widget is not yet implemented");
             },
             title: "Not implemented",
             config: {},
@@ -247,7 +247,7 @@ define(['MessageCenter'], function (mc) {
         "pivot": {
             type: "pivot",
             convertor: function (d) {
-                
+
                 var rowsAxisCaption = d.data.axes[1].caption || "Rows";
                 var transformedData = {
                     data: [],
@@ -294,6 +294,169 @@ define(['MessageCenter'], function (mc) {
             },
             config: {},
             filters: []
+        },
+        "columnChart": {
+            type: "highcharts",
+            callback: function (d) {
+                var data = d.data;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                    data.cells[i] = {
+                        y: data.cells[i],
+                        //drilldown: false,
+                        cube: data.cubeName,
+                        path: data.axes[1].tuples[i].path
+                    };
+                };
+
+                this.config.series = [{
+                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+
+               
+                //this.renderWidget();
+
+            },
+            config: {
+                chart: {
+                    type: 'column',
+                    margin: 75,
+                    options3d: {
+                        enabled: true,
+                    alpha: 15,
+                    beta: 15,
+                    viewDistance: 25,
+                    depth: 40
+                    }
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: 'Notice the 3D'
+                },
+                legend:{
+                    enabled:false
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25
+                    }
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    opposite: true
+                },
+                series: []
+            }
+        },
+        "lineChart":{
+            type: "highcharts",
+            callback: function (d) {
+
+               
+                var data = d.data;
+                //this.config.xAxis.type="category";
+                //this.config.xAxis.showEmpty = false;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+//                    data.cells[i] = {
+//                        y: data.cells[i],
+//                        cube: data.cubeName,
+//                        path: data.axes[1].tuples[i].path
+//                    };
+                };
+
+                this.config.series = [{
+//                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption,
+                    lineWidth: 4
+                }];
+
+            },
+            config:{
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'It is allowed to use subtitle',
+           
+        },
+        xAxis: {
+            categories: []
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        plotOptions: {
+            series: {
+                lineWidth: 3
+            }
+        },
+        legend: {
+            enabled:false
+        },
+        series: []
+    }
+        },
+        "":{
+            type:"highcharts",
+            callback: function (d) {
+                var data = d.data;
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    data.cells[i] = [data.axes[1].tuples[i].caption.toString(), data.cells[i]];
+                };
+
+                this.config.series = [{
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+                 
+
+                console.log(this.config);
+                //this.renderWidget();
+
+            },
+            config:{
+        chart: {
+            type: 'pyramid',
+            marginRight: 100
+        },
+        title: {
+            text: ''
+        },
+        plotOptions: {
+            series: {
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>({point.y:,.0f})',
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                    softConnector: true
+                }
+            }
+        },
+        
+        series: [{}]
+    }
         }
     };
 });

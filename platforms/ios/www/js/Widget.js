@@ -17,7 +17,8 @@ define([
     'Utils',
     'MessageCenter',
     'HighchartsWidget',
-], function (FiltersList, Utils, mc, HighchartsWidget) {
+    'PivotWidget'
+], function (FiltersList, Utils, mc, HighchartsWidget, PivotWidget) {
     /**
      * Creates new Widget object
      * @alias module:Widget
@@ -29,8 +30,9 @@ define([
      *<caption>Creating new widget</caption>
      * new Widget(config);
      */
-    function Widget(config) {
-        config = config || {};
+    function Widget(opts) {
+        this.def = opts.promise;
+        opts = opts || {};
         /** @lends module:Widget#*/
         'use strict';
         this.active = false;
@@ -39,56 +41,38 @@ define([
          * @function module:Widget#convertor
          * @return ConvertedData
          */
-        this.convertor = _.has(config, 'convertor') ? config.convertor : null;
+        this.convertor = _.has(opts, 'convertor') ? opts.convertor : null;
         /**
          * @var {number} module:Widget#id ID of widget in dashboard
          */
-        this.id = _.has(config, 'id') ? config.id : null;
-        this.callback = config.callback || undefined;
+        this.id = _.has(opts, 'id') ? opts.id : null;
+        this.callback = opts.callback || undefined;
         /**
          * @var {string} module:Widget#name Name of widget (title)
          */
-        this.name = _.has(config, 'title') ? config.title : "Widget" + this.id;
+        this.name = _.has(opts, 'config') ? opts.config.title.text : "Widget" + this.id;
         /**
          * @var {module:Dashboard} module:Widget#dashboard Parent dashboard object
          */
-        this.dashboard = _.has(config, 'dashboard') ? config.dashboard : null;
+        this.dashboard = _.has(opts, 'dashboard') ? opts.dashboard : null;
         /**
-         * @var {Object} module:Widget#chartConfig Chart config object
+         * @var {Object} module:Widget#config Chart config object
          */
-        this.chartConfig = _.has(config, 'chartConfig') ? config.chartConfig : {};
+        this.config = _.has(opts, 'config') ? opts.config : {};
         /**
          * @var {Object} module:Widget#chart Amcharts object, created after rendering
          *@deprecated
          */
         this.chart = '';
         this.subs = [];
-        /**
-         * Callback, fired when data acquired
-         * @function module:Widget#onDataAcquired
-         * @private
-         * @todo Route which field data would be kept
-         */
-        this.onDataAcquired = function (d) {
-            if (!d || d.data.length == 0) {
-                $("#widget" + this.id).html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>");
-                return;
-            }
-            if (this.callback) {
-                this.callback(d);
-                return;
-            }
-            console.log("GOT DATA:", this);
-            this.chartConfig.series = d.data;
-            if (this.renderWidget) this.renderWidget();
-        };
+
         /**
          * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
          */
         var _datasource = {};
 
         //Set up datasource without using setter
-        _datasource = config.datasource || {
+        _datasource = opts.datasource || {
             data: {}
         };
         Object.defineProperty(this, 'datasource', {
@@ -117,11 +101,36 @@ define([
         this.filters = "";
 
         var typesMap = {
-            'highcharts': HighchartsWidget
+            'highcharts': HighchartsWidget,
+            'pivot': PivotWidget
         };
-        //Render for differend Widgets
-        if (_.has(config, 'type') && _.has(typesMap, config.type)) {
-            _.extend(this, new typesMap[config.type](this))
+        //Extend with type-specified opts
+        if (_.has(opts, 'type') && _.has(typesMap, opts.type)) {
+            _.extend(this, new typesMap[opts.type]())
+        };
+        /**
+         * Callback, fired when data acquired
+         * @function module:Widget#onDataAcquired
+         * @private
+         * @todo Route which field data would be kept
+         */
+        this.onDataAcquired = function (d, isDrillDown) {
+            console.log(d);
+             $("#widget" + this.id).parent().find(".error-msg").html('').hide();
+            if(isDrillDown === undefined) isDrillDown = false;
+            if (!d || d.data === null) {
+                $("#widget" + this.id).parent().find(".error-msg").html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>").show();
+                return;
+            }
+            if (this.convertor) {
+                // d =  || d;
+                d = this.convertor(d);
+            }
+            if (this.callback) {
+                //Added widget link to callback's call
+                this.callback(d,this);
+            }
+            if (this.renderWidget) this.renderWidget(isDrillDown);
         };
         this.removeRefs = function () {
             var self = this;
@@ -134,14 +143,14 @@ define([
             self = null;
         };
         //When created widget, must subscribe to widget[i] data acquired
-        this.init(config);
+        this.init(opts);
         return this;
     };
 
     Widget.prototype.toString = function () {
         return "Widget" + this.id;
     };
-    Widget.prototype.init = function (config) {
+    Widget.prototype.init = function (opts) {
 
 
         this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
@@ -157,19 +166,21 @@ define([
          * @var {module:FiltersList} module:Widget#filters Selected filters list
          */
         this.filters = new FiltersList({
-            filters: config.filters || [],
+            filters: opts.filters || [],
             onSetFilter: this.requestData,
             container: "#widget" + this.id,
             w_obj: this
         });
-
-        this.requestData();
+        var self = this;
+        this.createHolder().then(function(){self.requestData()});
+        mc.publish('[Init]Finished: ' +this.name);
     };
     /**
      * Simply renders widget
      *@function module:Widget#render
      */
-    Widget.prototype.render = function () {
+    Widget.prototype.createHolder = function () {
+        var def = $.Deferred();
         //if (!this.active) return this;
         var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
         var self = this;
@@ -178,14 +189,14 @@ define([
                 .replace("{{id}}", self.id);
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
-
-                console.log("[Render]Finished: " + self.name);
+                def.resolve();
+                mc.publish("[Render]Holder created: " + self.name);
+                
             }
-            if (self.renderWidget) self.renderWidget();
             self = null;
         });
 
-        return this;
+        return def.promise();
 
     };
     /**

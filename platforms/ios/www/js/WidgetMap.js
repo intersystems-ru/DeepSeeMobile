@@ -4,52 +4,131 @@
  * E.g. DeepSee has "barChart", which we interpret as Widget with type "highcharts" and subtype "bar" (which gets into HighcharstWidget with type "bar")
  * @module WidgetMap
  */
-define([], function () {
+define(['MessageCenter'], function (mc) {
     return {
         "barChart": {
 
             type: "highcharts",
-            callback: function (data) {
-                var data = data.data;
-                var retVal = [];
-                for (var d = 0; d < data.length; d++) {
-                    retVal.push({
-                        name: data[d].name,
-                        data: [data[d].data]
-                    });
+            callback: function (d) {
+
+                console.log("HERE:", d);
+                var data = d.data;
+                //this.config.xAxis.type="category";
+                //this.config.xAxis.showEmpty = false;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
                 };
-                this.chartConfig.series = retVal;
-                this.renderWidget();
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                    data.cells[i] = {
+                        y: data.cells[i],
+                        drilldown: true,
+                        cube: data.cubeName,
+                        path: data.axes[1].tuples[i].path
+                    };
+                };
+
+                this.config.series = [{
+                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+
+                console.log(this.config);
+                //this.renderWidget();
 
             },
-            chartConfig: {
+            config: {
                 chart: {
-                    type: 'bar'
-                },
-                xAxis: {
-                    categories: ['Профиль']
-                },
-                yAxis: {
-                    title: {
-                        text: 'Людей'
+                    type: 'bar',
+                    events: {
+                        drilldown: function (e) {
+
+                            var chart = this;
+                            console.log(">", this);
+                            var _categories = this.axes[0].categories;
+                            this.axes[0].categories = [];
+                            console.log("chart=", chart);
+                            console.log("[pint = ", e.point);
+                            // Show the loading label
+                            chart.showLoading('Doing drilldown ...');
+                            var mc = require("MessageCenter");
+                            mc.subscribe("data_acquired:drilldown", {
+                                subscriber: this,
+                                callback: function (d) {
+                                    console.log('Drilldown data:', d);
+                                    var transformedData = [];
+                                    if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
+                                        d = d.data;
+                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
+                                            transformedData.push({
+                                                name: d.axes[1].tuples[i].caption,
+                                                path: d.axes[1].tuples[i].path,
+                                                cube: d.cubeName,
+                                                data: d.cells[i]
+                                            });
+                                        }
+                                        d = transformedData;
+                                    }
+                                    var data = d;
+                                    console.log(chart);
+                                    var retVal = [{
+                                        name: chart.userOptions.yAxis.title.text,
+                                        data: []
+                                        }]
+                                    for (var i = 0; i < data.length; i++) {
+                                        retVal[0].data.push({
+                                            name: data[i].name,
+                                            y: data[i].data,
+                                            path: data[i].path,
+                                            cube: data[i].cube
+                                        });
+                                    };
+                                    chart.hideLoading();
+                                    chart.addSeriesAsDrilldown(e.point, retVal[0]);
+                                    chart.axes[0].categories = _categories;
+                                },
+                                once: true
+                            });
+                            mc.publish("data_requested:drilldown", {
+                                cubeName: e.point.cube,
+                                path: e.point.path
+                                //name: chart.userOptions.axes[0]
+                            });
+                            mc = null;
+
+                        }
                     }
                 },
-                series: []
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {},
+
+                series: [],
+                drilldown: {
+                    series: []
+                }
+
             }
         },
         "pieChart": {
             type: "highcharts",
-            callback: function (data) {
-                var data = data.data;
+            callback: function (_d) {
+                var data = _d.data;
                 var retVal = [];
-                for (var d = 0; d < data.length; d++) {
-                    retVal.push([data[d].name, data[d].data]);
+                this.config.series[0].name = data.axes[0].caption;
+                for (var d = 0; d < data.axes[1].tuples.length; d++) {
+                    retVal.push([data.axes[1].tuples[d].caption, data.cells[d]]);
                 };
-
-                this.chartConfig.series[0].data = retVal;
-                this.renderWidget();
+                console.log("GOT DATA PIE:", this, retVal);
+                this.config.series[0].data = retVal;
+                //                this.renderWidget();
             },
-            chartConfig: {
+            config: {
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -68,38 +147,26 @@ define([], function () {
                     }
                 },
                 series: [{
-                    type: 'pie',
-                    name: 'Очередь',
-                    data: [
-                            ['Firefox', 45.0],
-                            ['IE', 26.8],
-                        {
-                            name: 'Chrome',
-                            y: 12.8,
-                            sliced: true,
-                            selected: true
-                            },
-                            ['Safari', 8.5],
-                            ['Opera', 6.2],
-                            ['Others', 0.7]
-                        ]
-                    }]
+                    type: "pie",
+                    data: []
+                }]
             }
         },
         "speedometer": {
             type: "highcharts",
             callback: function (d) {
+
                 chart = $('#widget' + this.id).highcharts();
                 if (!chart) this.renderWidget();
-                if (chart) {
+                if (chart && chart.series && chart.series.length > 0) {
                     var point = chart.series[0].points[0],
                         newVal;
 
-                    newVal = d.data[0].data;
+                    newVal = d[0].data;
                     point.update(newVal);
                 }
             },
-            chartConfig: {
+            config: {
                 chart: {
                     type: 'solidgauge'
                 },
@@ -160,27 +227,135 @@ define([], function () {
                 },
 
                 series: [{
-                    name: 'People',
-                    data: [80],
-                    dataLabels: {
-                        format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-                            ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
-                            '<span style="font-size:12px;color:silver">человек</span></div>'
-                    },
-                    tooltip: {
-                        valueSuffix: 'человек'
-                    }
-                 }]
+                    name: 'Speed',
+                    data: [80]
+                }]
 
             },
 
         },
-        "null":{
-            type:"none",
-            callback:function(d){ console.log (d);},
-            title:"Not implemented",
-            chartConfig:{},
-            filters:[]
+        "null": {
+            type: "none",
+            callback: function (d) {
+                console.log(d, this);
+                $("#widget" + this.id).parent().parent().find("h1").text("Widget is not yet implemented");
+            },
+            title: "Not implemented",
+            config: {},
+            filters: []
+        },
+        "pivot": {
+            type: "pivot",
+            convertor: function (d) {
+
+                var rowsAxisCaption = d.data.axes[1].caption || "Rows";
+                var transformedData = {
+                    data: [],
+                    measures: ['Count'],
+                    cols: ['Cols'],
+                    rows: [rowsAxisCaption],
+
+                };
+                //TODO: Получать заголовок
+                for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
+                    for (var j = 0; j < d.data.axes[0].tuples.length; j++) {
+                        var dataEntry = {};
+                        dataEntry[rowsAxisCaption] = d.data.axes[1].tuples[i].caption;
+                        dataEntry["Cols"] = d.data.axes[0].tuples[j].caption;
+                        dataEntry["Count"] = d.data.cells[i * d.data.axes[0].tuples.length + j];
+                        dataEntry["rowDrilldown"] = d.data.axes[1].tuples[i].path;
+                        transformedData.data.push(dataEntry);
+
+                    };
+                };
+                return transformedData;
+
+            },
+            callback: function (d, _widget) {
+                d.onDrillDown = (function (mc) {
+                    return function (path) {
+                        mc.subscribe("data_acquired:drilldown", {
+                            subscriber: _widget,
+                            callback: function (d) {
+                                this.onDataAcquired(d, true);
+                            },
+                            once: true
+                        })
+                        mc.publish("data_requested:drilldown", {
+                            cubeName: "HoleFoods",
+                            path: path,
+                            widget: _widget
+                            //name: chart.userOptions.axes[0]
+                        });
+
+                    };
+                })(mc);
+                this.config = $.extend(this.config, d);
+            },
+            config: {},
+            filters: []
+        },
+        "columnChart": {
+            type: "highcharts",
+            callback: function (d) {
+                var data = d.data;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                    data.cells[i] = {
+                        y: data.cells[i],
+                        //drilldown: false,
+                        cube: data.cubeName,
+                        path: data.axes[1].tuples[i].path
+                    };
+                };
+
+                this.config.series = [{
+                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+
+               
+                //this.renderWidget();
+
+            },
+            config: {
+                chart: {
+                    type: 'column',
+                    margin: 75,
+                    options3d: {
+                        enabled: true,
+                    alpha: 15,
+                    beta: 15,
+                    viewDistance: 25,
+                    depth: 40
+                    }
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: 'Notice the 3D'
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25
+                    }
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    opposite: true
+                },
+                series: []
+            }
         }
     };
 });

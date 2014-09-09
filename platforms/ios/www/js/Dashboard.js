@@ -42,23 +42,26 @@ define([
          * @public
          */
         this.activeWidget = undefined;
-        
         this.subs = [];
         /**
-         * Array of Filter objects
-         * @var {Array<module:Filter>}
-         * @name module:Dashboard#filters
-         * @todo Make this one private
+         * Dashboard config
+         * @var {module:DashboardConfig} module:Dashboard#config
          */
-       // this.filters = [];
+        this.config = new DashboardConfiguration();
+        /****
+        Methods
+        *****/
+        this.createHolder();
         this.onDashboardDataAcquired = function (d) {
             var widgets = d.children;
-            var self= this;
-            for(var i=0; i< widgets.length;i++){
-                
+            var self = this;
+            for (var i = 0; i < widgets.length; i++) {
+
                 var widget = widgets[i];
                 var widget_config = WidgetMap[widget.type];
-                if(!widget_config) {widget_config = WidgetMap["null"]}
+                if (!widget_config) {
+                    widget_config = WidgetMap["null"]
+                }
                 widget_config.datasource = {
                     data: {
                         MDX: widget.mdx
@@ -72,54 +75,49 @@ define([
                         value: filter.value
                     });
                 });
-                
 
-                widget_config.chartConfig.title = {
+
+                widget_config.config.title = {
                     text: widget.title
                 };
-                self.addWidget(widget_config).render();
+                self.addWidget(widget_config);
                 widget = null;
                 widget_config = null;
             };
-            self=null;
+            self = null;
+            
         };
         this.subs.push(mc.subscribe("data_acquired:dashboard", {
             subscriber: this,
             callback: this.onDashboardDataAcquired
         }));
         mc.publish("data_requested:dashboard", dashName);
-        /**
-         * Dashboard config
-         * @var {module:DashboardConfig} module:Dashboard#config
-         */
-        this.config = new DashboardConfiguration();
-        /**
-         * Renders up the whole dashboard with its widgets and so on.
-         * @function module:Dashboard#render
-         */
-        this.render = function () {
-            var holder = (this.config && this.config.holder) ? this.config.holder : "body";
-            require(['text!../views/Dashboard.html'], function (html) {
-                $(holder + " > *").remove();
-                $(holder).append(html);
-            });
-            for (var i = 0; i < this.widgets.length; i++) {
-                this.widgets[i].render()
-            }
+        
+        this.removeRefs = function () {
             var self = this;
-            //Handling active widget change
-            $(this.config.holder).off("slide").on("slide", function (e) {
-                if (self.activeWidget != e.originalEvent.detail.slideNumber) {
-                    self.activeWidget = e.originalEvent.detail.slideNumber;
-                    if (mc) mc.publish("set_active_widget", {
-                        id: self.activeWidget
-                    });
-                }
-            });
+            for (var i = 0; i < this.subs.length; i++) {
+                mc.remove(this.subs[i]);
+                self.subs[i] = null;
+            };
+            this.subs = [];
+            self = null;
 
-            return this;
         };
-        /**
+        mc.subscribe("clear:dashboard", {
+            subscriber: this,
+            callback: this.removeRefs,
+            once: true
+        });
+    };
+    /**
+     * @name module:Dashboard#toString
+     * @function
+     * @return {String} Module name
+     */
+    Dashboard.prototype.toString = function () {
+        return "Dashboard";
+    };
+/**
          * Renders up the whole dashboard with its widgets and so on.
          * @function module:Dashboard#addWidget
          * @param config {Object}  Configuration object for Widget
@@ -180,44 +178,50 @@ define([
         }]
     });
          */
-        this.addWidget = function (config) {
+    Dashboard.prototype.addWidget = function (config) {
+            var def = $.Deferred();
             var config = config || {};
             config.dashboard = this;
             config.id = this.widgets.length;
+            config.promise = def;
+            //Put promise to widget constructor
             var widget = new Widget(config);
             this.widgets[this.widgets.length] = widget;
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
             }
-            widget=null;
-            return this;
-        }
-        this.removeRefs = function(){
-            var self=this;
-            for(var i=0;i<this.subs.length;i++)
-            {
-                mc.remove(this.subs[i]);
-                self.subs[i] = null;
-            };
-            this.subs = [];
-            self= null;
-            
+            widget = null;
+            return def.promise();
         };
-        
-        mc.subscribe("clear:dashboard",{subscriber:this, callback:this.removeRefs, once:true});
-       
-        //mc.publish("filters_requested");
-        
+Dashboard.prototype.createHolder = function(){
+var holder = (this.config && this.config.holder) ? this.config.holder : "body";
+            require(['text!../views/Dashboard.html'], function (html) {
+                $(holder + " > *").remove();
+                $(holder).append(html);
+            });
+};
+         /**
+         * Renders up the whole dashboard with its widgets and so on.
+         * @function module:Dashboard#render
+         */
+Dashboard.prototype.render = function () {
+            
+            for (var i = 0; i < this.widgets.length; i++) {
+                this.widgets[i].renderWidget();
+            }
+            var self = this;
+            //Handling active widget change
+            $(this.config.holder).off("slide").on("slide", function (e) {
+                if (self.activeWidget != e.originalEvent.detail.slideNumber) {
+                    self.activeWidget = e.originalEvent.detail.slideNumber;
+                    if (mc) mc.publish("set_active_widget", {
+                        id: self.activeWidget
+                    });
+                }
+            });
 
-    };
-    /**
-     * @name module:Dashboard#toString
-     * @function
-     * @return {String} Module name
-     */
-    Dashboard.prototype.toString = function () {
-        return "Dashboard";
-    };
+            return this;
+        };
     return Dashboard;
 
 

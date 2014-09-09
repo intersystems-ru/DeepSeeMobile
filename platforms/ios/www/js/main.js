@@ -44,10 +44,7 @@ require([
             holder: "body> .content"
         });
         return false;
-    });
-    //App.m.subscribe("data_acquired", {subscriber:this, callback:function(d){console.log("DATA ACQUIRED:",d)}})
-    //App.a = new Dashboard("TEST/Mobiles.dashboard").render();
-    
+    }); 
     App.clearData = function() {
         App.m.publish("clear:widgets");
        
@@ -58,10 +55,7 @@ require([
             App.a.widgets = [];
         };
          App.m.publish("clear:dashboard");
-//        for (var key in App.a) {
-//            delete App.a[key];
-//        };
-//        delete App.a;
+
     };
 
 });

@@ -2,6 +2,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
+            console.log("Entered controller");
             App.dashboardList = e.children;
             if (sessionStorage.getItem("dashboard_list") == null) {
                 sessionStorage.setItem('dashboard_list', JSON.stringify(e))
@@ -16,6 +17,8 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                     e.preventDefault();
                     final.find("> *").removeClass("active");
                     $(this).addClass("active");
+                    //Устраняем самопроизвольный запрос  dashboard_list'a
+                    myScroll.destroy();
                     App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                     return false;
                 });
@@ -40,6 +43,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                     if (pullDownEl.className.match('flip')) {
                         pullDownEl.className = 'loading';
                         pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';
+                        console.log("Entered onScrollEnd");
                         MessageCenter.subscribe("data_acquired:dashboard_list", {
                             subscriber: this,
                             callback: function(e){myScroll.destroy(); onDashboardListAcquired(e); },

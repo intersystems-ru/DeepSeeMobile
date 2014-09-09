@@ -3,7 +3,7 @@
  * Implements ajax data fetching from Cache back-end
  * @module DBConnector
  */
-define(['MessageCenter'], function (mc) {
+define(['MessageCenter', 'Mocks'], function (mc, mocks) {
     "use strict";
     /**
      * @constructor
@@ -28,8 +28,25 @@ define(['MessageCenter'], function (mc) {
          */
         var defaults = {
             username: "_SYSTEM",
-            password: "159eAe72a79539f32acb15b305030060"
+            password: "159eAe72a79539f32acb15b305030060",
+            cubeName: "HoleFoods"
         };
+        var parseJSON = function (d) {
+            try {
+                d = JSON.parse(d)
+            } catch (e) {
+                console.log("Error in parsing data:", d);
+                d = undefined;
+
+            };
+            return d;
+        }
+        this.mode = "ONLINE";
+        this.drillMDX = function (str, path) {
+            var row = str.substring(str.indexOf(" ON 0,") + 6, str.indexOf(" ON 1"));
+            str = str.replace(row, path + ".Children");
+            return str;
+        }
         /**
          * @name module:DBConnector#toString
          * @function
@@ -48,9 +65,11 @@ define(['MessageCenter'], function (mc) {
         this.acquireData = function (args) {
             var requester = args.target;
             //Calling wrong function
+            //TODO: fix this
             if (requester === "dashboard") return;
             if (requester === "dashboard_list") return;
-            //            if( requester==="dashboard") { self.acquireDashboardData(args); return; }
+            if (requester === "drilldown") return;
+            if (requester === "drilldown1") requester = "drilldown";
             var opts = $.extend({
                 url: "http://37.139.4.54/tfoms/MDX",
                 type: "POST",
@@ -61,32 +80,23 @@ define(['MessageCenter'], function (mc) {
                     var chartData,
                         transformedData = [];
                     if (d) {
-                        var parse = function (d) {
-                            try {
-                                d = JSON.parse(d)
-                            } catch (e) {
-                                d = undefined
-                            };
-                            return d;
-                        }
-                        d = parse(d) || d;
-                        if (typeof d == "object" && d.length != 0) {
-                            for (var i = 0; i < d.axes[1].tuples.length; i++) {
-                                transformedData.push({
-                                    name: d.axes[1].tuples[i].caption,
-                                    data: d.cells[i]
-                                });
-                            }
-                        }
-                        chartData = transformedData || [];
+
+                        d = parseJSON(d) || d;
+                        chartData = d;
                     }
+                    if(d.cells && d.cells.length===0) {chartData = null}
                     mc.publish("data_acquired:" + requester, {
                         data: chartData
                     });
                     return 1;
                 }
             }, args.data);
-            $.ajax(opts);
+            if (this.mode == "ONLINE") {
+                $.ajax(opts);
+                return;
+            } else {
+                opts.success(mocks.MDXs[opts.data.MDX]);
+            }
 
         }
         /**
@@ -101,13 +111,15 @@ define(['MessageCenter'], function (mc) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube",
+                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName,
                 success: function (d) {
                     if (d) {
                         try {
-                            var d = JSON.parse(d) || d
+
+                            d = parseJSON(d) || d
+
                         } catch (e) {
-                            throw new Error("Invalid data from server");
+                            throw new Error("Invalid data from server", e);
                         }
                         var filters = d.children.slice(0);
                         mc.publish("filters_acquired", {
@@ -117,7 +129,12 @@ define(['MessageCenter'], function (mc) {
 
                 }
             };
-            $.ajax(filter_opts);
+            if (this.mode == "ONLINE") {
+                $.ajax(filter_opts);
+                return;
+            } else {
+                filter_opts.success(mocks.filters);
+            }
         };
         /**
          * Acquire possible values for selected filter
@@ -141,7 +158,7 @@ define(['MessageCenter'], function (mc) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube/" + path,
+                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName + "/" + path,
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
@@ -158,6 +175,24 @@ define(['MessageCenter'], function (mc) {
             }
             $.ajax(filter_list_opts);
         };
+        this.acquireDrilldown = function (args) {
+
+            var cubeName = args.cubeName,
+                path = args.path,
+                widget = args.widget || null;
+
+            var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
+            console.log(widget);
+            if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
+            args.target = "drilldown1";
+            args.data = {
+                data: {
+                    MDX: MDX
+                }
+            };
+            console.log(args);
+            this.acquireData(args);
+        };
 
         this.acquireDashboardData = function (args) {
             var dashName = args;
@@ -168,14 +203,18 @@ define(['MessageCenter'], function (mc) {
                 url: "http://37.139.4.54/tfoms/widgets/?w=" + dashName,
                 success: function (d) {
                     if (d) {
-                        var d = JSON.parse(d) || d;
+                        d = parseJSON(d) || d;
                         mc.publish("data_acquired:dashboard", d);
-
                     }
 
                 }
             };
-            $.ajax(dash_opts);
+            if (this.mode == "ONLINE") {
+                $.ajax(dash_opts);
+                return;
+            } else {
+                dash_opts.success(mocks.sample_dash);
+            }
         };
         this.acquireDashboardList = function (args) {
             var dash_opts = {
@@ -185,14 +224,19 @@ define(['MessageCenter'], function (mc) {
                 url: "http://37.139.4.54/tfoms/dashboards/",
                 success: function (d) {
                     if (d) {
-                        var d = JSON.parse(d) || d;
+                        var d = parseJSON(d) || d;
                         mc.publish("data_acquired:dashboard_list", d);
 
                     }
 
                 }
             };
-            $.ajax(dash_opts);
+            if (this.mode == "ONLINE") {
+                $.ajax(dash_opts);
+                return;
+            } else {
+                dash_opts.success(mocks.dashboards);
+            }
         };
         /* Subscriptions */
         mc.subscribe("data_requested", {
@@ -207,10 +251,17 @@ define(['MessageCenter'], function (mc) {
             subscriber: this,
             callback: this.acquireFilterValues
         });
-        mc.subscribe("data_requested:dashboard_list", {subscriber:this, callback:this.acquireDashboardList});
+        mc.subscribe("data_requested:dashboard_list", {
+            subscriber: this,
+            callback: this.acquireDashboardList
+        });
         mc.subscribe("data_requested:dashboard", {
             subscriber: this,
             callback: this.acquireDashboardData
+        });
+        mc.subscribe("data_requested:drilldown", {
+            subscriber: this,
+            callback: this.acquireDrilldown
         });
     };
     return new DBConnector();
