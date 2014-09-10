@@ -63,6 +63,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
+            console.log("acquireData.args",args);
             var requester = args.target;
             //Calling wrong function
             //TODO: fix this
@@ -70,6 +71,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "dashboard_list") return;
             if (requester === "drilldown") return;
             if (requester === "drilldown1") requester = "drilldown";
+            var mdxRequested = "";
             var opts = $.extend({
                 url: "http://37.139.4.54/tfoms/MDX",
                 type: "POST",
@@ -77,8 +79,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: "_SYSTEM",
                 password: "159eAe72a79539f32acb15b305030060",
                 success: function (d) {
+                    //console.log("%cGot data from server:","font-color:red",d);
                     var chartData,
                         transformedData = [];
+                        localStorage[mdxRequested] = d;
                     if (d) {
 
                         d = parseJSON(d) || d;
@@ -91,7 +95,9 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     return 1;
                 }
             }, args.data);
+            mdxRequested = opts.data.MDX;
             if (this.mode == "ONLINE") {
+                if(localStorage[mdxRequested]){opts.success(localStorage[mdxRequested]);return;}
                 $.ajax(opts);
                 return;
             } else {
@@ -182,7 +188,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 widget = args.widget || null;
 
             var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
-            console.log(widget);
+            //console.log(widget);
             if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
             args.target = "drilldown1";
             args.data = {
@@ -190,7 +196,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     MDX: MDX
                 }
             };
-            console.log(args);
+           // console.log(args);
             this.acquireData(args);
         };
 

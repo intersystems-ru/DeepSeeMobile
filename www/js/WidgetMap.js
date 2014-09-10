@@ -382,6 +382,7 @@ define(['MessageCenter'], function (mc) {
                 series: []
             }
         },
+        
         "lineChart":{
             type: "highcharts",
             callback: function (d) {

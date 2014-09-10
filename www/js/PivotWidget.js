@@ -30,10 +30,12 @@ define([], function () {
             });
             if (showDrilldown) {
                 $(w_selector).find(".drilldown-back-container").text("<").one("tap", function () {
+                    console.log("PIVOT SELECTOR", pivotSelector);
                     $(w_selector).find(".pivot-drilldown-container").hide();
                     $(w_selector).find(".drilldown-back-container").hide();
                     pivotSelector = ".pivot-container";
                     $(w_selector).find(".pivot-container").show();
+                    showDrilldown = false;
                 });
             }
         }

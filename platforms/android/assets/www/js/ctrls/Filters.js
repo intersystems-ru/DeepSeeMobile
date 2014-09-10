@@ -96,7 +96,7 @@ define([
                     self.getFilterInfo();
                     return false;
                 });
-                $holder.find(".toggle").off("toggle").on("toggle", function (e) {
+                $holder.find(".toggle").off("click").off("tap").off("toggle").on("toggle", function (e) {
                     if (e.originalEvent.detail.isActive) {
                         self.selectedFilter = $(this).parent().parent().data("filter");
                         self.getFilterInfo();

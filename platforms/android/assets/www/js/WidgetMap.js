@@ -19,26 +19,33 @@ define(['MessageCenter'], function (mc) {
                     text: data.axes[1].caption
                 };
                 this.config.yAxis.title = {
-                    text: data.axes[0].caption
+                    text: data.defaultCaption || data.axes[0].caption
                 };
+                var _pos = 0;
+                this.config.xAxis.categories = [];
+                this.config.series = [];
                 for (var i = 0; i < data.axes[1].tuples.length; i++) {
                     this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
-                    data.cells[i] = {
-                        y: data.cells[i],
+                }
+
+                for(var j = 0; j< data.axes[0].tuples.length; j++){
+                var tempData = [];
+                for(var i = 0; i< data.axes[1].tuples.length; i++){
+                        tempData[i] = {
+                        y: data.cells[i* data.axes[0].tuples.length + j],
                         drilldown: true,
                         cube: data.cubeName,
                         path: data.axes[1].tuples[i].path
+                        };
+                        
                     };
-                };
-
-                this.config.series = [{
-                    colorByPoint: true,
-                    data: data.cells,
-                    name: data.axes[0].caption
-                }];
-
-                console.log(this.config);
-                //this.renderWidget();
+                
+                this.config.series.push({
+                        colorByPoint:  (data.axes[0].tuples.length>1) ? false : true,
+                        data: tempData,
+                        name: data.axes[0].tuples[j].caption
+                        });
+                }
 
             },
             config: {
@@ -46,23 +53,31 @@ define(['MessageCenter'], function (mc) {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-
+                            if(this._isDrilldown) return;
+                            this._isDrilldown = true;
                             var chart = this;
-                            console.log(">",this);
-                            var _categories = this.axes[0].categories;
-                            this.axes[0].categories = [];
-                            console.log("chart=", chart);
-                            console.log("[pint = ", e.point);
+                            //var catName = chart.options.xAxis[0].title.text;
+                            this._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
+                            console.log(this._categories);
+//                            var _categories = this.options.xAxis[0].categories;
+                           this.axes[0].categories = [];
+                            if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
+                            
+                            
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
                             var mc = require("MessageCenter");
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
-                                    console.log('Drilldown data:', d);
                                     var transformedData = [];
+                                    var _name = d.data.axes[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
+                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
+//                                            chart.options.xAxis[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                            chart.axes[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                        }
                                         for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                             transformedData.push({
                                                 name: d.axes[1].tuples[i].caption,
@@ -74,9 +89,8 @@ define(['MessageCenter'], function (mc) {
                                         d = transformedData;
                                     }
                                     var data = d;
-                                    console.log(chart);
                                     var retVal = [{
-                                        name: chart.userOptions.yAxis.title.text,
+                                        name: _name,
                                         data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
@@ -89,7 +103,10 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
-                                    chart.axes[0].categories = _categories;
+                                    chart = null;
+//                                    chart.axes[0].categories = _categories;
+                                    //chart.options.xAxis[0].categories = _categories;
+                                    //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
                                 },
                                 once: true
                             });
@@ -100,6 +117,11 @@ define(['MessageCenter'], function (mc) {
                             });
                             mc = null;
 
+                        },
+                        drillup:function(e){
+                            console.log("DRILLUP");
+                            this._isDrilldown = false;
+                            if (this._categories) {this.axes[0].categories = this._categories;}
                         }
                     }
                 },
@@ -107,7 +129,7 @@ define(['MessageCenter'], function (mc) {
                     categories: []
                 },
                 yAxis: {},
-
+                legend:{enabled:false},
                 series: [],
                 drilldown: {
                     series: []
@@ -237,8 +259,8 @@ define(['MessageCenter'], function (mc) {
         "null": {
             type: "none",
             callback: function (d) {
-                console.log(d,this);
-                $("#widget"+this.id).parent().parent().find("h1").text("Widget is not yet implemented");
+                console.log(d, this);
+                $("#widget" + this.id).parent().parent().find("h1").text("Widget is not yet implemented");
             },
             title: "Not implemented",
             config: {},
@@ -247,7 +269,7 @@ define(['MessageCenter'], function (mc) {
         "pivot": {
             type: "pivot",
             convertor: function (d) {
-                
+
                 var rowsAxisCaption = d.data.axes[1].caption || "Rows";
                 var transformedData = {
                     data: [],
@@ -256,7 +278,6 @@ define(['MessageCenter'], function (mc) {
                     rows: [rowsAxisCaption],
 
                 };
-                //TODO: Получать заголовок
                 for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
                     for (var j = 0; j < d.data.axes[0].tuples.length; j++) {
                         var dataEntry = {};
@@ -277,6 +298,7 @@ define(['MessageCenter'], function (mc) {
                         mc.subscribe("data_acquired:drilldown", {
                             subscriber: _widget,
                             callback: function (d) {
+                                if(d && d.data ==null){return;}
                                 this.onDataAcquired(d, true);
                             },
                             once: true
@@ -294,6 +316,169 @@ define(['MessageCenter'], function (mc) {
             },
             config: {},
             filters: []
+        },
+        "columnChart": {
+            type: "highcharts",
+            callback: function (d) {
+                var data = d.data;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                    data.cells[i] = {
+                        y: data.cells[i],
+                        //drilldown: false,
+                        cube: data.cubeName,
+                        path: data.axes[1].tuples[i].path
+                    };
+                };
+
+                this.config.series = [{
+                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+
+               
+                //this.renderWidget();
+
+            },
+            config: {
+                chart: {
+                    type: 'column',
+                    margin: 75,
+                    options3d: {
+                    enabled: true,
+                    alpha: 15,
+                    beta: 15,
+                    viewDistance: 25,
+                    depth: 40
+                    }
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: 'Notice the 3D'
+                },
+                legend:{
+                    enabled:false
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25
+                    }
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    opposite: true
+                },
+                series: []
+            }
+        },
+        "lineChart":{
+            type: "highcharts",
+            callback: function (d) {
+
+               
+                var data = d.data;
+                //this.config.xAxis.type="category";
+                //this.config.xAxis.showEmpty = false;
+                this.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.axes[0].caption
+                };
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+//                    data.cells[i] = {
+//                        y: data.cells[i],
+//                        cube: data.cubeName,
+//                        path: data.axes[1].tuples[i].path
+//                    };
+                };
+
+                this.config.series = [{
+//                    colorByPoint: true,
+                    data: data.cells,
+                    name: data.axes[0].caption,
+                    lineWidth: 4
+                }];
+
+            },
+            config:{
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'It is allowed to use subtitle',
+           
+        },
+        xAxis: {
+            categories: []
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        plotOptions: {
+            series: {
+                lineWidth: 3
+            }
+        },
+        legend: {
+            enabled:false
+        },
+        series: []
+    }
+        },
+        "":{
+            type:"highcharts",
+            callback: function (d) {
+                var data = d.data;
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    data.cells[i] = [data.axes[1].tuples[i].caption.toString(), data.cells[i]];
+                };
+
+                this.config.series = [{
+                    data: data.cells,
+                    name: data.axes[0].caption
+                }];
+                 
+
+                console.log(this.config);
+                //this.renderWidget();
+
+            },
+            config:{
+        chart: {
+            type: 'pyramid',
+            marginRight: 100
+        },
+        title: {
+            text: ''
+        },
+        plotOptions: {
+            series: {
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>({point.y:,.0f})',
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                    softConnector: true
+                }
+            }
+        },
+        
+        series: [{}]
+    }
         }
     };
 });
