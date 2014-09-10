@@ -53,10 +53,12 @@ define(['MessageCenter'], function (mc) {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-                            if (this.drilldownLevels && this.drilldownLevels.length>0) return;
+                            if(this._isDrilldown) return;
+                            this._isDrilldown = true;
                             var chart = this;
-                            var catName = chart.options.xAxis[0].title.text;
-                            var _categories = this.axes[0].categories;
+                            //var catName = chart.options.xAxis[0].title.text;
+                            this._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
+                            console.log(this._categories);
 //                            var _categories = this.options.xAxis[0].categories;
                            this.axes[0].categories = [];
                             if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
@@ -69,6 +71,7 @@ define(['MessageCenter'], function (mc) {
                                 subscriber: this,
                                 callback: function (d) {
                                     var transformedData = [];
+                                    var _name = d.data.axes[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
                                         for (var i = 0; i < d.axes[1].tuples.length; i++) {
@@ -87,7 +90,7 @@ define(['MessageCenter'], function (mc) {
                                     }
                                     var data = d;
                                     var retVal = [{
-                                        name: catName,
+                                        name: _name,
                                         data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
@@ -100,6 +103,7 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
+                                    chart = null;
 //                                    chart.axes[0].categories = _categories;
                                     //chart.options.xAxis[0].categories = _categories;
                                     //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
@@ -113,6 +117,11 @@ define(['MessageCenter'], function (mc) {
                             });
                             mc = null;
 
+                        },
+                        drillup:function(e){
+                            console.log("DRILLUP");
+                            this._isDrilldown = false;
+                            if (this._categories) {this.axes[0].categories = this._categories;}
                         }
                     }
                 },

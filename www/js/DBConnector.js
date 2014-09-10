@@ -63,6 +63,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
+            console.log("acquireData.args",args);
             var requester = args.target;
             //Calling wrong function
             //TODO: fix this
@@ -187,7 +188,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 widget = args.widget || null;
 
             var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
-            console.log(widget);
+            //console.log(widget);
             if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
             args.target = "drilldown1";
             args.data = {
@@ -195,7 +196,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     MDX: MDX
                 }
             };
-            console.log(args);
+           // console.log(args);
             this.acquireData(args);
         };
 
