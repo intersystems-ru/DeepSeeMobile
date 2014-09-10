@@ -4,7 +4,7 @@ define(['MessageCenter'], function (mc) {
         LoadingSpinner.prototype._instance = this;
         var dataCount = 0;
 
-        this.show = function show() {
+        this.show = function() {
             console.log("Loading spinner.show");
             if (!dataCount && ($(".spinner-wrapper")[0] === undefined)) {
                 require(['text!../views/Spinner.html'], function (html) {
@@ -19,19 +19,19 @@ define(['MessageCenter'], function (mc) {
             console.log('Data count.show:',dataCount);
             
         };
-        this.hide = function hide() {
+        this.hide = function () {
             console.log("Loading spinner.hide");
-            if (dataCount === 0) return;
+            if (dataCount <= 0) return;
 
             dataCount--;
-            if (dataCount <= 0) {
-                $(".spinner-wrapper").animate({
-                    opacity: 0
-                }, 300, function () {
-                    $(this).hide();
+            console.log('Data count.hide:',dataCount);
+            if (dataCount == 0) {
+                console.log("щас спрячу");
+                $(".spinner-wrapper").animate({opacity: 0}, 300, function () {
+                    $(".spinner-wrapper").hide();
                 });
             }
-            console.log('Data count.hide:',dataCount);
+            
         };
         mc.subscribe('data_requested', {
             subscriber: this,

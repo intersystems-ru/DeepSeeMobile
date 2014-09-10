@@ -19,23 +19,38 @@ define(['MessageCenter'], function (mc) {
                     text: data.axes[1].caption
                 };
                 this.config.yAxis.title = {
-                    text: data.axes[0].caption
+                    text: data.defaultCaption || data.axes[0].caption
                 };
+                var _pos = 0;
                 for (var i = 0; i < data.axes[1].tuples.length; i++) {
                     this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
-                    data.cells[i] = {
-                        y: data.cells[i],
+                }
+
+                for(var j = 0; j< data.axes[0].tuples.length; j++){
+                var tempData = [];
+                for(var i = 0; i< data.axes[1].tuples.length; i++){
+                        tempData[i] = {
+                        y: data.cells[i* data.axes[0].tuples.length + j],
                         drilldown: true,
                         cube: data.cubeName,
                         path: data.axes[1].tuples[i].path
+                        };
+                        
                     };
-                };
+                
+                this.config.series.push({
+                        colorByPoint:  (data.axes[0].tuples.length>1) ? false : true,
+                        data: tempData,
+                        name: data.axes[0].tuples[j].caption
+                        });
+                }
+                
+               
+                
+                   
+                
 
-                this.config.series = [{
-                    colorByPoint: true,
-                    data: data.cells,
-                    name: data.axes[0].caption
-                }];
+                //this.config.series = [];
 
                 console.log(this.config);
                 //this.renderWidget();
@@ -277,6 +292,7 @@ define(['MessageCenter'], function (mc) {
                         mc.subscribe("data_acquired:drilldown", {
                             subscriber: _widget,
                             callback: function (d) {
+                                if(d && d.data ==null){return;}
                                 this.onDataAcquired(d, true);
                             },
                             once: true
@@ -330,7 +346,7 @@ define(['MessageCenter'], function (mc) {
                     type: 'column',
                     margin: 75,
                     options3d: {
-                        enabled: true,
+                    enabled: true,
                     alpha: 15,
                     beta: 15,
                     viewDistance: 25,

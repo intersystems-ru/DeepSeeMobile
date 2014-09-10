@@ -19,26 +19,33 @@ define(['MessageCenter'], function (mc) {
                     text: data.axes[1].caption
                 };
                 this.config.yAxis.title = {
-                    text: data.axes[0].caption
+                    text: data.defaultCaption || data.axes[0].caption
                 };
+                var _pos = 0;
+                this.config.xAxis.categories = [];
+                this.config.series = [];
                 for (var i = 0; i < data.axes[1].tuples.length; i++) {
                     this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
-                    data.cells[i] = {
-                        y: data.cells[i],
+                }
+
+                for(var j = 0; j< data.axes[0].tuples.length; j++){
+                var tempData = [];
+                for(var i = 0; i< data.axes[1].tuples.length; i++){
+                        tempData[i] = {
+                        y: data.cells[i* data.axes[0].tuples.length + j],
                         drilldown: true,
                         cube: data.cubeName,
                         path: data.axes[1].tuples[i].path
+                        };
+                        
                     };
-                };
-
-                this.config.series = [{
-                    colorByPoint: true,
-                    data: data.cells,
-                    name: data.axes[0].caption
-                }];
-
-                console.log(this.config);
-                //this.renderWidget();
+                
+                this.config.series.push({
+                        colorByPoint:  (data.axes[0].tuples.length>1) ? false : true,
+                        data: tempData,
+                        name: data.axes[0].tuples[j].caption
+                        });
+                }
 
             },
             config: {
@@ -46,23 +53,28 @@ define(['MessageCenter'], function (mc) {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-
+                            if (this.drilldownLevels && this.drilldownLevels.length>0) return;
                             var chart = this;
-                            console.log(">", this);
+                            var catName = chart.options.xAxis[0].title.text;
                             var _categories = this.axes[0].categories;
-                            this.axes[0].categories = [];
-                            console.log("chart=", chart);
-                            console.log("[pint = ", e.point);
+//                            var _categories = this.options.xAxis[0].categories;
+                           this.axes[0].categories = [];
+                            if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
+                            
+                            
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
                             var mc = require("MessageCenter");
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
-                                    console.log('Drilldown data:', d);
                                     var transformedData = [];
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
+                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
+//                                            chart.options.xAxis[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                            chart.axes[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                        }
                                         for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                             transformedData.push({
                                                 name: d.axes[1].tuples[i].caption,
@@ -74,9 +86,8 @@ define(['MessageCenter'], function (mc) {
                                         d = transformedData;
                                     }
                                     var data = d;
-                                    console.log(chart);
                                     var retVal = [{
-                                        name: chart.userOptions.yAxis.title.text,
+                                        name: catName,
                                         data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
@@ -89,7 +100,9 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
-                                    chart.axes[0].categories = _categories;
+//                                    chart.axes[0].categories = _categories;
+                                    //chart.options.xAxis[0].categories = _categories;
+                                    //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
                                 },
                                 once: true
                             });
@@ -107,7 +120,7 @@ define(['MessageCenter'], function (mc) {
                     categories: []
                 },
                 yAxis: {},
-
+                legend:{enabled:false},
                 series: [],
                 drilldown: {
                     series: []
@@ -256,7 +269,6 @@ define(['MessageCenter'], function (mc) {
                     rows: [rowsAxisCaption],
 
                 };
-                //TODO: Получать заголовок
                 for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
                     for (var j = 0; j < d.data.axes[0].tuples.length; j++) {
                         var dataEntry = {};

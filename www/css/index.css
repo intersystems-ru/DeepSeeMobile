@@ -152,6 +152,16 @@ nav.bar.bar-tab a.tab-item {
     width: 20px;
     height: 20px;
     z-index: 10000;
+    padding:10px;
+}
+#clearCache {
+    position: fixed;
+    top: 20px;
+    left: 50px;
+    width: 20px;
+    height: 20px;
+    z-index: 10000;
+    padding:10px;
 }
 /* PIVOT */
 

@@ -118,7 +118,7 @@ define([
             console.log(d);
              $("#widget" + this.id).parent().find(".error-msg").html('').hide();
             if(isDrillDown === undefined) isDrillDown = false;
-            if (!d || d.data === null) {
+            if (d===undefined || d.data === null) {
                 $("#widget" + this.id).parent().find(".error-msg").html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>").show();
                 return;
             }

@@ -70,6 +70,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "dashboard_list") return;
             if (requester === "drilldown") return;
             if (requester === "drilldown1") requester = "drilldown";
+            var mdxRequested = "";
             var opts = $.extend({
                 url: "http://37.139.4.54/tfoms/MDX",
                 type: "POST",
@@ -77,8 +78,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: "_SYSTEM",
                 password: "159eAe72a79539f32acb15b305030060",
                 success: function (d) {
+                    //console.log("%cGot data from server:","font-color:red",d);
                     var chartData,
                         transformedData = [];
+                        localStorage[mdxRequested] = d;
                     if (d) {
 
                         d = parseJSON(d) || d;
@@ -91,7 +94,9 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     return 1;
                 }
             }, args.data);
+            mdxRequested = opts.data.MDX;
             if (this.mode == "ONLINE") {
+                if(localStorage[mdxRequested]){opts.success(localStorage[mdxRequested]);return;}
                 $.ajax(opts);
                 return;
             } else {
