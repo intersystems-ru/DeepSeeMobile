@@ -63,7 +63,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
-            console.log("acquireData.args",args);
+            //console.log("acquireData.args",args);
             var requester = args.target;
             //Calling wrong function
             //TODO: fix this

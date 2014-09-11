@@ -7,7 +7,7 @@ define([], function () {
             var w_selector = "#widget" + this.id || "";
             var pivotSelector = ".pivot-container";
             if (isDrillDown) showDrilldown = isDrillDown;
-            console.log("PW: ", this.config, w_selector);
+            //console.log("PW: ", this.config, w_selector);
             if (Object.keys(this.config).length < 2) return this;
             if (!hasDiv) {
                 $("<div class='pivot-container' width=100%>").appendTo(w_selector);
@@ -30,7 +30,7 @@ define([], function () {
             });
             if (showDrilldown) {
                 $(w_selector).find(".drilldown-back-container").text("<").one("tap", function () {
-                    console.log("PIVOT SELECTOR", pivotSelector);
+                    //console.log("PIVOT SELECTOR", pivotSelector);
                     $(w_selector).find(".pivot-drilldown-container").hide();
                     $(w_selector).find(".drilldown-back-container").hide();
                     pivotSelector = ".pivot-container";

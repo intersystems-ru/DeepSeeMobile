@@ -11,7 +11,7 @@ define(['MessageCenter'], function (mc) {
             type: "highcharts",
             callback: function (d) {
 
-                console.log("HERE:", d);
+                //console.log("HERE:", d);
                 var data = d.data;
                 //this.config.xAxis.type="category";
                 //this.config.xAxis.showEmpty = false;
@@ -115,7 +115,7 @@ define(['MessageCenter'], function (mc) {
 
                         },
                         drillup:function(e){
-                            console.log("DRILLUP");
+                            //console.log("DRILLUP");
                             this._isDrilldown = false;
                             if (this._categories) {this.axes[0].categories = this._categories;}
                         }
@@ -142,7 +142,7 @@ define(['MessageCenter'], function (mc) {
                 for (var d = 0; d < data.axes[1].tuples.length; d++) {
                     retVal.push([data.axes[1].tuples[d].caption, data.cells[d]]);
                 };
-                console.log("GOT DATA PIE:", this, retVal);
+                //console.log("GOT DATA PIE:", this, retVal);
                 this.config.series[0].data = retVal;
                 //                this.renderWidget();
             },
@@ -255,7 +255,7 @@ define(['MessageCenter'], function (mc) {
         "null": {
             type: "none",
             callback: function (d) {
-                console.log(d, this);
+                //console.log(d, this);
                 $("#widget" + this.id).parent().parent().find("h1").text("Widget is not yet implemented");
             },
             title: "Not implemented",
@@ -451,7 +451,7 @@ define(['MessageCenter'], function (mc) {
                 }];
                  
 
-                console.log(this.config);
+                //console.log(this.config);
                 //this.renderWidget();
 
             },
