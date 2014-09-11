@@ -57,12 +57,6 @@ define(['MessageCenter'], function (mc) {
                             this._isDrilldown = true;
                             var chart = this;
                             //var catName = chart.options.xAxis[0].title.text;
-                            this._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
-                            console.log(this._categories);
-//                            var _categories = this.options.xAxis[0].categories;
-                           this.axes[0].categories = [];
-                            if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
-                            
                             
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
@@ -70,6 +64,11 @@ define(['MessageCenter'], function (mc) {
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
+                                    chart._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
+                                    chart.axes[0].categories = [];
+                                    if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = [];
+                            
+                            
                                     var transformedData = [];
                                     var _name = d.data.axes[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
@@ -104,9 +103,6 @@ define(['MessageCenter'], function (mc) {
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
                                     chart = null;
-//                                    chart.axes[0].categories = _categories;
-                                    //chart.options.xAxis[0].categories = _categories;
-                                    //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
                                 },
                                 once: true
                             });

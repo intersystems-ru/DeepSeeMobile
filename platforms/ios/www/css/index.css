@@ -46,6 +46,8 @@ header {
 .slide>div {
     height: 100%;
     padding-bottom: 44px;
+}
+.slide>div>div{
     overflow: auto;
     -webkit-overflow-scrolling:touch
 }
