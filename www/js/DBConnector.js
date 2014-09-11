@@ -3,7 +3,7 @@
  * Implements ajax data fetching from Cache back-end
  * @module DBConnector
  */
-define(['jquery', 'MessageCenter'], function ($, mc) {
+define(['MessageCenter', 'Mocks'], function (mc, mocks) {
     "use strict";
     /**
      * @constructor
@@ -17,6 +17,7 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
             return DBConnector.prototype._instance;
         }
         DBConnector.prototype._instance = this;
+        var self = this;
         /**
          * Default settings for DBConnector
          * @var {Object}
@@ -27,8 +28,25 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
          */
         var defaults = {
             username: "_SYSTEM",
-            password: "159eAe72a79539f32acb15b305030060"
+            password: "159eAe72a79539f32acb15b305030060",
+            cubeName: "HoleFoods"
         };
+        var parseJSON = function (d) {
+            try {
+                d = JSON.parse(d)
+            } catch (e) {
+                console.log("Error in parsing data:", d);
+                d = undefined;
+
+            };
+            return d;
+        }
+        this.mode = "ONLINE";
+        this.drillMDX = function (str, path) {
+            var row = str.substring(str.indexOf(" ON 0,") + 6, str.indexOf(" ON 1"));
+            str = str.replace(row, path + ".Children");
+            return str;
+        }
         /**
          * @name module:DBConnector#toString
          * @function
@@ -45,43 +63,46 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
-            var requester = args[0],
-                opts = $.extend({
-                    url: "http://37.139.4.54/tfoms/MDX",
-                    type: "POST",
-                    data: {},
-                    username: "_SYSTEM",
-                    password: "159eAe72a79539f32acb15b305030060",
-                    success: function (d) {
-                        var chartData,
-                            transformedData = [];
-                        if (d) {
-                            var parse = function (d) {
-                                try {
-                                    d = JSON.parse(d)
-                                } catch (e) {
-                                    d = undefined
-                                };
-                                return d;
-                            }
-                            d = parse(d) || d;    
-                            if (typeof d == "object" && d.length != 0) {
-                                for (var i = 0; i < d.axes[1].tuples.length; i++) {
-                                    transformedData.push({
-                                        category: d.axes[1].tuples[i].caption,
-                                        value: d.cells[i]
-                                    });
-                                }
-                            }
-                            chartData = transformedData || [];
-                        }
-                        mc.publish(requester + "_data_acquired", {
-                            data: chartData
-                        });
-                        return 1;
+            //console.log("acquireData.args",args);
+            var requester = args.target;
+            //Calling wrong function
+            //TODO: fix this
+            if (requester === "dashboard") return;
+            if (requester === "dashboard_list") return;
+            if (requester === "drilldown") return;
+            if (requester === "drilldown1") requester = "drilldown";
+            var mdxRequested = "";
+            var opts = $.extend({
+                url: "http://37.139.4.54/tfoms/MDX",
+                type: "POST",
+                data: {},
+                username: "_SYSTEM",
+                password: "159eAe72a79539f32acb15b305030060",
+                success: function (d) {
+                    //console.log("%cGot data from server:","font-color:red",d);
+                    var chartData,
+                        transformedData = [];
+                        localStorage[mdxRequested] = d;
+                    if (d) {
+
+                        d = parseJSON(d) || d;
+                        chartData = d;
                     }
-                }, args[1]);
-            $.ajax(opts);
+                    if(d.cells && d.cells.length===0) {chartData = null}
+                    mc.publish("data_acquired:" + requester, {
+                        data: chartData
+                    });
+                    return 1;
+                }
+            }, args.data);
+            mdxRequested = opts.data.MDX;
+            if (this.mode == "ONLINE") {
+                if(localStorage[mdxRequested]){opts.success(localStorage[mdxRequested]);return;}
+                $.ajax(opts);
+                return;
+            } else {
+                opts.success(mocks.MDXs[opts.data.MDX]);
+            }
 
         }
         /**
@@ -96,13 +117,15 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube",
+                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName,
                 success: function (d) {
                     if (d) {
                         try {
-                            var d = JSON.parse(d) || d
+
+                            d = parseJSON(d) || d
+
                         } catch (e) {
-                            throw new Error("Invalid data from server");
+                            throw new Error("Invalid data from server", e);
                         }
                         var filters = d.children.slice(0);
                         mc.publish("filters_acquired", {
@@ -112,7 +135,12 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
 
                 }
             };
-            $.ajax(filter_opts);
+            if (this.mode == "ONLINE") {
+                $.ajax(filter_opts);
+                return;
+            } else {
+                filter_opts.success(mocks.filters);
+            }
         };
         /**
          * Acquire possible values for selected filter
@@ -122,19 +150,28 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
          * @listens module:MessageCenter#filter_list_requested
          */
         this.acquireFilterValues = function (args) {
-            var path = args[0],
-                name = args[1];
+            var path = args.target,
+                name = args.data;
+            if (sessionStorage.getItem("filterValues:" + path)) {
+                mc.publish("filter_values_acquired:" + path, {
+                    data: JSON.parse(sessionStorage.getItem("filterValues:" + path)),
+                    path: path,
+                    name: name
+                });
+                return;
+            }
             var filter_list_opts = {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/QueueCube/" + path,
+                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName + "/" + path,
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
-                            filters = d.children.slice(0);
-                        mc.publish("filter_values_acquired" + path, {
-                            data: filters,
+                            filterValues = d.children.slice(0);
+                        sessionStorage.setItem("filterValues:" + path, JSON.stringify(filterValues))
+                        mc.publish("filter_values_acquired:" + path, {
+                            data: filterValues,
                             path: path,
                             name: name
                         });
@@ -144,21 +181,94 @@ define(['jquery', 'MessageCenter'], function ($, mc) {
             }
             $.ajax(filter_list_opts);
         };
-        /* Subscriptions */
-        if (mc) {
-            mc.subscribe("data_requested", {
-                subscriber: this,
-                callback: this.acquireData
-            });
-            mc.subscribe("filters_requested", {
-                subscriber: this,
-                callback: this.acquireFilters
-            });
-            mc.subscribe("filter_values_requested", {
-                subscriber: this,
-                callback: this.acquireFilterValues
-            });
+        this.acquireDrilldown = function (args) {
+
+            var cubeName = args.cubeName,
+                path = args.path,
+                widget = args.widget || null;
+
+            var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
+            //console.log(widget);
+            if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
+            args.target = "drilldown1";
+            args.data = {
+                data: {
+                    MDX: MDX
+                }
+            };
+           // console.log(args);
+            this.acquireData(args);
         };
+
+        this.acquireDashboardData = function (args) {
+            var dashName = args;
+            var dash_opts = {
+                username: defaults.username,
+                password: defaults.password,
+                type: "GET",
+                url: "http://37.139.4.54/tfoms/widgets/?w=" + dashName,
+                success: function (d) {
+                    if (d) {
+                        d = parseJSON(d) || d;
+                        mc.publish("data_acquired:dashboard", d);
+                    }
+
+                }
+            };
+            if (this.mode == "ONLINE") {
+                $.ajax(dash_opts);
+                return;
+            } else {
+                dash_opts.success(mocks.sample_dash);
+            }
+        };
+        this.acquireDashboardList = function (args) {
+            var dash_opts = {
+                username: defaults.username,
+                password: defaults.password,
+                type: "GET",
+                url: "http://37.139.4.54/tfoms/dashboards/",
+                success: function (d) {
+                    if (d) {
+                        var d = parseJSON(d) || d;
+                        mc.publish("data_acquired:dashboard_list", d);
+
+                    }
+
+                }
+            };
+            if (this.mode == "ONLINE") {
+                $.ajax(dash_opts);
+                return;
+            } else {
+                dash_opts.success(mocks.dashboards);
+            }
+        };
+        /* Subscriptions */
+        mc.subscribe("data_requested", {
+            subscriber: this,
+            callback: this.acquireData
+        });
+        mc.subscribe("filters_requested", {
+            subscriber: this,
+            callback: this.acquireFilters
+        });
+        mc.subscribe("filter_values_requested", {
+            subscriber: this,
+            callback: this.acquireFilterValues
+        });
+        mc.subscribe("data_requested:dashboard_list", {
+            subscriber: this,
+            callback: this.acquireDashboardList
+        });
+        mc.subscribe("data_requested:dashboard", {
+            subscriber: this,
+            callback: this.acquireDashboardData
+        });
+        mc.subscribe("data_requested:drilldown", {
+            subscriber: this,
+            callback: this.acquireDrilldown
+        });
     };
     return new DBConnector();
 });

@@ -1,6 +1,10 @@
 /**
  * @fileOverview
- * Widget module<br>
+ * Widget module.<br>
+ * Represents widget class.
+ * Implements common widget interface.
+ * All render details must be implemented in classes ******Widget.js
+ * and added to typesMap
  * @author Shmidt Ivan
  * @version 0.0.1
  * @module Widget
@@ -8,7 +12,13 @@
  * @requires Utils
  * @requires MessageCenter
  */
-define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, mc) {
+define([
+    'FiltersList',
+    'Utils',
+    'MessageCenter',
+    'HighchartsWidget',
+    'PivotWidget'
+], function (FiltersList, Utils, mc, HighchartsWidget, PivotWidget) {
     /**
      * Creates new Widget object
      * @alias module:Widget
@@ -20,78 +30,56 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
      *<caption>Creating new widget</caption>
      * new Widget(config);
      */
-    function Widget(config) {
+    function Widget(opts) {
+        this.def = opts.promise;
+        opts = opts || {};
         /** @lends module:Widget#*/
         'use strict';
-        var self = this;
+        this.active = false;
+        /** 
+         * If defined, would be used for data convertion
+         * @function module:Widget#convertor
+         * @return ConvertedData
+         */
+        this.convertor = _.has(opts, 'convertor') ? opts.convertor : null;
         /**
          * @var {number} module:Widget#id ID of widget in dashboard
          */
-        this.id = config.id;
-        this.toString = function () {
-            return "Widget" + this.id;
-        };
+        this.id = _.has(opts, 'id') ? opts.id : null;
+        this.callback = opts.callback || undefined;
         /**
          * @var {string} module:Widget#name Name of widget (title)
          */
-        this.name = config.title || "Widget" + this.id;
+        this.name = _.has(opts, 'config') ? opts.config.title.text : "Widget" + this.id;
         /**
          * @var {module:Dashboard} module:Widget#dashboard Parent dashboard object
          */
-        this.dashboard = config.dashboard || "";
+        this.dashboard = _.has(opts, 'dashboard') ? opts.dashboard : null;
         /**
-         * @var {Object} module:Widget#amcharts_config AmCharts config object
+         * @var {Object} module:Widget#config Chart config object
          */
-        this.amcharts_config = config.amconfig || {};
+        this.config = _.has(opts, 'config') ? opts.config : {};
         /**
          * @var {Object} module:Widget#chart Amcharts object, created after rendering
+         *@deprecated
          */
         this.chart = '';
-        /**
-         * Request data from module:MessageCenter
-         * @function module:Widget#requestData
-         * @fires module:MessageCenter#data_requested
-         */
-        this.requestData = function () {
-            mc.publish("data_requested", ["widget" + self.id, {
-                data: self.datasource.data
-            }]);
-        }
-        /**
-         * Callback, fired when data acquired
-         * @function module:Widget#onDataAcquired
-         * @private
-         */
-        var onDataAcquired = config.callback || function (d) {
-            this.amcharts_config.dataProvider = d.data;
-            this.render();
-        };
+        this.subs = [];
 
-        //When created widget, must subscribe to widget[i] data acquired
-        if (mc) {
-            mc.subscribe("widget" + this.id + "_data_acquired", {
-                subscriber: this,
-                callback: onDataAcquired
-            });
-        }
-        /**
-         * @var {module:FiltersList} module:Widget#filters Selected filters list
-         */
-        this.filters = new FiltersList({
-            filters: config.filters,
-            onSetFilter: this.requestData,
-            container: "#widget" + self.id
-        });
         /**
          * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
          */
         var _datasource = {};
+
+        //Set up datasource without using setter
+        _datasource = opts.datasource || {
+            data: {}
+        };
         Object.defineProperty(this, 'datasource', {
             get: function () {
                 var retVal = _datasource.data.MDX;
-                if (self.filters.hasFilters()) {
-                    var _filters = self.filters.getAll();
-                    console.log("%cFILTERS:", "color:blue", _filters);
+                if (this.filters.hasFilters()) {
+                    var _filters = this.filters.getAll();
                     for (var i in _filters) {
                         if (_filters[i].value != '')
                             retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
@@ -105,44 +93,121 @@ define(['FiltersList', 'Utils', 'MessageCenter'], function (FiltersList, Utils, 
             },
             set: function (value) {
                 _datasource = value;
-                self.requestData();
+                this.requestData();
             }
 
 
         });
+        this.filters = "";
 
-        //Set up datasource using setter
-        this.datasource = config.datasource || {
-            data: {}
+        var typesMap = {
+            'highcharts': HighchartsWidget,
+            'pivot': PivotWidget
         };
-
+        //Extend with type-specified opts
+        if (_.has(opts, 'type') && _.has(typesMap, opts.type)) {
+            _.extend(this, new typesMap[opts.type]())
+        };
         /**
-         * Simply renders widget
-         *@function module:Widget#render
+         * Callback, fired when data acquired
+         * @function module:Widget#onDataAcquired
+         * @private
+         * @todo Route which field data would be kept
          */
-        this.render = function () {
-            var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
-
-            require(["text!../Widget.html"], function (html) {
-                html = html.replace("{{title}}", Utils.trim(self.name))
-                    .replace("{{id}}", self.id);
-                if ($("#widget" + self.id)[0] == undefined) $(widget_holder).append(html);
-                if (self.amcharts_config.dataProvider && self.amcharts_config.dataProvider.length == 0) {
-                    $("#widget" + self.id).empty().append("<p class='alert'>Cannot visuallize data! Change datasource</p>");
-                    return;
-                };
-                if (self.amcharts_config) {
-                    var w_selector = "widget" + self.id || "";
-                    if (AmCharts) {
-                        self.chart = AmCharts.makeChart(w_selector, self.amcharts_config);
-
-                    }
-                }
-                console.log("[Render]Finished: " + self.name);
+        this.onDataAcquired = function (d, isDrillDown) {
+            //console.log(d);
+             $("#widget" + this.id).parent().find(".error-msg").html('').hide();
+            if(isDrillDown === undefined) isDrillDown = false;
+            if (d===undefined || d.data === null) {
+                $("#widget" + this.id).parent().find(".error-msg").html("<h4 class='data-null'>Dataset is empty, change filters or query</h4>").show();
+                return;
+            }
+            if (this.convertor) {
+                // d =  || d;
+                d = this.convertor(d);
+            }
+            if (this.callback) {
+                //Added widget link to callback's call
+                this.callback(d,this);
+            }
+            if (this.renderWidget) this.renderWidget(isDrillDown);
+        };
+        this.removeRefs = function () {
+            var self = this;
+            _.each(this.subs, function (sub, i) {
+                mc.remove(sub);
+                sub = null;
+                self.subs.splice(i, 1);
             });
-            return this;
+            this.subs = [];
+            self = null;
+        };
+        //When created widget, must subscribe to widget[i] data acquired
+        this.init(opts);
+        return this;
+    };
 
-        }
+    Widget.prototype.toString = function () {
+        return "Widget" + this.id;
+    };
+    Widget.prototype.init = function (opts) {
+
+
+        this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
+            subscriber: this,
+            callback: this.onDataAcquired
+        }));
+        mc.subscribe("clear:widgets", {
+            subscriber: this,
+            callback: this.removeRefs,
+            once: true
+        });
+        /**
+         * @var {module:FiltersList} module:Widget#filters Selected filters list
+         */
+        this.filters = new FiltersList({
+            filters: opts.filters || [],
+            onSetFilter: this.requestData,
+            container: "#widget" + this.id,
+            w_obj: this
+        });
+        var self = this;
+        this.createHolder().then(function(){self.requestData()});
+        mc.publish('[Init]Finished: ' +this.name);
+    };
+    /**
+     * Simply renders widget
+     *@function module:Widget#render
+     */
+    Widget.prototype.createHolder = function () {
+        var def = $.Deferred();
+        //if (!this.active) return this;
+        var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
+        var self = this;
+        require(["text!../views/Widget.html"], function (html) {
+            html = html.replace("{{title}}", self.name)
+                .replace("{{id}}", self.id);
+            if ($("#widget" + self.id)[0] == undefined) {
+                $(widget_holder).append(html);
+                def.resolve();
+                //mc.publish("[Render]Holder created: " + self.name);
+                
+            }
+            self = null;
+        });
+
+        return def.promise();
+
+    };
+    /**
+     * Request data from module:MessageCenter
+     * @function module:Widget#requestData
+     * @fires module:MessageCenter#data_requested
+     */
+    Widget.prototype.requestData = function () {
+        mc.publish("data_requested:widget" + this.id, {
+            data: this.datasource.data
+        });
     };
     return Widget;
 })

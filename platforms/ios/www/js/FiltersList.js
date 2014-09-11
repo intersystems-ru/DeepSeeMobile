@@ -10,24 +10,26 @@ define(['Filter'], function (Filter) {
         this.hasFilters = function () {
             return (_filters && (Object.keys(_filters).length != 0));
         };
-        this.getFilter = function (name) {
-            return _filters[name] ? _filters[name] : "";
+        this.getFilter = function (path) {
+            return _filters[path] ? _filters[path] : "";
         };
-        this.remove = function(name){
-            delete _filters[name];
-            if(options.onSetFilter) options.onSetFilter();
+        this.remove = function(path){
+            delete _filters[path];
+            if(options.onSetFilter) options.onSetFilter.call(options.w_obj);
         }
         this.getAll = function () {
             return _filters;
         };
         this.setFilter = function (filter,silent) {
-            var name = filter.name || '',
+            var path = filter.path || '',
                 value = filter.value || '',
-                valueName = filter.valueName || '';
-            if (!_filters[name]) _filters[name] = new Filter(filter);
-                _filters[name].value = value;
-                _filters[name].valueName = valueName;
-            if (options.onSetFilter && !silent) options.onSetFilter();
+                valueName = filter.valueName || '',
+                name = filter.name || "";
+            if (!_filters[path]) _filters[path] = new Filter(filter);
+                _filters[path].value = value;
+                _filters[path].valueName = valueName;
+                _filters[path].name = name;
+            if (options.onSetFilter && !silent) options.onSetFilter.call(options.w_obj);
         };
         //Setting up filters from options
         if (options.filters) {

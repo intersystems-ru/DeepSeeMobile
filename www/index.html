@@ -4,7 +4,59 @@
 <head>
     <meta charset="utf-8">
     <title>Ratchet template page</title>
+<style>
+#pullDown{
+	background:#fff;
+	height:40px;
+	line-height:40px;
+	padding:5px 10px;
+    margin-top:-40px;
+	border-bottom:1px solid #ccc;
+	font-weight:bold;
+	font-size:14px;
+	color:#888;
+    -webkit-transition:margin-top 0.1s;
+}
+    #pullDown.flip{
+    margin-top:0px !important;
+    
+    }
+#pullDown .pullDownIcon{
+	display:block; float:left;
+	width:40px; height:40px;
+/*	background:url(pull-icon@2x.png) 0 0 no-repeat;*/
+	-webkit-background-size:40px 80px; background-size:40px 80px;
+	-webkit-transition-property:-webkit-transform;
+	-webkit-transition-duration:250ms;	
+}
+#pullDown .pullDownIcon {
+	-webkit-transform:rotate(0deg) translateZ(0);
+}
 
+#pullDown.flip .pullDownIcon {
+	-webkit-transform:rotate(-180deg) translateZ(0);
+}
+
+#pullDown.loading{
+    margin-top:-40px;
+}
+#pullDown.loading .pullDownIcon{
+	background-position:0 100%;
+	-webkit-transform:rotate(0deg) translateZ(0);
+	-webkit-transition-duration:0ms;
+    
+	-webkit-animation-name:loading;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:infinite;
+	-webkit-animation-timing-function:linear;
+}
+
+@-webkit-keyframes loading {
+	from { -webkit-transform:rotate(0deg) translateZ(0); }
+	to { -webkit-transform:rotate(360deg) translateZ(0); }
+}
+
+</style>
     <!-- Sets initial viewport load and disables zooming  -->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
@@ -15,19 +67,96 @@
     <!-- Include the compiled Ratchet CSS -->
     <link href="css/ratchet.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+<!--    <script type="text/javascript" src="js/lib/jquery-ui.min.js"></script>-->
+    <script type="text/javascript" src="js/lib/pivot.js"></script>
+    <script type="text/javascript" src="js/lib/underscore.js"></script>
+    <script src="js/lib/highcharts.src.js"></script>
+        <script src="js/lib/drilldown.js"></script>
+    <script src="js/lib/highcharts-more.js"></script>
+    <script src="js/lib/solid-gauge.src.js"></script>
+    <script src="js/lib/highcharts-3d.js"></script>
+    <script src="js/lib/funnel.js"></script>
+    
+    <!-- Contains alt theme <script>/**
+ * Grid-light theme for Highcharts JS
+ * @author Torstein Honsi
+ */
 
-    <!-- amCharts javascript sources -->
-    <script type="text/javascript" src="js/lib/amcharts/amcharts.js"></script>
-    <script type="text/javascript" src="js/lib/amcharts/serial.js"></script>
-    <script type="text/javascript" src="js/lib/amcharts/pie.js"></script>
-    <script type="text/javascript" src="js/lib/amcharts/gauge.js"></script>
+// Load the fonts
+Highcharts.createElement('link', {
+   href: 'http://fonts.googleapis.com/css?family=Dosis:400,600',
+   rel: 'stylesheet',
+   type: 'text/css'
+}, null, document.getElementsByTagName('head')[0]);
 
-    <!-- amCharts custom font -->
-    <link href='http://fonts.googleapis.com/css?family=Covered+By+Your+Grace' rel='stylesheet' type='text/css'>
+Highcharts.theme = {
+   colors: ["#7cb5ec", "#f7a35c", "#90ee7e", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
+      "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
+   chart: {
+      backgroundColor: null,
+      style: {
+         fontFamily: "Dosis, sans-serif"
+      }
+   },
+   title: {
+      style: {
+         fontSize: '16px',
+         fontWeight: 'bold',
+         textTransform: 'uppercase'
+      }
+   },
+   tooltip: {
+      borderWidth: 0,
+      backgroundColor: 'rgba(219,219,216,0.8)',
+      shadow: false
+   },
+   legend: {
+      itemStyle: {
+         fontWeight: 'bold',
+         fontSize: '13px'
+      }
+   },
+   xAxis: {
+      gridLineWidth: 1,
+      labels: {
+         style: {
+            fontSize: '12px'
+         }
+      }
+   },
+   yAxis: {
+      minorTickInterval: 'auto',
+      title: {
+         style: {
+            textTransform: 'uppercase'
+         }
+      },
+      labels: {
+         style: {
+            fontSize: '12px'
+         }
+      }
+   },
+   plotOptions: {
+      candlestick: {
+         lineColor: '#404048'
+      }
+   },
 
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
+   // General
+   background2: '#F0F0EA'
+   
+};
+
+// Apply the theme
+Highcharts.setOptions(Highcharts.theme);</script>
+--> 
+
     <script src="js/lib/jquery.tap.js"></script>
+    <script src="js/lib/handlebars-v1.3.0.js"></script>
 
 
     <!-- Include the compiled Ratchet JS -->
@@ -40,7 +169,7 @@
 
     <!-- Make sure all your bars are the first things in your <body> -->
     <header class="bar bar-nav">
-        <h1 class="title">Deep See Mobile</h1>
+        <h1 class="title">InterSystems DeepSee™ Mobile</h1>
     </header>
 
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
@@ -50,7 +179,7 @@
     <!--content-->
 
     <nav class="bar bar-tab">
-        <a class="tab-item active" href="#">
+        <a class="tab-item active nav-home" href="#">
             <span class="icon icon-home"></span>
             <span class="tab-label">Home</span>
         </a>
@@ -58,12 +187,15 @@
             <span class="icon icon-list"></span>
             <span class="tab-label">Filters</span>
         </a>
-        <a class="tab-item" href="#">
-            <span class="icon icon-gear"></span>
-            <span class="tab-label">Settings</span>
+        <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
+            <span class="icon fa fa-trash" ></span>
+            <span class="tab-label">Clear</span>
+        </a> 
+        <a class="tab-item" href="#" ontouchend="javascript:location.reload()">
+            <span class="icon fa fa-refresh" ></span>
+            <span class="tab-label">Reload</span>
         </a>
     </nav>
-
 
 
 
@@ -78,7 +210,8 @@
         
     </div>
 </div>
-       <script data-main="js/main-build" src="js/lib/require.js"></script>
+<!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
+       <script data-main="js/main" src="js/lib/require.js"></script>
 </body>
 
 </html>
