@@ -187,9 +187,9 @@ Highcharts.setOptions(Highcharts.theme);</script>
             <span class="icon icon-list"></span>
             <span class="tab-label">Filters</span>
         </a>
-        <a class="tab-item" href="#">
-            <span class="icon icon-gear"></span>
-            <span class="tab-label">Settings</span>
+        <a class="tab-item" href="#" ontouchend="javascript:location.reload()">
+            <span class="icon fa fa-refresh" ></span>
+            <span class="tab-label">Reload</span>
         </a>
     </nav>
 
@@ -208,7 +208,6 @@ Highcharts.setOptions(Highcharts.theme);</script>
 </div>
 <!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
-    <i class="fa fa-refresh" ontouchend="javascript:location.reload()" id="reload"></i>
     <i class="fa fa-trash" ontouchend="javascript:localStorage.clear();sessionStorage.clear();" id="clearCache"></i>
 </body>
 

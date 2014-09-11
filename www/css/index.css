@@ -149,19 +149,10 @@ nav.bar.bar-tab a.tab-item {
 .bar-tab {
     padding: 2px;
 }
-#reload {
-    position: fixed;
-    top: 20px;
-    left: 0px;
-    width: 20px;
-    height: 20px;
-    z-index: 10000;
-    padding:10px;
-}
 #clearCache {
     position: fixed;
     top: 20px;
-    right: 10px;
+    left: 8px;
     width: 20px;
     height: 20px;
     z-index: 10000;
