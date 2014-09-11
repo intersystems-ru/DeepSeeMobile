@@ -46,6 +46,8 @@ header {
 .slide>div {
     height: 100%;
     padding-bottom: 44px;
+    overflow: auto;
+    -webkit-overflow-scrolling:touch
 }
 .filter {
     width: 40px;
@@ -148,10 +150,20 @@ nav.bar.bar-tab a.tab-item {
 #reload {
     position: fixed;
     top: 20px;
-    left: 10px;
+    left: 0px;
     width: 20px;
     height: 20px;
     z-index: 10000;
+    padding:10px;
+}
+#clearCache {
+    position: fixed;
+    top: 20px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    z-index: 10000;
+    padding:10px;
 }
 /* PIVOT */
 

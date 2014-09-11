@@ -22,6 +22,8 @@ define(['MessageCenter'], function (mc) {
                     text: data.defaultCaption || data.axes[0].caption
                 };
                 var _pos = 0;
+                this.config.xAxis.categories = [];
+                this.config.series = [];
                 for (var i = 0; i < data.axes[1].tuples.length; i++) {
                     this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
                 }
@@ -44,16 +46,6 @@ define(['MessageCenter'], function (mc) {
                         name: data.axes[0].tuples[j].caption
                         });
                 }
-                
-               
-                
-                   
-                
-
-                //this.config.series = [];
-
-                console.log(this.config);
-                //this.renderWidget();
 
             },
             config: {
@@ -61,23 +53,31 @@ define(['MessageCenter'], function (mc) {
                     type: 'bar',
                     events: {
                         drilldown: function (e) {
-
+                            if(this._isDrilldown) return;
+                            this._isDrilldown = true;
                             var chart = this;
-                            console.log(">", this);
-                            var _categories = this.axes[0].categories;
-                            this.axes[0].categories = [];
-                            console.log("chart=", chart);
-                            console.log("[pint = ", e.point);
+                            //var catName = chart.options.xAxis[0].title.text;
+                            this._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
+                            console.log(this._categories);
+//                            var _categories = this.options.xAxis[0].categories;
+                           this.axes[0].categories = [];
+                            if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
+                            
+                            
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
                             var mc = require("MessageCenter");
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
-                                    console.log('Drilldown data:', d);
                                     var transformedData = [];
+                                    var _name = d.data.axes[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
+                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
+//                                            chart.options.xAxis[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                            chart.axes[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                        }
                                         for (var i = 0; i < d.axes[1].tuples.length; i++) {
                                             transformedData.push({
                                                 name: d.axes[1].tuples[i].caption,
@@ -89,9 +89,8 @@ define(['MessageCenter'], function (mc) {
                                         d = transformedData;
                                     }
                                     var data = d;
-                                    console.log(chart);
                                     var retVal = [{
-                                        name: chart.userOptions.yAxis.title.text,
+                                        name: _name,
                                         data: []
                                         }]
                                     for (var i = 0; i < data.length; i++) {
@@ -104,7 +103,10 @@ define(['MessageCenter'], function (mc) {
                                     };
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
-                                    chart.axes[0].categories = _categories;
+                                    chart = null;
+//                                    chart.axes[0].categories = _categories;
+                                    //chart.options.xAxis[0].categories = _categories;
+                                    //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
                                 },
                                 once: true
                             });
@@ -115,6 +117,11 @@ define(['MessageCenter'], function (mc) {
                             });
                             mc = null;
 
+                        },
+                        drillup:function(e){
+                            console.log("DRILLUP");
+                            this._isDrilldown = false;
+                            if (this._categories) {this.axes[0].categories = this._categories;}
                         }
                     }
                 },
@@ -122,7 +129,7 @@ define(['MessageCenter'], function (mc) {
                     categories: []
                 },
                 yAxis: {},
-
+                legend:{enabled:false},
                 series: [],
                 drilldown: {
                     series: []
@@ -271,7 +278,6 @@ define(['MessageCenter'], function (mc) {
                     rows: [rowsAxisCaption],
 
                 };
-                //TODO: Получать заголовок
                 for (var i = 0; i < d.data.axes[1].tuples.length; i++) {
                     for (var j = 0; j < d.data.axes[0].tuples.length; j++) {
                         var dataEntry = {};
@@ -376,6 +382,7 @@ define(['MessageCenter'], function (mc) {
                 series: []
             }
         },
+        
         "lineChart":{
             type: "highcharts",
             callback: function (d) {

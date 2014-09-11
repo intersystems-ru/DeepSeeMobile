@@ -780,7 +780,8 @@
     deltaY = e.touches[0].pageY - pageY;
     pageX  = e.touches[0].pageX;
     pageY  = e.touches[0].pageY;
-
+      
+    if(Math.abs(deltaY)>Math.abs(deltaX)) return true;
     if (typeof isScrolling === 'undefined') {
       isScrolling = Math.abs(deltaY) > Math.abs(deltaX);
     }
