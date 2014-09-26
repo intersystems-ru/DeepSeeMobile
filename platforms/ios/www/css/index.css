@@ -274,3 +274,6 @@ left: 5px;
 font-weight: bold;
     padding-right:30px;
 }
+.tab-item {
+    z-index:200000 !important;
+}

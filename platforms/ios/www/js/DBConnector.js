@@ -29,7 +29,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
         var defaults = {
             username: "_SYSTEM",
             password: "159eAe72a79539f32acb15b305030060",
-            cubeName: "HoleFoods"
+            cubeName: "HoleFoods",
+            server:"http://37.139.4.54/tfoms"
         };
         var parseJSON = function (d) {
             try {
@@ -41,7 +42,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             };
             return d;
         }
-        this.mode = "ONLINE";
+        this.mode = "OFFLINE";
         this.drillMDX = function (str, path) {
             var row = str.substring(str.indexOf(" ON 0,") + 6, str.indexOf(" ON 1"));
             str = str.replace(row, path + ".Children");
@@ -63,7 +64,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @listens module:MessageCenter#data_requested
          */
         this.acquireData = function (args) {
-            console.log("acquireData.args",args);
+            //console.log("acquireData.args",args);
             var requester = args.target;
             //Calling wrong function
             //TODO: fix this
@@ -73,7 +74,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "drilldown1") requester = "drilldown";
             var mdxRequested = "";
             var opts = $.extend({
-                url: "http://37.139.4.54/tfoms/MDX",
+                url: defaults.server+"/MDX",
                 type: "POST",
                 data: {},
                 username: "_SYSTEM",
@@ -117,7 +118,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName,
+                url: defaults.server+"/FilterValues/" + defaults.cubeName,
                 success: function (d) {
                     if (d) {
                         try {
@@ -164,7 +165,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/FilterValues/" + defaults.cubeName + "/" + path,
+                url: defaults.server+"/FilterValues/" + defaults.cubeName + "/" + path,
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
@@ -206,7 +207,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/widgets/?w=" + dashName,
+                url: defaults.server+"/widgets/?w=" + dashName,
                 success: function (d) {
                     if (d) {
                         d = parseJSON(d) || d;
@@ -227,7 +228,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: defaults.username,
                 password: defaults.password,
                 type: "GET",
-                url: "http://37.139.4.54/tfoms/dashboards/",
+                url: defaults.server+"/dashboards/",
                 success: function (d) {
                     if (d) {
                         var d = parseJSON(d) || d;

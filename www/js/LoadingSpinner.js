@@ -1,3 +1,12 @@
+/**
+ * @fileOverview
+ * Loading Spinner module.<br>
+ * Shows when data is loading and hides when loaded.<br>
+ * @author Shmidt Ivan
+ * @version 0.0.1
+ * @module LoadingSpinner
+ * @requires MessageCenter
+ */
 define(['MessageCenter'], function (mc) {
     function LoadingSpinner() {
         if (LoadingSpinner.prototype._instance) return LoadingSpinner.prototype._instance;

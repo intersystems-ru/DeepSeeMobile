@@ -782,7 +782,7 @@
     pageY  = e.touches[0].pageY;
       
     if(Math.abs(deltaY)>Math.abs(deltaX)) {//return true;
-            console.log(">",deltaY);
+            //console.log(">",deltaY);
                                           $("#widget"+App.a.widgets[App.a.activeWidget].id).scrollTop($("#widget"+App.a.widgets[App.a.activeWidget].id).scrollTop()-deltaY);
                                           return true;
                                           };

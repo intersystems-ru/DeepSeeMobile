@@ -25,6 +25,7 @@
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/phonegap.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/res \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/views \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/font-awesome.min.css \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/index.css \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/ratchet-theme-android.css \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/ratchet-theme-android.min.css \
@@ -32,6 +33,11 @@
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/ratchet-theme-ios.min.css \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/ratchet.css \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/css/ratchet.min.css \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/fontawesome-webfont.eot \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/fontawesome-webfont.svg \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/fontawesome-webfont.ttf \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/fontawesome-webfont.woff \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/FontAwesome.otf \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/ratchicons.eot \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/ratchicons.svg \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/fonts/ratchicons.ttf \
@@ -58,7 +64,11 @@
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/ctrls/DashboardList.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/ctrls/Filters.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/cordova.js \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/drilldown.js \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/funnel.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/handlebars-v1.3.0.js \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/highcharts-3d.js \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/highcharts-more.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/highcharts.src.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/iscroll-probe.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/iscroll.js \
@@ -73,6 +83,7 @@
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/ratchet.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/ratchet.min.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/require.js \
+/Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/solid-gauge.src.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/text.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/js/lib/underscore.js \
 /Developer/phonegap/DeepSeeMobile/platforms/android/assets/www/res/icon \

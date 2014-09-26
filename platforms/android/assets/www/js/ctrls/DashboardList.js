@@ -2,7 +2,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
-            console.log("Entered controller");
+            //console.log("Entered controller");
             App.dashboardList = e.children;
             if (sessionStorage.getItem("dashboard_list") == null) {
                 sessionStorage.setItem('dashboard_list', JSON.stringify(e))
@@ -43,7 +43,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                     if (pullDownEl.className.match('flip')) {
                         pullDownEl.className = 'loading';
                         pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';
-                        console.log("Entered onScrollEnd");
+                        //console.log("Entered onScrollEnd");
                         MessageCenter.subscribe("data_acquired:dashboard_list", {
                             subscriber: this,
                             callback: function(e){myScroll.destroy(); onDashboardListAcquired(e); },

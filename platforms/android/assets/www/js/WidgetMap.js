@@ -11,7 +11,7 @@ define(['MessageCenter'], function (mc) {
             type: "highcharts",
             callback: function (d) {
 
-                console.log("HERE:", d);
+                //console.log("HERE:", d);
                 var data = d.data;
                 //this.config.xAxis.type="category";
                 //this.config.xAxis.showEmpty = false;
@@ -57,12 +57,6 @@ define(['MessageCenter'], function (mc) {
                             this._isDrilldown = true;
                             var chart = this;
                             //var catName = chart.options.xAxis[0].title.text;
-                            this._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
-                            console.log(this._categories);
-//                            var _categories = this.options.xAxis[0].categories;
-                           this.axes[0].categories = [];
-                            if(this.userOptions&& this.userOptions.xAxis) this.userOptions.xAxis.categories = [];
-                            
                             
                             // Show the loading label
                             chart.showLoading('Doing drilldown ...');
@@ -70,6 +64,11 @@ define(['MessageCenter'], function (mc) {
                             mc.subscribe("data_acquired:drilldown", {
                                 subscriber: this,
                                 callback: function (d) {
+                                    chart._categories = (this.axes[0].categories[0]==undefined) ? this.userOptions.xAxis.categories : this.axes[0].categories;
+                                    chart.axes[0].categories = [];
+                                    if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = [];
+                            
+                            
                                     var transformedData = [];
                                     var _name = d.data.axes[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
@@ -104,9 +103,6 @@ define(['MessageCenter'], function (mc) {
                                     chart.hideLoading();
                                     chart.addSeriesAsDrilldown(e.point, retVal[0]);
                                     chart = null;
-//                                    chart.axes[0].categories = _categories;
-                                    //chart.options.xAxis[0].categories = _categories;
-                                    //if(chart.userOptions&& chart.userOptions.xAxis) chart.userOptions.xAxis.categories = _categories;
                                 },
                                 once: true
                             });
@@ -119,7 +115,7 @@ define(['MessageCenter'], function (mc) {
 
                         },
                         drillup:function(e){
-                            console.log("DRILLUP");
+                            //console.log("DRILLUP");
                             this._isDrilldown = false;
                             if (this._categories) {this.axes[0].categories = this._categories;}
                         }
@@ -146,7 +142,7 @@ define(['MessageCenter'], function (mc) {
                 for (var d = 0; d < data.axes[1].tuples.length; d++) {
                     retVal.push([data.axes[1].tuples[d].caption, data.cells[d]]);
                 };
-                console.log("GOT DATA PIE:", this, retVal);
+                //console.log("GOT DATA PIE:", this, retVal);
                 this.config.series[0].data = retVal;
                 //                this.renderWidget();
             },
@@ -259,7 +255,7 @@ define(['MessageCenter'], function (mc) {
         "null": {
             type: "none",
             callback: function (d) {
-                console.log(d, this);
+                //console.log(d, this);
                 $("#widget" + this.id).parent().parent().find("h1").text("Widget is not yet implemented");
             },
             title: "Not implemented",
@@ -382,7 +378,6 @@ define(['MessageCenter'], function (mc) {
                 series: []
             }
         },
-        
         "lineChart":{
             type: "highcharts",
             callback: function (d) {
@@ -455,7 +450,7 @@ define(['MessageCenter'], function (mc) {
                 }];
                  
 
-                console.log(this.config);
+                //console.log(this.config);
                 //this.renderWidget();
 
             },

@@ -115,7 +115,7 @@ define([
          * @todo Route which field data would be kept
          */
         this.onDataAcquired = function (d, isDrillDown) {
-            console.log(d);
+            //console.log(d);
              $("#widget" + this.id).parent().find(".error-msg").html('').hide();
             if(isDrillDown === undefined) isDrillDown = false;
             if (d===undefined || d.data === null) {
@@ -190,7 +190,7 @@ define([
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
                 def.resolve();
-                mc.publish("[Render]Holder created: " + self.name);
+                //mc.publish("[Render]Holder created: " + self.name);
                 
             }
             self = null;
