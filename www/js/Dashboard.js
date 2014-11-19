@@ -53,6 +53,10 @@ define([
         *****/
         this.createHolder();
         this.onDashboardDataAcquired = function (d) {
+            if(d === "null"){
+            //No widgets in dashboard
+                return;
+            }
             var widgets = d.children;
             var self = this;
             for (var i = 0; i < widgets.length; i++) {

@@ -26,12 +26,17 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @property {string} username Username to connect to DB
          * @property {string} password Password to connect to DB
          */
-        var defaults = {
-            username: "_SYSTEM",
-            password: "159eAe72a79539f32acb15b305030060",
-            cubeName: "HoleFoods",
-            server:"http://37.139.4.54/tfoms"
-        };
+//        var defaults = {
+//            username: "_SYSTEM",
+//            password: "159eAe72a79539f32acb15b305030060",
+//            //password:"x79BTop",
+//            cubeName: "PatientsCube",
+//            server:"http://37.139.4.54/tfoms"
+////              username: "_SYSTEM",
+////            password: "x79BTop",
+////            cubeName: "SubGroupCube",
+////            server:"http://classroom.intersystems.ru:57772/stc/mdxrest"
+//        };
         var parseJSON = function (d) {
             try {
                 d = JSON.parse(d)
@@ -74,16 +79,16 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "drilldown1") requester = "drilldown";
             var mdxRequested = "";
             var opts = $.extend({
-                url: defaults.server+"/MDX",
+                url: App.settings.server+"/MDXTest",
                 type: "POST",
                 data: {},
-                username: "_SYSTEM",
-                password: "159eAe72a79539f32acb15b305030060",
+                username: App.settings.username,
+                password:  App.settings.password,
                 success: function (d) {
                     //console.log("%cGot data from server:","font-color:red",d);
                     var chartData,
                         transformedData = [];
-                        localStorage[mdxRequested] = d;
+                        //localStorage[mdxRequested] = d;
                     if (d) {
 
                         d = parseJSON(d) || d;
@@ -115,10 +120,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          */
         this.acquireFilters = function (args) {
             var filter_opts = {
-                username: defaults.username,
-                password: defaults.password,
+                username: App.settings.username,
+                password: App.settings.password,
                 type: "GET",
-                url: defaults.server+"/FilterValues/" + defaults.cubeName,
+                url: App.settings.server+"/FilterValues/" + App.settings.cubeName,
                 success: function (d) {
                     if (d) {
                         try {
@@ -162,10 +167,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 return;
             }
             var filter_list_opts = {
-                username: defaults.username,
-                password: defaults.password,
+                username: App.settings.username,
+                password: App.settings.password,
                 type: "GET",
-                url: defaults.server+"/FilterValues/" + defaults.cubeName + "/" + path,
+                url: App.settings.server+"/FilterValues/" + App.settings.cubeName + "/" + path,
                 success: function (d) {
                     if (d) {
                         var d = JSON.parse(d) || d,
@@ -204,10 +209,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
         this.acquireDashboardData = function (args) {
             var dashName = args;
             var dash_opts = {
-                username: defaults.username,
-                password: defaults.password,
+                username: App.settings.username,
+                password: App.settings.password,
                 type: "GET",
-                url: defaults.server+"/widgets/?w=" + dashName,
+                url: App.settings.server+"/widgets/?w=" + dashName,
                 success: function (d) {
                     if (d) {
                         d = parseJSON(d) || d;
@@ -225,10 +230,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
         };
         this.acquireDashboardList = function (args) {
             var dash_opts = {
-                username: defaults.username,
-                password: defaults.password,
+                username: App.settings.username,
+                password: App.settings.password,
                 type: "GET",
-                url: defaults.server+"/dashboards/",
+                url: App.settings.server+"/Dashboards?Namespace="+App.settings.namespace,
                 success: function (d) {
                     if (d) {
                         var d = parseJSON(d) || d;

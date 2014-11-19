@@ -22,7 +22,21 @@ require([
     'Utilizer',
     'Filter'
 ], function (MessageCenter, LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils, IScroll, ViewManager,Utilizer,Filter) {
+    
     window.App = {};
+    App.settings = {
+           
+            get server(){return (localStorage.settings_server || "")},
+            set server(v){ localStorage.settings_server = v;},
+            get username(){return (localStorage.settings_username || "")},
+            set username(v){ localStorage.settings_username = v;},
+            get password(){return (localStorage.settings_password || "")},
+            set password(v){ localStorage.settings_password = v;},
+            get cubeName(){return (localStorage.settings_cube || "")},
+            set cubeName(v){ localStorage.settings_cube = v;},
+            get namespace(){return (localStorage.settings_namespace || "")},
+            set namespace(v){ localStorage.settings_namespace = v;}
+        }
     App.m = MessageCenter;
     App.v = ViewManager;
     App.filters = [];

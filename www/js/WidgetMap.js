@@ -309,6 +309,7 @@ define(['MessageCenter'], function (mc) {
                     };
                 })(mc);
                 this.config = $.extend(this.config, d);
+                console.log(d);
             },
             config: {},
             filters: []
