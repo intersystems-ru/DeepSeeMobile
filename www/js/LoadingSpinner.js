@@ -44,22 +44,22 @@ define(['MessageCenter'], function (mc) {
             }
 
         };
-        mc.subscribe('data_requested', {
-            subscriber: this,
-            callback: this.show
-        });
-        mc.subscribe('filters_values_requested', {
-            subscriber: this,
-            callback: this.show
-        });
-        mc.subscribe('data_acquired', {
-            subscriber: this,
-            callback: this.hide
-        });
-        mc.subscribe('filters_values_acquired', {
-            subscriber: this,
-            callback: this.hide
-        });
+//        mc.subscribe('data_requested', {
+//            subscriber: this,
+//            callback: this.show
+//        });
+//        mc.subscribe('filters_values_requested', {
+//            subscriber: this,
+//            callback: this.show
+//        });
+//        mc.subscribe('data_acquired', {
+//            subscriber: this,
+//            callback: this.hide
+//        });
+//        mc.subscribe('filters_values_acquired', {
+//            subscriber: this,
+//            callback: this.hide
+//        });
 
     };
     LoadingSpinner.prototype.toString = function () {
