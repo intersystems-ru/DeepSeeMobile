@@ -6,6 +6,62 @@
  */
 define(['MessageCenter'], function (mc) {
     return {
+        // Added by Gnibeda 25.11.2014
+        "barChartStacked": {
+            type: "highcharts",
+            callback: function (d) {
+                var data = d.data;
+                console.log(d);
+                var t = this;
+                t.config.xAxis.title = {
+                    text: data.axes[1].caption
+                };
+                this.config.yAxis.title = {
+                    text: data.defaultCaption || data.axes[0].caption
+                };
+                var _pos = 0;
+                this.config.xAxis.categories = [];
+                this.config.series = [];
+                for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                    this.config.xAxis.categories.push(data.axes[1].tuples[i].caption.toString());
+                }
+
+                for(var j = 0; j< data.axes[0].tuples.length; j++) {
+                    var tempData = [];
+                    for (var i = 0; i < data.axes[1].tuples.length; i++) {
+                        tempData[i] = {
+                            y: data.cells[i * data.axes[0].tuples.length + j],
+                            drilldown: true,
+                            cube: data.cubeName,
+                            path: data.axes[1].tuples[i].path
+                        };
+                    };
+                    this.config.series.push({
+                        colorByPoint:  (data.axes[0].tuples.length>1) ? false : true,
+                        data: tempData,
+                        name: data.axes[0].tuples[j].caption
+                    });
+                };
+            },
+            config: {
+                title: "",
+                chart: {
+                    type: 'bar'
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {},
+                legend:{enabled:true},
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                series: []
+            }
+        },
+
         "barChart": {
 
             type: "highcharts",
@@ -50,7 +106,7 @@ define(['MessageCenter'], function (mc) {
             },
             config: {
                 chart: {
-                    type: 'bar',
+                        type: 'bar',
                     events: {
                         drilldown: function (e) {
                             if(this._isDrilldown) return;
