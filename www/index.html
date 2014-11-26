@@ -109,7 +109,7 @@ Highcharts.setOptions(Highcharts.theme);</script>
 
     <!-- Include the compiled Ratchet JS -->
     <script src="js/lib/ratchet.js"></script>
-    <script src="js/lib/phonegap.js"></script>
+    <script src="js/lib/cordova.js"></script>
 
 </head>
 
@@ -165,6 +165,7 @@ Highcharts.setOptions(Highcharts.theme);</script>
 <!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
 <script>
+
     $("#settings").off('tap').on('tap', function(){
         App.m.publish("viewchange:Settings", {
             holder: "body > .content"

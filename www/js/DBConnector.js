@@ -79,9 +79,9 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "drilldown1") requester = "drilldown";
             var mdxRequested = "";
             var opts = $.extend({
-                url: App.settings.server+"/MDXTest",
+                url: App.settings.server+"/MDX",
                 type: "POST",
-                data: {},
+                contentType: "text/plain;charset=UTF-8",
                 username: App.settings.username,
                 password:  App.settings.password,
                 success: function (d) {
@@ -101,6 +101,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     return 1;
                 }
             }, args.data);
+            if (args.data.data.MDX.substr(0, 12).toUpperCase() == "DRILLTHROUGH") opts.url += "Drillthrough";
+            opts.data = JSON.stringify({MDX: args.data.data.MDX});
             mdxRequested = opts.data.MDX;
             if (this.mode == "ONLINE") {
                 if(localStorage[mdxRequested]){opts.success(localStorage[mdxRequested]);return;}
@@ -211,8 +213,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             var dash_opts = {
                 username: App.settings.username,
                 password: App.settings.password,
-                type: "GET",
-                url: App.settings.server+"/widgets/?w=" + dashName,
+                type: "POST",
+                url: App.settings.server+"/Widgets",
+                data: JSON.stringify({Dashboard: dashName}),
+                contentType: "text/plain;charset=UTF-8", // this needed because otherwise jq send request as form, not as raw data
                 success: function (d) {
                     if (d) {
                         d = parseJSON(d) || d;
@@ -237,6 +241,11 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 success: function (d) {
                     if (d) {
                         var d = parseJSON(d) || d;
+                        // temp. delete after debug. hide trash items
+                        /*var r = [];
+                        for (var i = 0; i < d.children.length; i++) if (d.children[i].path.indexOf("$TRASH") == -1) r.push(d.children[i]);
+                        d.children = r;*/
+                        // ---------------
                         mc.publish("data_acquired:dashboard_list", d);
 
                     }
