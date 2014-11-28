@@ -37,6 +37,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
 ////            cubeName: "SubGroupCube",
 ////            server:"http://classroom.intersystems.ru:57772/stc/mdxrest"
 //        };
+
         var parseJSON = function (d) {
             try {
                 d = JSON.parse(d)
@@ -79,7 +80,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             if (requester === "drilldown1") requester = "drilldown";
             var mdxRequested = "";
             var opts = $.extend({
-                url: App.settings.server+"/MDX",
+                url: App.settings.server+"/MDX?Namespace=" + App.settings.namespace,
                 type: "POST",
                 contentType: "text/plain;charset=UTF-8",
                 username: App.settings.username,
@@ -125,7 +126,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: App.settings.username,
                 password: App.settings.password,
                 type: "GET",
-                url: App.settings.server+"/FilterValues/" + App.settings.cubeName,
+                url: App.settings.server+"/FilterValues/" + App.settings.cubeName + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
                     if (d) {
                         try {
@@ -214,7 +215,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: App.settings.username,
                 password: App.settings.password,
                 type: "POST",
-                url: App.settings.server+"/Widgets",
+                url: App.settings.server+"/Widgets?Namespace=" + App.settings.namespace,
                 data: JSON.stringify({Dashboard: dashName}),
                 contentType: "text/plain;charset=UTF-8", // this needed because otherwise jq send request as form, not as raw data
                 success: function (d) {
