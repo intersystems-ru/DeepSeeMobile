@@ -102,7 +102,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     return 1;
                 }
             }, args.data);
-            if (args.data.data.MDX.substr(0, 12).toUpperCase() == "DRILLTHROUGH") opts.url += "Drillthrough";
+            if (args.data.data.MDX.substr(0, 12).toUpperCase() == "DRILLTHROUGH") opts.url = opts.url.replace("/MDX","/MDXDrillthrough");
             opts.data = JSON.stringify({MDX: args.data.data.MDX});
             mdxRequested = opts.data.MDX;
             if (this.mode == "ONLINE") {
