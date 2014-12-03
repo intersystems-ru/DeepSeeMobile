@@ -32,7 +32,7 @@ define(['MessageCenter'], function (mc) {
                         tempData[i] = {
                             y: data.Data[i * data.Cols[0].tuples.length + j],
                             drilldown: true,
-                            cube: data.cubeName,
+                            cube: data.Info.cubeName,
                             path: data.Cols[1].tuples[i].path
                         };
                     };
@@ -86,19 +86,19 @@ define(['MessageCenter'], function (mc) {
                 for(var j = 0; j< data.Cols[0].tuples.length; j++){
                 var tempData = [];
                 for(var i = 0; i< data.Cols[1].tuples.length; i++){
-                        tempData[i] = {
+                    tempData[i] = {
                         y: data.Data[i* data.Cols[0].tuples.length + j],
                         drilldown: true,
-                        cube: data.cubeName,
+                        cube: data.Info.cubeName,
                         path: data.Cols[1].tuples[i].path
-                        };
-                        
                     };
+
+                };
                 
                 this.config.series.push({
-                        colorByPoint:  (data.Cols[0].tuples.length>1) ? false : true,
-                        data: tempData,
-                        name: data.Cols[0].tuples[j].caption
+                            colorByPoint:  (data.Cols[0].tuples.length>1) ? false : true,
+                            data: tempData,
+                            name: data.Cols[0].tuples[j].caption,
                         });
                 }
 
@@ -108,6 +108,7 @@ define(['MessageCenter'], function (mc) {
                         type: 'bar',
                     events: {
                         drilldown: function (e) {
+                            console.log("DFGDF");
                             if(this._isDrilldown) return;
                             this._isDrilldown = true;
                             var chart = this;
@@ -125,19 +126,19 @@ define(['MessageCenter'], function (mc) {
                             
                             
                                     var transformedData = [];
-                                    var _name = d.data.axes[0].caption;
+                                    var _name = d.data.Cols[0].caption;
                                     if (typeof d == "object" && (d.length != 0) && d.data != null && d.data != "null") {
                                         d = d.data;
-                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
-//                                            chart.options.xAxis[0].categories[i]= d.axes[1].tuples[i].caption.toString();
-                                            chart.axes[0].categories[i]= d.axes[1].tuples[i].caption.toString();
+                                        for (var i = 0; i < d.Cols[1].tuples.length; i++) {
+//                                            chart.options.xAxis[0].categories[i]= d.Cols[1].tuples[i].caption.toString();
+                                            chart.axes[0].categories[i]= d.Cols[1].tuples[i].caption.toString();
                                         }
-                                        for (var i = 0; i < d.axes[1].tuples.length; i++) {
+                                        for (var i = 0; i < d.Cols[1].tuples.length; i++) {
                                             transformedData.push({
-                                                name: d.axes[1].tuples[i].caption,
-                                                path: d.axes[1].tuples[i].path,
-                                                cube: d.cubeName,
-                                                data: d.cells[i]
+                                                name: d.Cols[1].tuples[i].caption,
+                                                path: d.Cols[1].tuples[i].path,
+                                                cube: d.Info.cubeName,
+                                                data: d.Data[i]
                                             });
                                         }
                                         d = transformedData;
@@ -406,7 +407,7 @@ define(['MessageCenter'], function (mc) {
                     data.Data[i] = {
                         y: data.Data[i],
                         //drilldown: false,
-                        cube: data.cubeName,
+                        cube: data.Info.cubeName,
                         path: data.Cols[1].tuples[i].path
                     };
                 };
@@ -492,7 +493,7 @@ define(['MessageCenter'], function (mc) {
             text: ''
         },
         subtitle: {
-            text: 'It is allowed to use subtitle',
+            text: 'It is allowed to use subtitle'
            
         },
         xAxis: {

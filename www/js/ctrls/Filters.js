@@ -63,6 +63,7 @@ define([
                 $(holder).find(".filter-list-info").append(infoItem);
                 var filtersNum = App.filters.length;
                 for (var i = 0; i < filtersNum; i++) {
+                    if (App.a.activeWidget != App.filters[i].widget.id) continue;
                     var listItem = $(html).find(".filter-list-item").clone();
                     listItem.html(
                         listItem.html().replace(/{{filterName}}/, App.filters[i].name) //todo: a.filters is BAAAD
@@ -89,9 +90,10 @@ define([
                 };
                 var $holder = $(holder);
                 $holder.find("a").off('tap').on('tap', function (e) {
+                    if ($(this).find(".toggle").hasClass("active")) return;
                     e.preventDefault();
                     if (e.originalEvent.target != this) return;
-                    if (!$(this).find(".toggle").hasClass("active")) return;
+
                     self.selectedFilter = $(this).parent().data("filter");
                     self.getFilterInfo();
                     return false;
@@ -130,7 +132,7 @@ define([
                     callback: self.renderInfo,
                     once: true
                 });
-                mc.publish("filter_values_requested:" + self.selectedFilter.path, [self.selectedFilter.name]);
+                mc.publish("filter_values_requested:" + self.selectedFilter.path, self.selectedFilter);
             } else {
                 self.renderInfo(JSON.parse(fv));
             }

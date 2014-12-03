@@ -31,6 +31,7 @@ define([
      * new Widget(config);
      */
     function Widget(opts) {
+
         this.def = opts.promise;
         opts = opts || {};
         /** @lends module:Widget#*/
@@ -65,6 +66,15 @@ define([
          */
         this.chart = '';
         this.subs = [];
+
+        /**
+         * @var {string} module:Widget#cube Cube name used by widget
+         */
+        this.cube = null;
+        var parts = opts.datasource.data.MDX.toUpperCase().split("FROM ");
+        if (parts.length >= 2) {
+            this.cube = parts[1].split(" ")[0].replace("[", "").replace("]", "");
+        }
 
         /**
          * @var {object} module:Widget#datasource Object with getter and setter, represents Widget's data source
@@ -152,7 +162,9 @@ define([
     };
     Widget.prototype.init = function (opts) {
 
-
+       // if (this.cube) {
+         //   mc.publish('filters_requested', {cube: this.cube});
+        //}
         this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
             subscriber: this,
             callback: this.onDataAcquired

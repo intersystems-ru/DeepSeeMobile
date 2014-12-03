@@ -4,6 +4,6 @@ define([], function(){
     return function(){
         this.name = "";
         this.locked = false;
-        this.holder = "body > .content"; //here our dashboard will be stored
+        this.holder = "#mainScreen > .content"; //here our dashboard will be stored
     }
 });

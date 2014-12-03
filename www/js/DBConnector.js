@@ -50,7 +50,9 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
         }
         this.mode = "ONLINE";
         this.drillMDX = function (str, path) {
-            var row = str.substring(str.indexOf(" ON 0,") + 6, str.indexOf(" ON 1"));
+            var pos = str.indexOf(" ON 0,");
+            if (pos == -1) pos = 1;
+            var row = str.substring(pos + 6, str.indexOf(" ON 1"));
             str = str.replace(row, path + ".Children");
             return str;
         }
@@ -126,7 +128,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: App.settings.username,
                 password: App.settings.password,
                 type: "GET",
-                url: App.settings.server+"/FilterValues/" + App.settings.cubeName + "?Namespace=" + App.settings.namespace,
+                url: App.settings.server+"/FilterValues/" + args.data.cube + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
                     if (d) {
                         try {
@@ -138,7 +140,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                         }
                         var filters = d.children.slice(0);
                         mc.publish("filters_acquired", {
-                            data: filters
+                            data: filters, cube: args.data.cube, widget: args.data.widget
                         });
                     }
 
@@ -160,7 +162,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          */
         this.acquireFilterValues = function (args) {
             var path = args.target,
-                name = args.data;
+                name = args.data.name,
+                cube = args.data.cube;
             if (sessionStorage.getItem("filterValues:" + path)) {
                 mc.publish("filter_values_acquired:" + path, {
                     data: JSON.parse(sessionStorage.getItem("filterValues:" + path)),
@@ -173,11 +176,11 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 username: App.settings.username,
                 password: App.settings.password,
                 type: "GET",
-                url: App.settings.server+"/FilterValues/" + App.settings.cubeName + "/" + path,
+                url: App.settings.server+"/FilterValues/" + cube + "/" + path + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
                     if (d) {
-                        var d = JSON.parse(d) || d,
-                            filterValues = d.children.slice(0);
+                        //var d = JSON.parse(d) || d,
+                        var filterValues = d.children.slice(0);
                         sessionStorage.setItem("filterValues:" + path, JSON.stringify(filterValues))
                         mc.publish("filter_values_acquired:" + path, {
                             data: filterValues,

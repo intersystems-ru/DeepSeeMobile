@@ -22,10 +22,10 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                     App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                     return false;
                 });
-                $('body > .content').html(final);
+                $('#mainScreen > .content').html(final);
                 var pullDownEl = document.getElementById('pullDown'),
                     pullDownOffset = pullDownEl.offsetHeight;
-                var myScroll = new IScroll('body > .content', {
+                var myScroll = new IScroll('#mainScreen > .content', {
                     probeType: 1
                 });
                 myScroll.on('scroll', function () {

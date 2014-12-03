@@ -114,41 +114,58 @@ Highcharts.setOptions(Highcharts.theme);</script>
 </head>
 
 <body>
+    <div id="loginScreen" style="display: none">
+        <h1 class="logoText">InterSystems DeepSee™ Mobile</h1>
+        <div class="loginBox">
+            <label>Login</label>
+            <input class="input-styled" type="text" id="txtLogin"/>
+            <label>Password</label>
+            <input class="input-styled" type="password" id="txtPassword"/>
 
-    <!-- Make sure all your bars are the first things in your <body> -->
-    <header class="bar bar-nav">
-        <h1 class="title">InterSystems DeepSee™ Mobile</h1>
-    </header>
-
-    <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
-    <div class="content">
-
+            <div style="text-align: center; padding-top: 2em">
+                <div id="btnLogin" class="btn">Sign in</div>
+            </div>
+        </div>
+        <div style="position: absolute; bottom: 0; right: 0;padding-right: 1em; font-size: xx-small">
+            ver. 0.1a
+        </div>
     </div>
-    <!--content-->
+    <div id="mainScreen" style="display: none">
+        <!-- Make sure all your bars are the first things in your <body> -->
+        <header class="bar bar-nav">
+            <h1 class="title">InterSystems DeepSee™ Mobile</h1>
 
-    <nav class="bar bar-tab">
-        <a class="tab-item active nav-home" href="#">
-            <span class="icon icon-home"></span>
-            <span class="tab-label">Home</span>
-        </a>
-        <a class="tab-item" href="#filters" data-transition="slide-in">
-            <span class="icon icon-list"></span>
-            <span class="tab-label">Filters</span>
-        </a>
-        <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
-            <span class="icon fa fa-trash" ></span>
-            <span class="tab-label">Clear</span>
-        </a> 
-        <a class="tab-item" href="#" ontouchend="javascript:location.reload()">
-            <span class="icon fa fa-refresh" ></span>
-            <span class="tab-label">Reload</span>
-        </a>
-        <a class="tab-item" href="#" id="settings">
-            <span class="icon fa fa-cog" ></span>
-            <span class="tab-label">Settings</span>
-        </a>
-    </nav>
+        </header>
 
+        <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+        <div class="content">
+
+        </div>
+        <!--content-->
+
+        <nav class="bar bar-tab">
+            <a class="tab-item active nav-home" href="#">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">Home</span>
+            </a>
+            <a class="tab-item" href="#filters" data-transition="slide-in">
+                <span class="icon icon-list"></span>
+                <span class="tab-label">Filters</span>
+            </a>
+            <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
+                <span class="icon fa fa-trash" ></span>
+                <span class="tab-label">Clear</span>
+            </a>
+            <a class="tab-item" href="#" ontouchend="javascript:location.reload()">
+                <span class="icon fa fa-refresh" ></span>
+                <span class="tab-label">Reload</span>
+            </a>
+            <a class="tab-item" href="#" id="settings">
+                <span class="icon fa fa-cog" ></span>
+                <span class="tab-label">Settings</span>
+            </a>
+        </nav>
+    </div>
 
 
 
@@ -168,7 +185,7 @@ Highcharts.setOptions(Highcharts.theme);</script>
 
     $("#settings").off('tap').on('tap', function(){
         App.m.publish("viewchange:Settings", {
-            holder: "body > .content"
+            holder: "#mainScreen > .content"
         });
     });
     </script>

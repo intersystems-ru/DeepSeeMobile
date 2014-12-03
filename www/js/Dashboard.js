@@ -57,6 +57,8 @@ define([
             //No widgets in dashboard
                 return;
             }
+            App.filters = [];
+            var requestedFiltersForCube = [];
             var widgets = d.children;
             var self = this;
             for (var i = 0; i < widgets.length; i++) {
@@ -85,6 +87,18 @@ define([
                     text: widget.title
                 };
                 self.addWidget(widget_config);
+
+                var cube = null;
+                var parts = widget_config.datasource.data.MDX.toUpperCase().split("FROM ");
+                if (parts.length >= 2) {
+                    cube = parts[1].split(" ")[0].replace("[", "").replace("]", "");
+                }
+                if (cube) {
+                    //if (requestedFiltersForCube.indexOf(cube) == -1) {
+                        mc.publish('filters_requested', {cube: cube, widget: self.widgets[self.widgets.length - 1]});
+                      //  requestedFiltersForCube.push(cube);
+                    //}
+                }
                 widget = null;
                 widget_config = null;
             };
@@ -198,7 +212,7 @@ define([
             return def.promise();
         };
 Dashboard.prototype.createHolder = function(){
-var holder = (this.config && this.config.holder) ? this.config.holder : "body";
+var holder = (this.config && this.config.holder) ? this.config.holder : "mainScreen > .content";
             require(['text!../views/Dashboard.html'], function (html) {
                 $(holder + " > *").remove();
                 $(holder).append(html);
