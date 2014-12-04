@@ -87,17 +87,9 @@ define([
                     text: widget.title
                 };
                 self.addWidget(widget_config);
-
-                var cube = null;
-                var parts = widget_config.datasource.data.MDX.toUpperCase().split("FROM ");
-                if (parts.length >= 2) {
-                    cube = parts[1].split(" ")[0].replace("[", "").replace("]", "");
-                }
-                if (cube) {
-                    //if (requestedFiltersForCube.indexOf(cube) == -1) {
-                        mc.publish('filters_requested', {cube: cube, widget: self.widgets[self.widgets.length - 1]});
-                      //  requestedFiltersForCube.push(cube);
-                    //}
+                self.widgets[self.widgets.length - 1].cube = widgets[i].cube;
+                if (widgets[i].cube) {
+                    mc.publish('filters_requested', {cube: widgets[i].cube, widget: self.widgets[self.widgets.length - 1]});
                 }
                 widget = null;
                 widget_config = null;
