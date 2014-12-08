@@ -24,23 +24,59 @@ require([
 ], function (MessageCenter, LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils, IScroll, ViewManager,Utilizer,Filter) {
     
     window.App = {};
+    var login  = "";
+    var pass   = "";
 
     $("#Login").focus();
-    $("#btnLogin").on("tap", DoLogin).on("click", DoLogin);
-    Start();
+    $("#btnLogin").on("tap", DoLogin);
+    //Start();
+
+    function make_base_auth(user, password) {
+        var tok = user + ':' + password;
+        var hash = btoa(tok);
+        return "Basic " + hash;
+    }
 
     function DoLogin() {
-        var login = $("#txtLogin").val();
-        var pass = $("#txtPassword").val();
-
+        $("#txtError").hide();
+        login = $("#txtLogin").val();
+        pass = $("#txtPassword").val();
         if (login && pass) {
-            //TODO: auth here
-            Start();
+            $("#loginProgress").show();
+            $.ajax
+            ({
+                type: "GET",
+                url: "http://37.139.4.54/tfomsauth/Test",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", make_base_auth(login, pass));
+                },
+                error: loginError,
+                success: loginSuccess
+            });
         }
+    }
 
+    function loginSuccess(d){
+        $("#txtError").hide();
+        $("#loginProgress").hide();
+        Start();
+    }
+
+    function loginError(d) {
+        $("#loginProgress").hide();
+        $("#txtError").text("Wrong login or password").show();
     }
 
     function Start() {
+        $.ajaxPrefilter(function( options ) {
+            if (!options.beforeSend) {
+                options.beforeSend = function (xhr) {
+                    xhr.setRequestHeader('Authorization', make_base_auth(login, pass));
+                    //xhr.setRequestHeader('Authorization', make_base_auth("_SYSTEM", "159eAe72a79539f32acb15b305030060"));
+                }
+            }
+        });
+
         $("#loginScreen").remove();
         $("#mainScreen").show();
         App.settings = {

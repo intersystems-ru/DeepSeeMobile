@@ -180,6 +180,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 success: function (d) {
                     if (d) {
                         //var d = JSON.parse(d) || d,
+                        if (typeof(d) == "string") d = parseJSON(d);
                         var filterValues = d.children.slice(0);
                         sessionStorage.setItem("filterValues:" + path, JSON.stringify(filterValues))
                         mc.publish("filter_values_acquired:" + path, {
@@ -237,14 +238,26 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             }
         };
         this.acquireDashboardList = function (args) {
+            function make_base_auth(user, password) {
+                var tok = user + ':' + password;
+                var hash = btoa(tok);
+                return "Basic " + hash;
+            }
+
             var dash_opts = {
-                username: App.settings.username,
-                password: App.settings.password,
+                //username: App.settings.username,
+                //password: App.settings.password,
                 type: "GET",
+                data: {"test":true},
+                dataType: 'json',
                 url: App.settings.server+"/Dashboards?Namespace="+App.settings.namespace,
+                //beforeSend: function (xhr) {
+                  //  xhr.setRequestHeader('Authorization', make_base_auth("_SYSTEM", "159eAe72a79539f32acb15b305030060"));
+                //},
                 success: function (d) {
                     if (d) {
-                        var d = parseJSON(d) || d;
+                        if (typeof(d) == "string") d = parseJSON(d);
+                        //var d = parseJSON(d) || d;
                         // temp. delete after debug. hide trash items
                         /*var r = [];
                         for (var i = 0; i < d.children.length; i++) if (d.children[i].path.indexOf("$TRASH") == -1) r.push(d.children[i]);

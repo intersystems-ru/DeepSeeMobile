@@ -114,16 +114,20 @@ Highcharts.setOptions(Highcharts.theme);</script>
 </head>
 
 <body>
-    <div id="loginScreen" style="display: none">
+    <div id="loginScreen">
         <h1 class="logoText">InterSystems DeepSee™ Mobile</h1>
         <div class="loginBox">
             <label>Login</label>
-            <input class="input-styled" type="text" id="txtLogin"/>
+            <input class="input-styled" type="text" id="txtLogin" value=""/>
             <label>Password</label>
-            <input class="input-styled" type="password" id="txtPassword"/>
+            <input class="input-styled" type="password" id="txtPassword" value=""/>
 
             <div style="text-align: center; padding-top: 2em">
                 <div id="btnLogin" class="btn">Sign in</div>
+            </div>
+            <div style="text-align: center; padding-top: 2em">
+                <div id="loginProgress" class="loader" style="display: none"></div>
+                <label id="txtError" class="err-msg badge badge-negative" style="display: none"></label>
             </div>
         </div>
         <div style="position: absolute; bottom: 0; right: 0;padding-right: 1em; font-size: xx-small">
