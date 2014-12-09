@@ -15,7 +15,7 @@ define(['MessageCenter'], function (mc) {
                 var $html = $(html);
                 $(d.data.holder).append($html);
                 console.log(d.data.holder,$html);
-                js.call(self);
+                js.call(self, d.data);
             });
             
         };
