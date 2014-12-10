@@ -2,12 +2,21 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
+            $("#btnMainRefresh").off('tap').on('tap', function() {
+                if (App.a) {
+                    if (App.a.widgets[App.a.activeWidget]) App.a.widgets[App.a.activeWidget].requestData()
+                } else {
+                    App.m.publish("viewchange:DashboardList", {holder: "#mainScreen > .content"});
+                }
+            });
+
             //console.log("Entered controller");
             App.dashboardList = e.children;
             if (sessionStorage.getItem("dashboard_list") == null) {
                 sessionStorage.setItem('dashboard_list', JSON.stringify(e))
             };
             require(['text!../views/DashboardList.html'], function (html) {
+                $("#btnMainFilter").hide();
                 var template = Handlebars.compile(html);
                 var rendered = template({
                     dashboardList: e.children
