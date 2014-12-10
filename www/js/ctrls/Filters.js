@@ -52,7 +52,7 @@ define([
          */
         this.render = function () {
             require(['text!../views/Filters.html'], function (html) {
-
+                $("#btnFilterAccept").hide()
                 var holder = "#filters .content";
                 $(holder).empty();
                 $("#filters .title").text("Filters");
@@ -90,7 +90,7 @@ define([
                 };
                 var $holder = $(holder);
                 $holder.find("a").off('tap').on('tap', function (e) {
-                    if ($(this).find(".toggle").hasClass("active")) return;
+                    //if ($(this).find(".toggle").hasClass("active")) return;
                     e.preventDefault();
                     if (e.originalEvent.target != this) return;
 
@@ -150,7 +150,6 @@ define([
                 sessionStorage.setItem("filters_values_" + self.selectedFilter.path, JSON.stringify(d))
             }
             require(['text!../views/FiltersInfo.html'], function (html) {
-
                 var holder = "#filters .content";
                 $(holder).empty();
                 $("#filters .title").text(d.name);
@@ -167,29 +166,69 @@ define([
                         .replace(/{{filterValueName}}/, d.data[i].name)
                     );
                     var wf = App.a.widgets[App.a.activeWidget].filters.getFilter(self.selectedFilter.path);
-                    if (wf.value == d.data[i].value) {
-                        li.addClass("active");
+                    if ($.isArray(wf.value)) {
+                        if (wf.value.indexOf(d.data[i].value) != -1) {
+                            li.addClass("active");
+                            li.find(".icon-check").show();
+                        }
+                    } else {
+                        if (wf.value == d.data[i].value) {
+                            li.addClass("active");
+                        }
                     }
                     li.data("name", d.name).data("value", d.data[i].value).data("valueName", d.data[i].name);
-                    li.one('tap', function () {
-                        App.a.widgets[App.a.activeWidget].filters.setFilter({
+                    li.off('tap').on('tap', function (e) {
+                        e.preventDefault();
+                        var check = $(this).find(".icon-check");
+                        if (check.is(":visible")) {
+                            $(this).removeClass("active");
+                            check.hide();
+                        } else {
+                            $(this).addClass("active");
+                            check.show();
+                        }
+
+                        // is any filter is checked? then show button accept
+                        if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
+                        else $("#btnFilterAccept").hide();
+                        /*App.a.widgets[App.a.activeWidget].filters.setFilter({
                             name: $(this).data("name"),
                             path: self.selectedFilter.path,
                             value: $(this).data("value"),
                             valueName: $(this).data("valueName")
                         });
-                        $("#filters").removeClass("active");
+                        $("#filters").removeClass("active");*/
                     });
                     list.append(li);
 
 
                 }
+
+                if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
+                else $("#btnFilterAccept").hide();
+
                 if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
                     });
                 }
-
+                $("#btnFilterAccept").off("tap").on("tap", function(){
+                    var items = $("#filters .content").find(".icon-check:visible");
+                    if (items.length == 0) return;
+                    var values = [];
+                    var valueNames = [];
+                    for (var i = 0; i < items.length; i++) {
+                        values.push($(items[i]).parent().data("value"));
+                        valueNames.push($(items[i]).parent().data("valueName"));
+                    }
+                    App.a.widgets[App.a.activeWidget].filters.setFilter({
+                        name: $(items[0]).parent().data("name"),
+                        path: self.selectedFilter.path,
+                        value: values,
+                        valueName: valueNames
+                    });
+                    $("#filters").removeClass("active");
+                });
             });
 
 
