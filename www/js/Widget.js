@@ -91,8 +91,20 @@ define([
                 if (this.filters.hasFilters()) {
                     var _filters = this.filters.getAll();
                     for (var i in _filters) {
-                        if (_filters[i].value != '')
-                            retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
+                        if ($.isArray(_filters[i].value)) {
+                            if (_filters[i].value.length == 1) {
+                                if (_filters[i].value[0] != '') retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value[0];
+                            } else {
+                                retVal += ' %FILTER {'
+                                for (var k = 0; k < _filters[i].value.length; k++) {
+                                    if (_filters[i].value[k] != "") retVal += _filters[i].path + "." + _filters[i].value[k] + ",";
+                                }
+                                if (retVal.substr(retVal.length - 1, 1) == ",") retVal= retVal.substr(0, retVal.length - 1);
+                                retVal += "} ";
+                            }
+                        } else {
+                            if (_filters[i].value != '') retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
+                        }
                     }
                 }
                 return {
