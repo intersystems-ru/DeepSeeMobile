@@ -131,34 +131,41 @@ Highcharts.setOptions(Highcharts.theme);</script>
         <nav class="bar bar-tab">
             <a class="tab-item active nav-home" href="#">
                 <span class="icon icon-home"></span>
-                <span class="tab-label">Home</span>
+                <span class="tab-label">Dashboards</span>
             </a>
-            <a class="tab-item" href="#filters" data-transition="slide-in">
+            <a id="btnMainFilter" class="tab-item" href="#filters" data-transition="slide-in" style="display:none;">
                 <span class="icon icon-list"></span>
                 <span class="tab-label">Filters</span>
             </a>
-            <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
-                <span class="icon fa fa-trash" ></span>
-                <span class="tab-label">Clear</span>
+            <!--
+           <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
+               <span class="icon fa fa-trash" ></span>
+               <span class="tab-label">Clear</span>
+           </a>
+           -->
+           <a id="btnMainRefresh" class="tab-item" href="#">
+               <span class="icon fa fa-refresh" ></span>
+               <span class="tab-label">Reload</span>
+           </a>
+            <a id="btnMainSignOut" class="tab-item" href="#">
+                <span class="icon icon-left-nav" ></span>
+                <span class="tab-label">Sign out</span>
             </a>
-            <a class="tab-item" href="#" ontouchend="javascript:location.reload()">
-                <span class="icon fa fa-refresh" ></span>
-                <span class="tab-label">Reload</span>
-            </a>
-        </nav>
-    </div>
+       </nav>
+   </div>
 
 
 
 <div id="filters" class="modal">
-    <header class="bar bar-nav">
-        <a class="icon icon-close pull-right" href="#filters"></a>
-        <h1 class="title">Filters</h1>
-    </header>
+   <header class="bar bar-nav">
+       <a class="icon icon-left-nav pull-left" href="#filters"></a>
+       <button id="btnFilterAccept" class="btn btn-link btn-nav pull-right" style="display: none">Accept</button>
+       <h1 class="title">Filters</h1>
+   </header>
 
-    <div class="content">
-        
-    </div>
+   <div class="content">
+
+   </div>
 </div>
 <!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
@@ -168,6 +175,15 @@ Highcharts.setOptions(Highcharts.theme);</script>
             holder: "#mainScreen > .content"
         });
     });
+
+    $("#btnMainSignOut").off('tap').on('tap', function(){
+        $("#mainScreen").hide();
+        $("#loginScreen").show();
+        App.m.publish("viewchange:Login", {
+            holder: "#loginScreen"
+        });
+    });
+
     </script>
 </body>
 
