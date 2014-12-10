@@ -9,7 +9,8 @@ define([], function(){
             if (localStorage.currentServerId) {
                 var id = parseInt(localStorage.currentServerId);
                 if (servers[id]) {
-                    $("#selServer").text("Server: " + servers[id].ip);
+                    if (servers[id].name) $("#selServer").text("Server: " + servers[id].name);
+                    else $("#selServer").text("Server: " + servers[id].ip);
                     $("#txtLogin").val(servers[id].user);
                     $("#txtPassword").val(servers[id].password);
                     App.settings.server = servers[id].ip;
