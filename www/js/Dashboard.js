@@ -53,6 +53,7 @@ define([
         *****/
         this.createHolder();
         this.onDashboardDataAcquired = function (d) {
+            $("#btnMainFilter").show();
             if(d === "null"){
             //No widgets in dashboard
                 return;
