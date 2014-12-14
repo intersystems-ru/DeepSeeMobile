@@ -29,6 +29,7 @@ define([], function(){
                 ({
                     type: "GET",
                     url: App.settings.server + "/Test",
+                    dataType: 'text',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("Authorization", make_base_auth(login, pass));
                     },
