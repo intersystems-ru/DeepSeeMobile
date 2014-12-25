@@ -200,6 +200,8 @@ define([
             this.widgets[this.widgets.length] = widget;
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
+                this.setTitle(widget.name);
+                //mc.publish("set_active_widget", { id: 0 });
             }
             widget = null;
             return def.promise();
@@ -215,6 +217,11 @@ var holder = (this.config && this.config.holder) ? this.config.holder : "mainScr
          * Renders up the whole dashboard with its widgets and so on.
          * @function module:Dashboard#render
          */
+
+Dashboard.prototype.setTitle = function(txt) {
+    if (!txt) $("#mainTitle").text("InterSystems DeepSee™"); else $("#mainTitle").text(txt);
+}
+
 Dashboard.prototype.render = function () {
             
             for (var i = 0; i < this.widgets.length; i++) {
@@ -225,6 +232,14 @@ Dashboard.prototype.render = function () {
             $(this.config.holder).off("slide").on("slide", function (e) {
                 if (self.activeWidget != e.originalEvent.detail.slideNumber) {
                     self.activeWidget = e.originalEvent.detail.slideNumber;
+                    var w = App.a.widgets[self.activeWidget];
+                    $("#btnMainBack").hide();
+                    $("#btnMainDrillthrough").hide();
+                    if (w.pivot) {
+                        $("#btnMainDrillthrough").show();
+                        if (w.pivot.pivotView.tablesStack.length > 1) $("#btnMainBack").show();
+                    }
+                    self.setTitle(w.name);
                     if (mc) mc.publish("set_active_widget", {
                         id: self.activeWidget
                     });
