@@ -37,21 +37,17 @@
       return document.querySelector(modalToggle.hash);
     }
   };
-    
-    var openModal = function (event) {
+
+  window.addEventListener('touchend', function (event) {
     var modal = getModal(event);
     if (modal) {
       if (modal && modal.classList.contains('modal')) {
         modal.classList.toggle('active');
       }
-        $(modal).trigger("modalOpened",  {smth:modal});
       event.preventDefault(); // prevents rewriting url (apps can still use hash values in url)
     }
-  };
-//Added click for desktop compatibility
-      window.addEventListener('click', openModal);
-  window.addEventListener('touchend', openModal);
-})();
+  });
+}());
 
 /* ========================================================================
  * Ratchet: popovers.js v2.0.2
@@ -780,12 +776,7 @@
     deltaY = e.touches[0].pageY - pageY;
     pageX  = e.touches[0].pageX;
     pageY  = e.touches[0].pageY;
-      
-    if(Math.abs(deltaY)>Math.abs(deltaX)) {//return true;
-            //console.log(">",deltaY);
-                                          $("#widget"+App.a.widgets[App.a.activeWidget].id).scrollTop($("#widget"+App.a.widgets[App.a.activeWidget].id).scrollTop()-deltaY);
-                                          return true;
-                                          };
+
     if (typeof isScrolling === 'undefined') {
       isScrolling = Math.abs(deltaY) > Math.abs(deltaX);
     }
@@ -879,13 +870,11 @@
 
     start     = { pageX : e.touches[0].pageX - offset, pageY : e.touches[0].pageY };
     touchMove = false;
-      e.preventDefault();
-      return false;
   });
 
   window.addEventListener('touchmove', function (e) {
     e = e.originalEvent || e;
-      e.preventDefault();
+
     if (e.touches.length > 1) {
       return; // Exit if a pinch
     }
@@ -919,11 +908,9 @@
     handle.style.webkitTransform = 'translate3d(' + distanceX + 'px,0,0)';
 
     toggle.classList[(distanceX > (toggleWidth / 2 - handleWidth / 2)) ? 'add' : 'remove']('active');
-      return false;
   });
 
   window.addEventListener('touchend', function (e) {
-      e.preventDefault();
     if (!toggle) {
       return;
     }
@@ -944,7 +931,7 @@
 
     e = new CustomEvent('toggle', {
       detail: { isActive: slideOn },
-      bubbles: false,
+      bubbles: true,
       cancelable: true
     });
 
@@ -952,8 +939,6 @@
 
     touchMove = false;
     toggle    = false;
-      
-      return false;
   });
 
 }());

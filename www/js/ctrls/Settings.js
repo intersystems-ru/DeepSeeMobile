@@ -11,7 +11,7 @@ define([], function(){
          $("#cube").on('input', function(e){setTimeout(function(){App.settings.cubeName = $("#cube").val();},0)});
         if (App.settings.namespace) $("#namespace").val(App.settings.namespace);
          $("#namespace").on('input', function(e){setTimeout(function(){App.settings.namespace = $("#namespace").val();},0)});
-         
-    
+
+
     };
 });
