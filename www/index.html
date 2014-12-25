@@ -16,6 +16,14 @@
     <link href="css/ratchet.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
       <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="css/LightPivot.css" rel="stylesheet">
+    <script type="text/javascript" src="js/lib/pivot/LightPivotTable.js"></script>
+    <script type="text/javascript" src="js/lib/pivot/DataSource.js"></script>
+    <script type="text/javascript" src="js/lib/pivot/PivotView.js"></script>
+    <script type="text/javascript" src="js/lib/pivot/DataController.js"></script>
+    <script type="text/javascript" src="js/lib/pivot/MDXParser.js"></script>
+
       <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
   <!--    <script type="text/javascript" src="js/lib/jquery-ui.min.js"></script>-->
     <script type="text/javascript" src="js/lib/pivot.js"></script>
@@ -119,7 +127,7 @@ Highcharts.setOptions(Highcharts.theme);</script>
         <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
             <h1 class="title">InterSystems DeepSee™ Mobile</h1>
-
+            <a id="btnMainBack" class="icon icon-left-nav pull-left" style="display: none"></a>
         </header>
 
         <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
@@ -174,6 +182,21 @@ Highcharts.setOptions(Highcharts.theme);</script>
         App.m.publish("viewchange:Settings", {
             holder: "#mainScreen > .content"
         });
+    });
+
+    // TODO: move events to another unit
+    $("#btnMainBack").off('tap').on('tap', function(){
+        if (App.a.activeWidget != null && App.a.activeWidget != undefined) {
+            var w = App.a.widgets[App.a.activeWidget];
+            if (w) {
+                if (w.pivot) {
+                    if (w.pivot.DRILL_LEVEL == 0) return;
+                    w.pivot.CONTROLS.back();
+                    //w.pivot.pivotView._backClickHandler(new Event("click"));
+                    if (w.pivot.DRILL_LEVEL == 0) $("#btnMainBack").hide();
+                }
+            }
+        }
     });
 
     $("#btnMainSignOut").off('tap').on('tap', function(){
