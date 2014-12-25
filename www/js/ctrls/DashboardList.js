@@ -1,4 +1,4 @@
-define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, MessageCenter, Dashboard) {
+define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_iscroll, */MessageCenter, Dashboard) {
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
@@ -27,15 +27,20 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                     final.find("> *").removeClass("active");
                     $(this).addClass("active");
                     //Устраняем самопроизвольный запрос  dashboard_list'a
-                    myScroll.destroy();
+                    //myScroll.destroy();
                     App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                     return false;
                 });
+
                 $('#mainScreen > .content').html(final);
-                var pullDownEl = document.getElementById('pullDown'),
-                    pullDownOffset = pullDownEl.offsetHeight;
-                var myScroll = new IScroll('#mainScreen > .content', {
-                    probeType: 1
+                //new IScroll($('#mainScreen > .content').get(0), {vScrollbar: true});
+
+
+                //$('body').html(final);
+                //var pullDownEl = document.getElementById('pullDown'),
+                  //  pullDownOffset = pullDownEl.offsetHeight;
+                /*var myScroll = new IScroll('#mainScreen > .content', {
+                    probeType: 1, click: true
                 });
                 myScroll.on('scroll', function () {
                     if (this.y > 5 && !pullDownEl.className.match('flip')) {
@@ -60,7 +65,7 @@ define(['lib/iscroll-probe', 'MessageCenter', 'Dashboard'], function (_iscroll, 
                         });
                         MessageCenter.publish("data_requested:dashboard_list");
                     }
-                });
+                });*/
             });
         };
         if (sessionStorage.getItem("dashboard_list") == null) {
