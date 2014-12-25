@@ -17,8 +17,9 @@ define([
     'Utils',
     'MessageCenter',
     'HighchartsWidget',
-    'PivotWidget'
-], function (FiltersList, Utils, mc, HighchartsWidget, PivotWidget) {
+    'PivotWidget',
+    'TextWidget'
+], function (FiltersList, Utils, mc, HighchartsWidget, PivotWidget, TextWidget) {
     /**
      * Creates new Widget object
      * @alias module:Widget
@@ -124,7 +125,8 @@ define([
 
         var typesMap = {
             'highcharts': HighchartsWidget,
-            'pivot': PivotWidget
+            'pivot': PivotWidget,
+            'textMeter': TextWidget
         };
         //Extend with type-specified opts
         if (_.has(opts, 'type') && _.has(typesMap, opts.type)) {
@@ -209,8 +211,7 @@ define([
         var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
         var self = this;
         require(["text!../views/Widget.html"], function (html) {
-            html = html.replace("{{title}}", self.name)
-                .replace("{{id}}", self.id);
+            html = html./*replace("{{title}}", self.name).*/replace("{{id}}", self.id);
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
                 def.resolve();
