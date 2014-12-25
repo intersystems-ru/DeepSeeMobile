@@ -31,6 +31,7 @@ header {
 }
 .content {
     bottom: 50px;
+    overflow-y: auto;
 }
 .alert {
     text-align: center;
@@ -47,10 +48,11 @@ header {
     height: 100%;
     padding-bottom: 44px;
 }
+/*
 .slide>div>div{
     overflow: auto;
     -webkit-overflow-scrolling:touch
-}
+}*/
 .filter {
     width: 40px;
     height: 40px;
@@ -404,4 +406,9 @@ font-weight: bold;
     40% {
         box-shadow: 0 2.5em 0 0 #007aff;
     }
+}
+
+
+.selected-cell {
+    background-color: limegreen;
 }
