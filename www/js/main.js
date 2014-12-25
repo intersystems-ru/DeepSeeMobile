@@ -17,11 +17,11 @@ require([
     'Dashboard',
     'ctrls/Filters',
     'Utils',
-    'lib/iscroll',
+//    'lib/iscroll',
     'ViewManager',
     'Utilizer',
     'Filter'
-], function (MessageCenter, LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils, IScroll, ViewManager,Utilizer,Filter) {
+], function (MessageCenter, LoadingSpinner, DBConnector, Dashboard, FiltersView, Utils, /*IScroll,*/ ViewManager,Utilizer,Filter) {
     
     window.App = {};
 
@@ -41,7 +41,7 @@ require([
             }
         }
     });
-    //MessageCenter.publish('filters_requested');
+
 
     MessageCenter.publish("viewchange:Login", {
         holder: "#loginScreen"
