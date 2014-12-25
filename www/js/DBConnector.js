@@ -40,6 +40,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
 
         var parseJSON = function (d) {
             try {
+                if (typeof(d) == "object") return d;
                 d = JSON.parse(d)
             } catch (e) {
                 console.log("Error in parsing data:", d);
@@ -85,8 +86,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 url: App.settings.server+"/MDX?Namespace=" + App.settings.namespace,
                 type: "POST",
                 contentType: "text/plain;charset=UTF-8",
-                username: App.settings.username,
-                password:  App.settings.password,
+                //username: App.settings.username,
+                //password:  App.settings.password,
                 success: function (d) {
                     //console.log("%cGot data from server:","font-color:red",d);
                     var chartData,
@@ -125,8 +126,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          */
         this.acquireFilters = function (args) {
             var filter_opts = {
-                username: App.settings.username,
-                password: App.settings.password,
+                //username: App.settings.username,
+                //password: App.settings.password,
                 type: "GET",
                 url: App.settings.server+"/FilterValues/" + args.data.cube + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
@@ -173,8 +174,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 return;
             }
             var filter_list_opts = {
-                username: App.settings.username,
-                password: App.settings.password,
+                //username: App.settings.username,
+                //password: App.settings.password,
                 type: "GET",
                 url: App.settings.server+"/FilterValues/" + cube + "/" + path + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
@@ -216,8 +217,8 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
         this.acquireDashboardData = function (args) {
             var dashName = args;
             var dash_opts = {
-                username: App.settings.username,
-                password: App.settings.password,
+                //username: App.settings.username,
+                //password: App.settings.password,
                 type: "POST",
                 url: App.settings.server+"/Widgets?Namespace=" + App.settings.namespace,
                 data: JSON.stringify({Dashboard: dashName}),
