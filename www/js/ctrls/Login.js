@@ -4,6 +4,9 @@ define([], function(){
         var login;
         var pass;
 
+
+        if (sessionStorage.dashboard_list) delete sessionStorage.dashboard_list;
+
         if (localStorage.servers) servers = JSON.parse(localStorage.servers);
         if (servers) {
             if (localStorage.currentServerId) {
@@ -50,7 +53,8 @@ define([], function(){
             $("#mainScreen").show();
             $("#txtError").hide();
             $("#loginProgress").hide();
-
+            App.settings.username = login;
+            App.settings.password = pass;
             $.ajaxPrefilter(function( options ) {
                 if (!options.beforeSend) {
                     options.beforeSend = function (xhr) {
