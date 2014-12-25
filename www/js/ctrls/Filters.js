@@ -14,9 +14,9 @@
  * @todo Delete high dependency with window.a = dashboard
  */
 define([
-    'lib/iscroll',
+    //'lib/iscroll',
     "MessageCenter"
-], function (IScroll, mc) {
+], function (/*IScroll, */mc) {
     'use strict';
     /**
      * Creates or returns existing FiltersView object
@@ -107,11 +107,11 @@ define([
                         App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").path);
                     }
                 });
-                if (IScroll) {
+                /*if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
                     });
-                };
+                };*/
             });
 
         };
@@ -207,11 +207,11 @@ define([
                 if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
                 else $("#btnFilterAccept").hide();
 
-                if (IScroll) {
+                /*if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
                     });
-                }
+                }*/
                 $("#btnFilterAccept").off("tap").on("tap", function(){
                     var items = $("#filters .content").find(".icon-check:visible");
                     if (items.length == 0) return;
@@ -228,11 +228,21 @@ define([
                         valueName: valueNames
                     });
                     $("#filters").removeClass("active");
+                    $("#btnMainFilter").show();
                 });
             });
 
 
         };
+
+        $("#btnMainFilter").off("tap").on("tap", function() {
+            self.render();
+        });
+
+        mc.subscribe("filters_acquired", {
+            subscriber: this,
+            callback: this.render
+        });
         mc.subscribe("set_active_widget", {
             subscriber: this,
             callback: this.render
