@@ -318,6 +318,15 @@ define(['MessageCenter'], function (mc) {
             config: {},
             filters: []
         },
+        "textMeter": {
+            type: "textMeter",
+            callback: function (d) {
+                this.config.textData = d;
+            },
+            title: "Test",
+            config: {},
+            filters: []
+        },
         "pivot": {
             type: "pivot",
             convertor: function (d) {
@@ -406,7 +415,7 @@ define(['MessageCenter'], function (mc) {
                     this.config.xAxis.categories.push(data.Cols[1].tuples[i].caption.toString());
                     data.Data[i] = {
                         y: data.Data[i],
-                        //drilldown: false,
+                        drilldown: true,
                         cube: data.Info.cubeName,
                         path: data.Cols[1].tuples[i].path
                     };
@@ -426,20 +435,20 @@ define(['MessageCenter'], function (mc) {
                 chart: {
                     type: 'column',
                     margin: 75,
-                    options3d: {
+                    /*options3d: {
                     enabled: true,
                     alpha: 15,
                     beta: 15,
                     viewDistance: 25,
                     depth: 40
-                    }
+                    }*/
                 },
                 title: {
                     text: ''
                 },
-                subtitle: {
+                /*subtitle: {
                     text: 'Notice the 3D'
-                },
+                },*/
                 legend:{
                     enabled:false
                 },
