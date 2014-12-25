@@ -3,18 +3,27 @@
         <h1 class="title">Please login</h1>
     </header>
     <div class="content">
-        <br>
-        <ul class="table-view">
-            <li class="table-view-cell media">
-                <a id="selServer" class="navigate-right">Server:</a>
-            </li>
-        </ul>
-        <input id="txtLogin" type="text" placeholder="Login">
-        <input id="txtPassword" type="password" placeholder="Password">
-        <button id="btnLogin" class="btn btn-primary btn-block">Sign in</button>
-        <div style="text-align: center">
-            <div id="loginProgress" class="loader" style="display: none"></div>
-            <label id="txtError"class="err-msg badge badge-negative" style="display: none"></label>
+
+            <br>
+            <ul class="table-view">
+                <li class="table-view-cell media">
+                    <a id="selServer" class="navigate-right">Server:</a>
+                </li>
+            </ul>
+        <div class="card">
+            <input id="txtLogin" type="text" placeholder="Login">
+            <input id="txtPassword" type="password" placeholder="Password">
+            <button id="btnLogin" class="btn btn-primary btn-block">Sign in</button>
+            <div style="text-align: center">
+                <div id="loginProgress" class="loader" style="display: none"></div>
+                <label id="txtError"class="err-msg badge badge-negative" style="display: none"></label>
+            </div>
         </div>
+
+    </div>
+
+
+    <div class="bar bar-standard bar-footer">
+        <div class="pull-right" style="font-size: x-small">ver. 0.43</div>
     </div>
 </div>
