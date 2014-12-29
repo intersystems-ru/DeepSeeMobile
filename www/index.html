@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Ratchet template page</title>
+    <title>DeepSee Mobile</title>
 
     <!-- Sets initial viewport load and disables zooming  -->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -12,11 +12,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <!-- Include the compiled Ratchet CSS -->
-    <link href="css/ratchet.css" rel="stylesheet">
-    <link href="css/index.css" rel="stylesheet">
-      <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png"/>
 
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <!-- <link href="css/ratchet-theme-ios.min.css" rel="stylesheet">-->
+     <link href="css/index.css" rel="stylesheet">
+
+     <link href="css/font-awesome.min.css" rel="stylesheet">
+
+     <!-- Light pivot table -->
     <link href="css/LightPivot.css" rel="stylesheet">
     <script type="text/javascript" src="js/lib/pivot/LightPivotTable.js"></script>
     <script type="text/javascript" src="js/lib/pivot/DataSource.js"></script>
@@ -24,92 +30,17 @@
     <script type="text/javascript" src="js/lib/pivot/DataController.js"></script>
     <script type="text/javascript" src="js/lib/pivot/MDXParser.js"></script>
 
-      <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
-  <!--    <script type="text/javascript" src="js/lib/jquery-ui.min.js"></script>-->
-    <script type="text/javascript" src="js/lib/pivot.js"></script>
+
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.textfill.min.js"></script>
+    <!--<script type="text/javascript" src="js/lib/pivot.js"></script>-->
     <script type="text/javascript" src="js/lib/underscore.js"></script>
     <script src="js/lib/highcharts.src.js"></script>
-        <script src="js/lib/drilldown.js"></script>
+    <script src="js/lib/drilldown.js"></script>
     <script src="js/lib/highcharts-more.js"></script>
     <script src="js/lib/solid-gauge.src.js"></script>
     <script src="js/lib/highcharts-3d.js"></script>
     <script src="js/lib/funnel.js"></script>
-    
-    <!-- Contains alt theme <script>/**
- * Grid-light theme for Highcharts JS
- * @author Torstein Honsi
- */
-
-// Load the fonts
-Highcharts.createElement('link', {
-   href: 'http://fonts.googleapis.com/css?family=Dosis:400,600',
-   rel: 'stylesheet',
-   type: 'text/css'
-}, null, document.getElementsByTagName('head')[0]);
-
-Highcharts.theme = {
-   colors: ["#7cb5ec", "#f7a35c", "#90ee7e", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-      "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
-   chart: {
-      backgroundColor: null,
-      style: {
-         fontFamily: "Dosis, sans-serif"
-      }
-   },
-   title: {
-      style: {
-         fontSize: '16px',
-         fontWeight: 'bold',
-         textTransform: 'uppercase'
-      }
-   },
-   tooltip: {
-      borderWidth: 0,
-      backgroundColor: 'rgba(219,219,216,0.8)',
-      shadow: false
-   },
-   legend: {
-      itemStyle: {
-         fontWeight: 'bold',
-         fontSize: '13px'
-      }
-   },
-   xAxis: {
-      gridLineWidth: 1,
-      labels: {
-         style: {
-            fontSize: '12px'
-         }
-      }
-   },
-   yAxis: {
-      minorTickInterval: 'auto',
-      title: {
-         style: {
-            textTransform: 'uppercase'
-         }
-      },
-      labels: {
-         style: {
-            fontSize: '12px'
-         }
-      }
-   },
-   plotOptions: {
-      candlestick: {
-         lineColor: '#404048'
-      }
-   },
-
-
-   // General
-   background2: '#F0F0EA'
-   
-};
-
-// Apply the theme
-Highcharts.setOptions(Highcharts.theme);</script>
---> 
 
     <script src="js/lib/jquery.tap.js"></script>
     <script src="js/lib/handlebars-v1.3.0.js"></script>
@@ -126,7 +57,13 @@ Highcharts.setOptions(Highcharts.theme);</script>
     <div id="mainScreen" style="display: none;">
         <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
-            <h1 class="title">InterSystems DeepSee™ Mobile</h1>
+            <h1 class="title" id="mainTitle">InterSystems DeepSee™</h1>
+
+            <!-- TODO: make widget page change from popover
+            <a href="#widgetList" class="pull-right">
+                <span class="icon icon-caret"></span>
+            </a>
+            -->
             <a id="btnMainBack" class="icon icon-left-nav pull-left" style="display: none"></a>
         </header>
 
@@ -137,12 +74,13 @@ Highcharts.setOptions(Highcharts.theme);</script>
         <!--content-->
 
         <nav class="bar bar-tab">
-            <a class="tab-item active nav-home" href="#">
-                <span class="icon icon-home"></span>
-                <span class="tab-label">Dashboards</span>
+            <a class="tab-item nav-home" href="#">
+                <span class="icon fa fa-home"></span>
+                <span class="tab-label">Home</span>
             </a>
-            <a id="btnMainFilter" class="tab-item" href="#filters" data-transition="slide-in" style="display:none;">
-                <span class="icon icon-list"></span>
+            <a id="btnMainFilter" class="tab-item" style="display:none;">
+            <!--<a id="btnMainFilter" class="tab-item" href="#filters" data-transition="slide-in" style="display:none;">-->
+                <span class="icon fa fa-filter"></span>
                 <span class="tab-label">Filters</span>
             </a>
             <!--
@@ -152,11 +90,11 @@ Highcharts.setOptions(Highcharts.theme);</script>
            </a>
            -->
            <a id="btnMainRefresh" class="tab-item" href="#">
-               <span class="icon fa fa-refresh" ></span>
+               <span class="icon fa fa-refresh"></span>
                <span class="tab-label">Reload</span>
            </a>
             <a id="btnMainSignOut" class="tab-item" href="#">
-                <span class="icon icon-left-nav" ></span>
+                <span class="icon fa fa-sign-out" ></span>
                 <span class="tab-label">Sign out</span>
             </a>
        </nav>
@@ -165,16 +103,31 @@ Highcharts.setOptions(Highcharts.theme);</script>
 
 
 <div id="filters" class="modal">
-   <header class="bar bar-nav">
-       <a class="icon icon-left-nav pull-left" href="#filters"></a>
-       <button id="btnFilterAccept" class="btn btn-link btn-nav pull-right" style="display: none">Accept</button>
-       <h1 class="title">Filters</h1>
-   </header>
+    <header class="bar bar-nav">
+        <a id="btnFilterBack" class="icon icon-left-nav pull-left"></a>
+        <button id="btnFilterAccept" class="btn btn-link btn-nav pull-right" style="display: none">Accept</button>
+        <h1 class="title">Filters</h1>
+    </header>
 
-   <div class="content">
+    <div class="content">
 
-   </div>
+    </div>
+    <!--
+    <div class="bar bar-standard bar-footer">
+        <button class="btn btn-block btn-negative">Dismiss filters</button>
+    </div>
+    -->
 </div>
+
+    <!--TODO: make widget page change from popover
+    <div id="widgetList" class="popover">
+        <ul class="table-view">
+
+
+        </ul>
+    </div>
+
+    -->
 <!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
 <script>
@@ -198,6 +151,7 @@ Highcharts.setOptions(Highcharts.theme);</script>
             }
         }
     });
+
 
     $("#btnMainSignOut").off('tap').on('tap', function(){
         $("#mainScreen").hide();
