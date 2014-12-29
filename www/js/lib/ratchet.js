@@ -714,6 +714,15 @@
   var scrollableArea;
 
   var getSlider = function (target) {
+
+    // ******************* Pivot scroll fix ******************/
+    var p = $(target).parents("thead");
+    if (p) if (p.hasClass("fixedHeader")) {
+        slider = null;
+        return;
+    }
+    // *******************************************************/
+
     var i;
     var sliders = document.querySelectorAll('.slider > .slide-group');
 
