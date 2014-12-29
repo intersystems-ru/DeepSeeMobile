@@ -190,6 +190,7 @@ define([
     });
          */
     Dashboard.prototype.addWidget = function (config) {
+            var self = this;
             var def = $.Deferred();
             var config = config || {};
             config.dashboard = this;
@@ -200,30 +201,53 @@ define([
             this.widgets[this.widgets.length] = widget;
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
-                this.setTitle(widget.name);
+                App.setTitle(widget.name);
                 //mc.publish("set_active_widget", { id: 0 });
             }
+
+        /** TODO: make widget page change from popover
+            var name = widget.name;
+            if (!name) name = "Widget #" + this.widgets.length.toString();
+            var el = $("<li num="+this.widgets.length+" class='table-view-cell'>" + name + "</li>");
+            el.on("tap", function(e) {
+                var slide = $(self.config.holder).find(".slide").get(0);
+                var offset = (parseInt($(e.target).attr("num"))-1) * slide.offsetWidth;
+                // Move slide
+                var slider = $(self.config.holder).find('.slide-group').get(0);
+                slider.style['-webkit-transition-duration'] = '.2s';
+                slider.style.webkitTransform = 'translate3d(-' + offset + 'px,0,0)';
+                $("#widgetList").removeClass("visible");
+                $('div.backdrop').remove();
+            });
+            $("#widgetList").find(".table-view").append(el);
+**/
             widget = null;
             return def.promise();
         };
-Dashboard.prototype.createHolder = function(){
-var holder = (this.config && this.config.holder) ? this.config.holder : "mainScreen > .content";
-            require(['text!../views/Dashboard.html'], function (html) {
-                $(holder + " > *").remove();
-                $(holder).append(html);
-            });
-};
-         /**
+
+        Dashboard.prototype.createHolder = function(){
+            var holder = (this.config && this.config.holder) ? this.config.holder : "mainScreen > .content";
+
+
+            //temp//
+            /*$(holder + " > *").remove();
+            var tbl = $("<table border='1' width='100%'></table>");
+            tbl.appendTo(holder);
+            return;*/
+            ///////////
+
+                require(['text!../views/Dashboard.html'], function (html) {
+                    $(holder + " > *").remove();
+                    $(holder).append(html);
+                });
+        };
+             /**
          * Renders up the whole dashboard with its widgets and so on.
          * @function module:Dashboard#render
          */
 
-Dashboard.prototype.setTitle = function(txt) {
-    if (!txt) $("#mainTitle").text("InterSystems DeepSee™"); else $("#mainTitle").text(txt);
-}
-
-Dashboard.prototype.render = function () {
-            
+        Dashboard.prototype.render = function () {
+            App.setTitle("");
             for (var i = 0; i < this.widgets.length; i++) {
                 this.widgets[i].renderWidget();
             }
@@ -239,15 +263,45 @@ Dashboard.prototype.render = function () {
                         $("#btnMainDrillthrough").show();
                         if (w.pivot.pivotView.tablesStack.length > 1) $("#btnMainBack").show();
                     }
-                    self.setTitle(w.name);
+                    App.setTitle(w.name);
                     if (mc) mc.publish("set_active_widget", {
                         id: self.activeWidget
                     });
                 }
             });
 
+           // setTimeout(this.tileView, 1000);
+
+
             return this;
         };
+
+        Dashboard.prototype.tileView = function() {
+            var slide = $(App.a.config.holder).find('.slide-group');
+            var tbl = $("<table border='1'></table>");
+            var tr = null;
+            var td = null;
+            var c = 0;
+            slide.find(".slide").each(function(n, e){
+                if (c == 0) {
+                    tr = $("<tr></tr>");
+                }
+                tr.appendTo(tbl);
+                td = $("<td></td>");
+                $(e).find("div:eq(0)").appendTo(td);
+                td.appendTo(tr);
+                c++;
+                if (c == 2) c = 0;
+                console.log(e);
+            });
+
+            tbl.css("width", "300px")
+                .css("border", "1px solid")
+                .appendTo(App.a.config.holder);
+
+            $(App.a.config.holder).find(".slider").remove();
+        }
+
     return Dashboard;
 
 
