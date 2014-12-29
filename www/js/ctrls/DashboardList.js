@@ -16,12 +16,14 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
                 sessionStorage.setItem('dashboard_list', JSON.stringify(e))
             };
             require(['text!../views/DashboardList.html'], function (html) {
+                App.setTitle("");
                 $("#btnMainFilter").hide();
                 var template = Handlebars.compile(html);
                 var rendered = template({
                     dashboardList: e.children
                 });
                 var final = $(rendered);
+                final.show();
                 final.find("li").off("tap").on('tap', function (e) {
                     e.preventDefault();
                     final.find("> *").removeClass("active");
@@ -32,7 +34,9 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
                     return false;
                 });
 
+
                 $('#mainScreen > .content').html(final);
+                $('#mainScreen > .content').find(".loader").remove();
                 //new IScroll($('#mainScreen > .content').get(0), {vScrollbar: true});
 
 
