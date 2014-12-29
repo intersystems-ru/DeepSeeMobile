@@ -14,7 +14,7 @@ define(['MessageCenter'], function (mc) {
             require(["text!../views/" + view + ".html", 'js/ctrls/' + view + '.js'], function (html, js) {
                 var $html = $(html);
                 $(d.data.holder).append($html);
-                console.log(d.data.holder,$html);
+                //console.log(d.data.holder,$html);
                 js.call(self, d.data);
             });
             
