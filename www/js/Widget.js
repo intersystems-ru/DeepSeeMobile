@@ -207,6 +207,23 @@ define([
      */
     Widget.prototype.createHolder = function () {
         var def = $.Deferred();
+
+
+        ///temp
+        /*var w = $("#mainScreen > .content").get(0).offsetWidth / 2;
+        var h = $("#mainScreen > .content").get(0).offsetHeight / 2;
+        var widget_holder = this.dashboard.config.holder + " > table";
+        if ($(widget_holder).find("tr").last().find("td").size() != 1) {
+            $("<tr><td style='width:"+w+"px; height:"+h+"px' id='widget" + this.id + "'></td></tr>").appendTo(widget_holder);
+        } else {
+            $("<td style='width:"+w+"px; height:"+h+"px' id='widget" + this.id + "'></td>").appendTo($(widget_holder).find("tr").last());
+        }
+        def.resolve();
+        return def.promise();*/
+        ////////////////
+
+
+
         //if (!this.active) return this;
         var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
         var self = this;
