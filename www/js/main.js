@@ -27,7 +27,8 @@ require([
 
     App.settings = {
         server: "",
-        namespace: ""
+        namespace: "",
+        title: "InterSystems DeepSee™"
     };
 
     App.m = MessageCenter;
@@ -64,6 +65,10 @@ require([
         };
         App.m.publish("clear:dashboard");
     };
+
+    App.setTitle = function(txt) {
+        if (!txt) $("#mainTitle").text(App.settings.title); else $("#mainTitle").text(txt);
+    }
 
 
 });
