@@ -1,11 +1,11 @@
 define([], function(){
     return function(d){
         var id = d.id;
-        console.log(id);
+
         var servers;
         if (localStorage.servers) servers = JSON.parse(localStorage.servers);
         if (!servers) servers = [];
-
+        if (id != undefined && id != null) $("#serverInfoTitle").text("Edit server");
 
         if (id != undefined) {
             //edit mode, fill fields
