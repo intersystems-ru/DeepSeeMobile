@@ -52,7 +52,8 @@ define([
          */
         this.render = function () {
             require(['text!../views/Filters.html'], function (html) {
-                $("#btnFilterAccept").hide()
+                $("#filters").data("isValues", 0);
+                $("#btnFilterAccept").hide();
                 var holder = "#filters .content";
                 $(holder).empty();
                 $("#filters .title").text("Filters");
@@ -66,7 +67,7 @@ define([
                     if (App.a.activeWidget != App.filters[i].widget.id) continue;
                     var listItem = $(html).find(".filter-list-item").clone();
                     listItem.html(
-                        listItem.html().replace(/{{filterName}}/, App.filters[i].name) //todo: a.filters is BAAAD
+                        listItem.html().replace(/{{filterName}}/, App.filters[i].name)
                     );
                     listItem.data("filter", App.filters[i]);
 
@@ -149,6 +150,7 @@ define([
             if (!fv) {
                 sessionStorage.setItem("filters_values_" + self.selectedFilter.path, JSON.stringify(d))
             }
+            $("#filters").data("isValues", 1);
             require(['text!../views/FiltersInfo.html'], function (html) {
                 var holder = "#filters .content";
                 $(holder).empty();
@@ -235,10 +237,19 @@ define([
 
         };
 
-        $("#btnMainFilter").off("tap").on("tap", function() {
-            self.render();
+        $("#btnFilterBack").off("tap").on("tap", function() {
+            if ($("#filters").data("isValues") == 1) {
+                self.render();
+            } else
+            $("#filters").removeClass("active");
         });
 
+        $("#btnMainFilter").off("tap").on("tap", function() {
+            self.render();
+            $("#filters").addClass("active");
+        });
+
+/*
         mc.subscribe("filters_acquired", {
             subscriber: this,
             callback: this.render
@@ -246,12 +257,15 @@ define([
         mc.subscribe("set_active_widget", {
             subscriber: this,
             callback: this.render
-        });
+        });*/
         /*mc.subscribe("filters_acquired", {
             subscriber: this,
             callback: this.render
         }); //TODO: - what comes first - this one or in DashBoard?*/
-        $("#filters").on('modalOpened', this.render);
+        /*$("#filters").on('modalOpened', function() {
+            console.log("flt render");
+            self.render();
+        });*/
     };
     return new FiltersView();
 });
