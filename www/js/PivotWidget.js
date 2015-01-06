@@ -46,7 +46,7 @@ define([], function () {
                     dataSource: {
                         MDX2JSONSource: App.settings.server,
                         basicMDX: this.datasource.data.MDX,
-                        namespace: "samples",
+                        namespace: App.settings.namespace,
                         username: App.settings.username,
                         password: App.settings.password
                     },
