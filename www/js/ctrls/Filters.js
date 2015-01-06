@@ -75,8 +75,6 @@ define([
                         var fv = App.a.widgets[App.a.activeWidget].filters.getFilter(App.filters[i].path).valueName || App.a.widgets[App.a.activeWidget].filters.getFilter(App.filters[i].path).value;
                         listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
                         listItem.find(".toggle").addClass("active");
-
-
                     } else {
                         listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
                     }
@@ -108,6 +106,20 @@ define([
                         App.a.widgets[App.a.activeWidget].filters.remove($(this).parent().parent().data("filter").path);
                     }
                 });
+
+                if (App.a.widgets[App.a.activeWidget].filters.hasFilters()) {
+                    $("#fltBarFooter").show();
+                } else $("#fltBarFooter").hide();
+
+                $("#btnDismissFilters").off('tap').on('tap', function (e) {
+                    $("#filters").removeClass("active");
+                    var allFilters = App.a.widgets[App.a.activeWidget].filters.getAll();
+                    for (var f in allFilters) {
+                        App.a.widgets[App.a.activeWidget].filters.remove(f);
+                    }
+                    $("#btnMainFilter").removeClass("tab-item-green");
+                });
+
                 /*if (IScroll) {
                     new IScroll('#filters .content', {
                         tap: true
@@ -125,9 +137,6 @@ define([
         this.getFilterInfo = function (d) {
             var fv = sessionStorage.getItem("filters_values_" + self.selectedFilter.path);
             if (!fv) {
-
-
-
                 mc.subscribe("filter_values_acquired:" + self.selectedFilter.path, {
                     subscriber: self,
                     callback: self.renderInfo,
@@ -215,6 +224,7 @@ define([
                     });
                 }*/
                 $("#btnFilterAccept").off("tap").on("tap", function(){
+                    $("#btnMainFilter").removeClass("tab-item-green");
                     var items = $("#filters .content").find(".icon-check:visible");
                     if (items.length == 0) return;
                     var values = [];
@@ -229,6 +239,7 @@ define([
                         value: values,
                         valueName: valueNames
                     });
+                    $("#btnMainFilter").addClass("tab-item-green");
                     $("#filters").removeClass("active");
                     $("#btnMainFilter").show();
                 });
@@ -240,8 +251,10 @@ define([
         $("#btnFilterBack").off("tap").on("tap", function() {
             if ($("#filters").data("isValues") == 1) {
                 self.render();
-            } else
-            $("#filters").removeClass("active");
+            } else {
+                if (!App.a.widgets[App.a.activeWidget].filters.hasFilters()) $("#btnMainFilter").removeClass("tab-item-green");
+                $("#filters").removeClass("active");
+            }
         });
 
         $("#btnMainFilter").off("tap").on("tap", function() {
