@@ -329,7 +329,7 @@ define(['MessageCenter'], function (mc) {
         },
         "pivot": {
             type: "pivot",
-            convertor: function (d) {
+           /* convertor: function (d) {
                 var transformedData = {
                     data: [],
                     measures: ['Count'],
@@ -397,7 +397,7 @@ define(['MessageCenter'], function (mc) {
                 })(mc);
                 this.config = $.extend(this.config, d);
                 console.log(d);
-            },
+            },*/
             config: {},
             filters: []
         },
@@ -424,7 +424,7 @@ define(['MessageCenter'], function (mc) {
                 this.config.series = [{
                     colorByPoint: true,
                     data: data.Data,
-                    name: data.Cols[0].caption
+                    name: data.Cols[0].tuples[0].caption
                 }];
 
                
@@ -469,33 +469,39 @@ define(['MessageCenter'], function (mc) {
         "lineChart":{
             type: "highcharts",
             callback: function (d) {
-
-               
                 var data = d.data;
-                //this.config.xAxis.type="category";
-                //this.config.xAxis.showEmpty = false;
                 this.config.xAxis.title = {
                     text: data.Cols[1].caption
                 };
                 this.config.yAxis.title = {
                     text: data.Cols[0].caption
                 };
+
                 for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                     this.config.xAxis.categories.push(data.Cols[1].tuples[i].caption.toString());
-//                    data.cells[i] = {
-//                        y: data.cells[i],
-//                        cube: data.cubeName,
-//                        path: data.axes[1].tuples[i].path
-//                    };
                 };
+                this.config.series = [];
 
-                this.config.series = [{
-//                    colorByPoint: true,
-                    data: data.Data,
-                    name: data.Cols[0].caption,
-                    lineWidth: 4
-                }];
-
+                for(var j = 0; j< data.Cols[0].tuples.length; j++) {
+                    var tempData = [];
+                    for (var i = 0; i < data.Cols[1].tuples.length; i++) {
+                        tempData.push({
+                            y: data.Data[i * data.Cols[0].tuples.length + j],
+                            drilldown: true,
+                            cube: data.Info.cubeName,
+                            path: data.Cols[1].tuples[i].path
+                        });
+                    };
+                    for (var i = 0; i < tempData.length; i++) {
+                        if (!tempData[i].y) tempData[i].y = 0;
+                        if (tempData[i].y == "") tempData[i].y = 0;
+                    }
+                    this.config.series.push({
+                        //colorByPoint:  false,//(data.Cols[0].tuples.length>1) ? false : true,
+                        data: tempData,
+                        name: data.Cols[0].tuples[j].caption
+                    });
+                };
             },
             config:{
         title: {
@@ -519,7 +525,7 @@ define(['MessageCenter'], function (mc) {
             }
         },
         legend: {
-            enabled:false
+            enabled:true
         },
         series: []
     }
