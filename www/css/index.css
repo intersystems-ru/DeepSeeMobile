@@ -27,6 +27,13 @@ body {
 header {
     font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 }
+
+.title {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-left: 36px;
+    padding-right: 36px;
+}
 .content {
     /*bottom: 0px;
     //overflow-y: auto;*/
@@ -219,4 +226,8 @@ nav.bar.bar-tab a.tab-item {
     height: 200px;
     width: 100%;
 
+}
+
+.tab-item-green span {
+    color: green; !important;
 }
