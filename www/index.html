@@ -24,6 +24,30 @@
 
      <!-- Light pivot table -->
     <link href="css/LightPivot.css" rel="stylesheet">
+
+    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.fitTextToHeight.js"></script>
+    <!--<script type="text/javascript" src="js/lib/pivot.js"></script>-->
+    <script type="text/javascript" src="js/lib/underscore.js"></script>
+
+
+    <!--        <script src="js/lib/highcharts.src.js"></script>-
+
+            <script src="js/lib/Highcharts-LegendExtension.src.js"></script>
+            -->
+
+    <!--<script src="js/lib/drilldown.js"></script>
+    <script src="js/lib/solid-gauge.src.js"></script>
+    <script src="js/lib/funnel.js"></script>-->
+    <script src="js/lib/jquery.tap.js"></script>
+    <script src="js/lib/handlebars-v1.3.0.js"></script>
+
+    <script src="js/lib/highstock.src.js"></script>
+    <script src="js/lib/highcharts-more.js"></script>
+    <script src="js/lib/heatmap.src.js"></script>
+    <script src="js/lib/treemap.src.js"></script>
+    <script src="js/lib/Highcharts-LegendExtension.src.js"></script>
+
     <script type="text/javascript" src="js/lib/pivot/LightPivotTable.js"></script>
     <script type="text/javascript" src="js/lib/pivot/DataSource.js"></script>
     <script type="text/javascript" src="js/lib/pivot/PivotView.js"></script>
@@ -31,31 +55,20 @@
     <script type="text/javascript" src="js/lib/pivot/MDXParser.js"></script>
 
 
-    <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
-    <script type="text/javascript" src="js/lib/jquery.textfill.min.js"></script>
-    <!--<script type="text/javascript" src="js/lib/pivot.js"></script>-->
-    <script type="text/javascript" src="js/lib/underscore.js"></script>
-    <script src="js/lib/highcharts.src.js"></script>
-    <script src="js/lib/drilldown.js"></script>
-    <script src="js/lib/highcharts-more.js"></script>
-    <script src="js/lib/solid-gauge.src.js"></script>
-    <script src="js/lib/highcharts-3d.js"></script>
-    <script src="js/lib/funnel.js"></script>
-
-    <script src="js/lib/jquery.tap.js"></script>
-    <script src="js/lib/handlebars-v1.3.0.js"></script>
-
-
     <!-- Include the compiled Ratchet JS -->
     <script src="js/lib/ratchet.js"></script>
     <script src="js/lib/cordova.js"></script>
 
-</head>
+    <!--
+        <script src="http://jsconsole.com/remote.js?82FA66FF-B21F-4487-83C1-A11B5034B9D9"></script>
+        -->
 
-<body>
-    <div id="loginScreen"></div>
-    <div id="mainScreen" style="display: none;">
-        <!-- Make sure all your bars are the first things in your <body> -->
+    </head>
+
+        <body>
+            <div id="loginScreen"></div>
+            <div id="mainScreen" style="display: none;">
+                <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
             <h1 class="title" id="mainTitle">InterSystems DeepSee™</h1>
 
@@ -72,6 +85,8 @@
 
         </div>
         <!--content-->
+        <div class="tri-left" style="display: none"></div>
+        <div class="tri-right" style="display: none"></div>
 
         <nav class="bar bar-tab">
             <a class="tab-item nav-home" href="#">
@@ -116,18 +131,23 @@
     <div id="fltBarFooter" class="bar bar-standard bar-footer">
         <button id="btnDismissFilters" class="btn btn-block btn-negative">Dismiss filters</button>
     </div>
-
 </div>
 
-    <!--TODO: make widget page change from popover
-    <div id="widgetList" class="popover">
-        <ul class="table-view">
+    <!--TODO: make widget settings
+   <div id="sideOptions" class="side-slider">
+
+   </div>
+
+   -->
+   <!--TODO: make widget page change from popover
+   <div id="widgetList" class="popover">
+       <ul class="table-view">
 
 
-        </ul>
-    </div>
+       </ul>
+   </div>
 
-    -->
+   -->
 <!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
 <script>
