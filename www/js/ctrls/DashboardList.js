@@ -2,10 +2,13 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
+            //App.m.publish("clear:dashboard");
+
             $("#btnMainRefresh").off('tap').on('tap', function() {
                 if (App.a) {
-                    if (App.a.widgets[App.a.activeWidget]) App.a.widgets[App.a.activeWidget].requestData()
+                    if (App.a.widgets[App.a.activeWidget]) App.a.widgets[App.a.activeWidget].requestData();
                 } else {
+                    delete sessionStorage.dashboard_list;
                     App.m.publish("viewchange:DashboardList", {holder: "#mainScreen > .content"});
                 }
             });
