@@ -9,6 +9,8 @@ define(['MessageCenter'], function (mc) {
             if (d && d.handler && typeof d.handler == 'function') {
                 d.handler();
             }
+            if (App.a) if (App.a.widgets[App.a.activeWidget]) App.a.widgets[App.a.activeWidget].onDeactivate();
+
             $(d.data.holder).empty();
             var self = this;
             require(["text!../views/" + view + ".html", 'js/ctrls/' + view + '.js'], function (html, js) {
