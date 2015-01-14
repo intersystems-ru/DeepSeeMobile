@@ -1,11 +1,14 @@
 define([], function () {
-    function PivotWidget() {
+    function PivotWidget(conf) {
         var hasDiv = false;
         var showDrilldown = false;
+        this.conf = conf;
+
         this.renderWidget = function (isDrillDown) {
 
             if (this.pivot) {
-                this.pivot.dataSource.BASIC_MDX =  this.datasource.data.MDX;
+                this.pivot.changeBasicMDX(this.datasource.data.MDX);
+                //this.pivot.dataSource.BASIC_MDX =  this.datasource.data.MDX;
                 this.pivot.refresh();
                 return;
             }
@@ -38,12 +41,14 @@ define([], function () {
             /*if (!this.pivotScroll) {
                 this.pivotScroll = new IScroll($(w_selector).parent().get(0), {vScrollbar: true});
             }*/
+            $(w_selector).empty();
 
             var self= this;
             self.selCellFilters = "";
             var setup = {
                     container: $(w_selector).get(0),
                     dataSource: {
+                        pivot: this.conf.datasource.pivot,
                         MDX2JSONSource: App.settings.server,
                         basicMDX: this.datasource.data.MDX,
                         namespace: App.settings.namespace,
@@ -56,7 +61,7 @@ define([], function () {
                         },
                         drillThrough: function() {
                             $("#btnMainBack").show();
-                        },
+                        }
                         /* cellDrillThrough: function(d) {
                             $(d.event.currentTarget).parent().parent().find(".selected-cell").removeClass("selected-cell");
                             $(d.event.currentTarget).addClass("selected-cell");
@@ -68,7 +73,8 @@ define([], function () {
                     },
                     hideButtons: true,
                     showSummary: true,
-                    triggerEvent: "click",
+                    enableHeadersScrolling: true,
+                    //triggerEvent: "click",
                     formatNumbers: "#,###.##"
                 }
 
@@ -103,6 +109,12 @@ define([], function () {
             }*/
         }
     }
+
+    PivotWidget.prototype.onDeactivate = function() {
+        require("Widget").prototype.onDeactivate.apply(this);
+        $("#btnMainBack").hide();
+    }
+
     PivotWidget.prototype.toString = function () {
         return 'PivotWidget'
     };
