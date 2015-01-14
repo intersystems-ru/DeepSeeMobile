@@ -151,10 +151,19 @@ define([], function () {
                     if (s.once) subscriptions[_event].subscribers.splice(i, 1);
                 });
                 if (_target && _.has(subscriptions[_event].children, _target)) {
+                    var subToRemove = [];
                     _.each(subscriptions[_event].children[_target].subscribers, function (s, i) {
                         publishForSubscriber(s, args);
-                        if (s.once) subscriptions[_event].children[_target].subscribers.splice(i, 1);
+                        if (s.once) {
+                            // this is cause errors! don't remove item in each loop
+                            //subscriptions[_event].children[_target].subscribers.splice(i, 1);
+                            subToRemove.push(subscriptions[_event].children[_target].subscribers[i]);
+                        }
                     });
+                    for (var k = 0; k < subToRemove.length; k++) {
+                        var idx = subscriptions[_event].children[_target].subscribers.indexOf(subToRemove[k]);
+                        if (idx != -1) subscriptions[_event].children[_target].subscribers.splice(idx, 1);
+                    }
                 }
 
             }
