@@ -70,10 +70,15 @@ define([
                     widget_config = WidgetMap["null"]
                 }
                 widget_config.datasource = {
+                    pivot: widget.dataSource,
                     data: {
                         MDX: widget.mdx
                     }
                 };
+
+                if (widget.type == "pivot") {
+                    widget_config.datasource.data.MDX = widget.basemdx;
+                }
                 widget_config.filters = [];
                 _.each(widget.children, function (filter) {
                     widget_config.filters.push({
@@ -92,12 +97,20 @@ define([
                 if (widgets[i].cube) {
                     mc.publish('filters_requested', {cube: widgets[i].cube, widget: self.widgets[self.widgets.length - 1]});
                 }
+                if (widgets[i].controls) {
+                    self.widgets[self.widgets.length - 1].controls = [];
+                    for (var k = 0; k < widgets[i].controls.length; k++) if (widgets[i].controls[k].value != ""){
+                        self.widgets[self.widgets.length - 1].controls.push(widgets[i].controls[k]);
+                    }
+                }
+
                 widget = null;
                 widget_config = null;
             };
             self = null;
-            
+            this.updateMarkers();
         };
+
         this.subs.push(mc.subscribe("data_acquired:dashboard", {
             subscriber: this,
             callback: this.onDashboardDataAcquired
@@ -105,6 +118,7 @@ define([
         mc.publish("data_requested:dashboard", dashName);
         
         this.removeRefs = function () {
+            this.hideMarkers();
             var self = this;
             for (var i = 0; i < this.subs.length; i++) {
                 mc.remove(this.subs[i]);
@@ -114,12 +128,38 @@ define([
             self = null;
 
         };
+        mc.subscribe("set_active_widget", {
+            subscriber: this,
+            callback: this.updateMarkers
+        });
         mc.subscribe("clear:dashboard", {
             subscriber: this,
             callback: this.removeRefs,
             once: true
         });
     };
+
+    Dashboard.prototype.hideMarkers = function() {
+        $(".tri-left").hide();
+        $(".tri-right").hide();
+    };
+
+    Dashboard.prototype.updateMarkers = function() {
+        $(".tri-left").hide();
+        $(".tri-right").hide();
+        if (App.a.widgets.length == 0) return;
+        if (App.a.activeWidget == 0) {
+            $(".tri-right").show();
+            return;
+        }
+        if (App.a.activeWidget == App.a.widgets.length - 1) {
+            $(".tri-left").show();
+            return;
+        }
+        $(".tri-right").show();
+        $(".tri-left").show();
+    }
+
     /**
      * @name module:Dashboard#toString
      * @function
@@ -202,6 +242,7 @@ define([
             if (this.activeWidget == null) {
                 this.activeWidget = 0;
                 App.setTitle(widget.name);
+                widget.onActivate();
                 //mc.publish("set_active_widget", { id: 0 });
             }
 
@@ -255,8 +296,12 @@ define([
             //Handling active widget change
             $(this.config.holder).off("slide").on("slide", function (e) {
                 if (self.activeWidget != e.originalEvent.detail.slideNumber) {
+                    var oldWidget = App.a.widgets[self.activeWidget];
+                    if (oldWidget) oldWidget.onDeactivate();
                     self.activeWidget = e.originalEvent.detail.slideNumber;
                     var w = App.a.widgets[self.activeWidget];
+                    if (w) w.onActivate();
+
                     $("#btnMainBack").hide();
                     $("#btnMainDrillthrough").hide();
                     if (w.pivot) {
