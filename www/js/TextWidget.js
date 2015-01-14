@@ -1,12 +1,21 @@
 define([], function () {
+
     function TextWidget() {
+
+        this.btnChangeMode = null;
+        this.displayMode = 0;
+
+
         this.renderWidget = function () {
             var w_selector = "#widget" + this.id || "";
             var parent = $(w_selector);
+            parent.css("overflow-y", "auto");
             var self = this;
 
-            this.renderAsTableview();
-            return;
+            if (this.displayMode == 0) {
+                this.renderAsTableview();
+                return;
+            }
 
             require(['text!../views/TextWidget.html'], function (html) {
                 var list = $(html).clone();
@@ -56,11 +65,40 @@ define([], function () {
         }
     };
 
+    $.fn.fitText = function( kompressor, options ) {
+
+        // Setup options
+        var compressor = kompressor || 1,
+            settings = $.extend({
+                'minFontSize' : Number.NEGATIVE_INFINITY,
+                'maxFontSize' : Number.POSITIVE_INFINITY
+            }, options);
+
+        return this.each(function(){
+
+            // Store the object
+            var $this = $(this);
+
+            // Resizer() resizes items based on the object width divided by the compressor * 10
+            var resizer = function () {
+                $this.css('font-size', Math.max(Math.min($this.height() / (compressor*10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)));
+            };
+
+            // Call once to set.
+            resizer();
+
+            // Call on resize. Opera debounces their resize by default.
+            $(window).on('resize.fittext orientationchange.fittext', resizer);
+
+        });
+
+    };
+
     $.fn.textfill = function(options) {
         var fontSize = options.maxFontPixels;
         var ourText = $('span:visible:first', this);
-        var maxHeight = $(this).height();
-        var maxWidth = $(this).width();
+        var maxHeight = options.maxHeight ? options.maxHeight : $(this).height();
+        var maxWidth = options.maxWidth ? options.maxWidth : $(this).width();
         var textHeight;
         var textWidth;
         do {
@@ -91,14 +129,31 @@ define([], function () {
                         r.html(r.html().replace(/{{title}}/, d.Cols[0].tuples[i].caption));
                         r.html(r.html().replace(/{{value}}/, d.Data[i]));
 
-                        var div = r.find("div:eq(1)");
+                        //var div = r.find("div:eq(1)");
+                        var div = r.find("span:eq(0)");
                         r.appendTo(table);
-                        div.textfill({ maxFontPixels: 200 });
+                        div.textfill({ maxFontPixels: 200, maxWidth: table.width(), maxHeight: table.height() / d.Cols[0].tuples.length - r.find("div:eq(0)").height() });
+                            r.find("span:eq(1)").css("top", parseInt(table.height() / d.Cols[0].tuples.length / 3.1).toString() + "px");
+                        /*textFit(div.get(0), {
+                            maxFontSize: 200,
+                            alignHoriz: true,
+                            alignVert: true
+                        });*/
+
+///                        div.fitText(1.2);
+                        //div.textfill({ maxFontPixels: 200 });
                         //r.find('div').textfill({ maxFontPixels: 1500 });
                     }
                 }
             }
 
+/*
+            setTimeout(function() {
+                parent.find("div[data=1]").each(function(n, el) {
+                    $(el).textfill({ maxFontPixels: 200 });
+                });
+            }, 10);
+*/
 
             /*for (var i = 0; i < items.length; i++) {
                 var r = tr.clone();
@@ -108,8 +163,49 @@ define([], function () {
         });
     }
 
+    TextWidget.prototype.changeMode = function() {
+
+    }
+
+    TextWidget.prototype.onActivate = function() {
+        var self = this;
+        $(window).on("orientationchange",function(){
+            self.renderWidget();
+        });
+
+        require("Widget").prototype.onActivate.apply(this);
+        if (!this.btnChangeMode) {
+            this.btnChangeMode = $('<a class="icon fa fa-file-text-o pull-right"></a>');
+        }
+        this.btnChangeMode.appendTo(App.ui.navBar);
+
+
+        this.btnChangeMode.on("tap", function() {
+            self.btnChangeMode.removeClass("fa-file-text-o");
+            self.btnChangeMode.removeClass("fa-file-text");
+            if (self.displayMode == 1) {
+                self.displayMode = 0;
+                self.btnChangeMode.addClass("fa-file-text-o");
+            } else {
+                self.displayMode = 1;
+                self.btnChangeMode.addClass("fa-file-text");
+            }
+
+            self.renderWidget();
+        });
+    }
+
+    TextWidget.prototype.onDeactivate = function() {
+        require("Widget").prototype.onDeactivate.apply(this);
+        if (this.btnChangeMode) {
+            this.btnChangeMode.off("tap");
+            this.btnChangeMode.remove();
+        }
+    }
+
     TextWidget.prototype.toString = function () {
         return 'TextWidget'
     };
+
     return TextWidget;
 });
