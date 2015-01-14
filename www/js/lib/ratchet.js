@@ -713,11 +713,19 @@
   var isScrolling;
   var scrollableArea;
 
-  var getSlider = function (target) {
+  var getSlider = function (target, e) {
 
-    // ******************* Pivot scroll fix ******************/
-    var p = $(target).parents("thead");
-    if (p) if (p.hasClass("fixedHeader")) {
+    // ******************* Pivot  and timechart scroll fix ******************/
+    if ($(target).parents(".highcharts-navigator-handle-right").length != 0) return;
+    if ($(target).parents(".highcharts-navigator-handle-left").length != 0) return;
+
+    var scroller = $(target).parent("svg").find(".highcharts-navigator-handle-right");
+    if (scroller.size() != 0) {
+      if ((e.touches[0].pageY - 40 < scroller.position().top + 64) && (e.touches[0].pageY - 40 > scroller.position().top - 20)) return;
+    }
+
+    var p = $(target).parents("div");
+    if (p) if (p.hasClass("lpt-topHeader") || p.hasClass("highcharts-navigator")) {
         slider = null;
         return;
     }
@@ -752,7 +760,7 @@
   };
 
   var onTouchStart = function (e) {
-    slider = getSlider(e.target);
+    slider = getSlider(e.target, e);
 
     if (!slider) {
       return;
