@@ -52,6 +52,8 @@ define([
          */
         this.render = function () {
             require(['text!../views/Filters.html'], function (html) {
+                $("#fltBarFooter").hide();
+
                 $("#filters").data("isValues", 0);
                 $("#btnFilterAccept").hide();
                 var holder = "#filters .content";
