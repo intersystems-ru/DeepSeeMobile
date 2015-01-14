@@ -89,6 +89,7 @@ define([
         Object.defineProperty(this, 'datasource', {
             get: function () {
                 var retVal = _datasource.data.MDX;
+                //if (this.type = 'pivot') retVal = _datasource.data.basemdx;
                 if (this.filters.hasFilters()) {
                     var _filters = this.filters.getAll();
                     for (var i in _filters) {
@@ -106,6 +107,14 @@ define([
                         } else {
                             if (_filters[i].value != '') retVal += ' %FILTER ' + _filters[i].path + "." + _filters[i].value;
                         }
+                    }
+                }
+                if (this.controls) {
+                    for (var i = 0; i< this.controls.length; i++) {
+                        if (this.controls[i].action == "applyFilter") {
+                            retVal += ' %FILTER {' + this.controls[i].targetProperty +  "." + this.controls[i].value + "} ";
+                        }
+
                     }
                 }
                 return {
@@ -130,7 +139,7 @@ define([
         };
         //Extend with type-specified opts
         if (_.has(opts, 'type') && _.has(typesMap, opts.type)) {
-            _.extend(this, new typesMap[opts.type]())
+            _.extend(this, new typesMap[opts.type](opts))
         };
         /**
          * Callback, fired when data acquired
@@ -251,5 +260,22 @@ define([
             data: this.datasource.data
         });
     };
+
+    /**
+     * Called when widget activated(currently on screen)
+     * @function module:Widget#onActivate
+     */
+    Widget.prototype.onActivate = function () {
+        if (this.filters.hasFilters()) $("#btnMainFilter").addClass("tab-item-green"); else $("#btnMainFilter").removeClass("tab-item-green");
+    }
+
+    /**
+     * Called when widget deactivated
+     * @function module:Widget#onActivate
+     */
+    Widget.prototype.onDeactivate = function () {
+        $("#btnMainFilter").removeClass("tab-item-green");
+    }
+
     return Widget;
 })
