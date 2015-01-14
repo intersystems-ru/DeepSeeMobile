@@ -15,6 +15,7 @@ var LightPivotTable = function (configuration) {
 
     this.DRILL_LEVEL = -1;
     this.CONFIG = configuration;
+    this.VERSION = "".concat(/*{{replace:version}}*/) || "[NotBuilt]";
 
     /**
      * @see this.init
@@ -23,6 +24,10 @@ var LightPivotTable = function (configuration) {
     this.CONTROLS = {};
 
     this.mdxParser = new MDXParser();
+
+    /**
+     * @type {PivotView}
+     */
     this.pivotView = new PivotView(this, configuration.container);
     this.dataSource = this.pushDataSource(configuration.dataSource);
 
@@ -42,7 +47,15 @@ var LightPivotTable = function (configuration) {
  */
 LightPivotTable.prototype.refresh = function () {
 
-    var _  = this;
+    var _  = this,
+        i;
+
+    this.clearFilters();
+    if (this.CONFIG["defaultFilterSpecs"] instanceof Array) {
+        for (i in this.CONFIG["defaultFilterSpecs"]) {
+            this.setFilter(this.CONFIG["defaultFilterSpecs"][i]);
+        }
+    }
 
     this.dataSource.getCurrentData(function (data) {
         if (_.dataController.isValidData(data)) {
@@ -51,6 +64,44 @@ LightPivotTable.prototype.refresh = function () {
             _.pivotView.displayMessage(data.error || "Invalid data to display.");
         }
     });
+
+};
+
+/**
+ * @param {string} mdx - New mdx.
+ */
+LightPivotTable.prototype.changeBasicMDX = function (mdx) {
+
+    // return LPT to the first level
+    for (var i = this._dataSourcesStack.length - 1; i > 0; i--) {
+        this.popDataSource();
+        this.pivotView.popTable();
+        this.dataController.popData();
+    }
+    // change MDX
+    this.CONFIG.dataSource.basicMDX = mdx;
+    this.dataSource.BASIC_MDX = mdx;
+    // do refresh
+    this.refresh();
+
+};
+
+/**
+ * Returns current mdx including filters.
+ * @returns {string}
+ * @deprecated
+ */
+LightPivotTable.prototype.getActualMDX = function () {
+
+    var mdx = this.CONFIG.dataSource.basicMDX,
+        mdxParser = new MDXParser(),
+        filters = this.dataSource.FILTERS;
+
+    for (var i in filters) {
+        mdx = mdxParser.applyFilter(mdx, filters[i]);
+    }
+
+    return mdx;
 
 };
 
@@ -93,7 +144,7 @@ LightPivotTable.prototype.pushDataSource = function (config) {
     var newDataSource;
 
     this.DRILL_LEVEL++;
-    this._dataSourcesStack.push(newDataSource = new DataSource(config || {}, this.CONFIG));
+    this._dataSourcesStack.push(newDataSource = new DataSource(config || {}, this.CONFIG, this));
     this.dataSource = newDataSource;
 
     return newDataSource;
@@ -117,7 +168,7 @@ LightPivotTable.prototype.popDataSource = function () {
  */
 LightPivotTable.prototype.dataIsChanged = function () {
 
-    this.pivotView.renderRawData(this.dataController.getData().rawData);
+    this.pivotView.renderRawData(this.dataController.getData());
 
 };
 
@@ -190,7 +241,6 @@ LightPivotTable.prototype.tryDrillThrough = function (filters) {
 
     // clone dataSource config object
     for (var i in _.CONFIG.dataSource) { ds[i] = _.CONFIG.dataSource[i]; }
-    ds.action = "MDXDrillthrough";
 
     ds.basicMDX = this.mdxParser.drillThrough(this.dataSource.BASIC_MDX, filters)
         || this.dataSource.basicMDX;
@@ -201,7 +251,9 @@ LightPivotTable.prototype.tryDrillThrough = function (filters) {
 
     this.dataSource.getCurrentData(function (data) {
         if (_.dataController.isValidData(data) && data.dataArray.length > 0) {
-            _.pivotView.pushTable();
+            _.pivotView.pushTable({
+                disableConditionalFormatting: true
+            });
             _.dataController.pushData();
             _.dataController.setData(data);
             if (typeof _.CONFIG.triggers["drillThrough"] === "function") {

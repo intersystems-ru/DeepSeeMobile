@@ -5,18 +5,20 @@
  *
  * @param {Object} config
  * @param {Object} globalConfig
+ * @param {LightPivotTable} lpt
  * @constructor
  */
-var DataSource = function (config, globalConfig) {
+var DataSource = function (config, globalConfig, lpt) {
 
     this.SOURCE_URL = config.MDX2JSONSource ||
         location.host + ":" + location.port + "/" + (location.pathname.split("/") || [])[1];
     this.NAMESPACE = config["namespace"];
     this.USERNAME = config["username"];
     this.PASSWORD = config["password"];
-    this.BASIC_MDX = config.basicMDX;
-
+    this.LPT = lpt;
     this.GLOBAL_CONFIG = globalConfig;
+
+    this.BASIC_MDX = config.basicMDX;
 
     /**
      * Name of data source pivot.
@@ -25,11 +27,14 @@ var DataSource = function (config, globalConfig) {
      */
     this.DATA_SOURCE_PIVOT = config["pivot"] || "";
 
-    this.ACTION = config.action || "MDX";
-
     this.FILTERS = [];
 
-    this.BASIC_FILTERS = [];
+    /**
+     * @type {Array}
+     * @private
+     * @deprecated
+     */
+    this._PIVOT_DEFAULT_FILTERS = [];
 
 };
 
@@ -48,10 +53,16 @@ DataSource.prototype._post = function (url, data, callback) {
                 try {
                     return JSON.parse(xhr.responseText) || {}
                 } catch (e) {
-                    return {
-                        error: "<h1>Unable to parse server response</h1><p>" + xhr.responseText
+                    try {
+                        var temp = null;
+                        eval("temp=" + xhr.responseText);
+                        return temp;
+                    } catch (e) {
+                        return {
+                            error: "<h1>Unable to parse server response</h1><p>" + xhr.responseText
                             + "</p>"
-                    };
+                        };
+                    }
                 }
             })());
         } else if (xhr.readyState === 4 && xhr.status !== 200) {
@@ -119,6 +130,7 @@ DataSource.prototype.getCurrentData = function (callback) {
         __ = this._convert,
         mdx = this.BASIC_MDX,
         mdxParser = new MDXParser(),
+        mdxType = mdxParser.mdxType(mdx),
         ready = {
             state: 0,
             data: {},
@@ -130,6 +142,7 @@ DataSource.prototype.getCurrentData = function (callback) {
         var data = ready.pivotData;
 
         _.GLOBAL_CONFIG["pivotProperties"] = ready.pivotData;
+        //_._PIVOT_DEFAULT_FILTERS = [];
 
         if (data["rowAxisOptions"]) {
             if (data["rowAxisOptions"]["drilldownSpec"]) {
@@ -147,30 +160,13 @@ DataSource.prototype.getCurrentData = function (callback) {
             }
         }
 
-        if (data["filters"] && data["filters"].length > 0) {
-            for (var i in data["filters"]) {
-                if (data["filters"][i]["spec"]) {
-                    _.BASIC_FILTERS.push(data["filters"][i]["spec"]);
-                }
-            }
-        }
-
-        // temporary hard workaround (getting last column specs)
-        _.GLOBAL_CONFIG["_temp_lastColSpec"] = (function (lev) {
-            var tc = lev,
-                f = function (lev) {
-                    if (lev["childLevels"] && lev["childLevels"].length > 0) {
-                        for (var i in lev["childLevels"]) {
-                            f(lev["childLevels"][i]);
-                        }
-                    } else {
-                        tc = lev;
-                    }
-                };
-            if (lev) f(lev);
-            return tc;
-        })(data["columnLevels"][data["columnLevels"].length - 1]);
-        // end
+        //if (data["filters"] && data["filters"].length > 0) {
+        //    for (var i in data["filters"]) {
+        //        if (data["filters"][i]["spec"]) {
+        //            _._PIVOT_DEFAULT_FILTERS.push(data["filters"][i]["spec"]);
+        //        }
+        //    }
+        //}
 
     };
 
@@ -178,10 +174,9 @@ DataSource.prototype.getCurrentData = function (callback) {
 
         var data = ready.data;
 
-        console.log("Retrieved data:", ready);
+        //console.log("Retrieved data:", ready);
 
-        (data.Info || {}).action = _.ACTION;
-        if (_.ACTION === "MDXDrillthrough") {
+        if (mdxType === "drillthrough") {
             callback((function (data) {
 
                 var arr = data["children"] || [],
@@ -206,7 +201,7 @@ DataSource.prototype.getCurrentData = function (callback) {
                         leftHeaderColumnsNumber: 0,
                         rowCount: arr.length,
                         topHeaderRowsNumber: headers.length,
-                        action: _.ACTION
+                        mdxType: mdxType
                     }
                 };
 
@@ -219,33 +214,39 @@ DataSource.prototype.getCurrentData = function (callback) {
                 return __(obj);
 
             })(data));
-        } else if (_.ACTION = "MDX") {
+        } else if (mdxType === "mdx") {
             callback(_._convert(data));
         } else {
-            console.error("Not implemented URL action: " + _.ACTION);
-            callback({ error: "Not implemented URL action: " + data || true });
+            callback({ error: "Unrecognised MDX: " + mdx || true });
         }
 
     };
 
     var requestData = function () {
 
-        var filters = _.BASIC_FILTERS.concat(_.FILTERS);
+        //var filters = _._PIVOT_DEFAULT_FILTERS.concat(_.FILTERS);
+        //
+        //for (var i in filters) {
+        //    mdx = mdxParser.applyFilter(mdx, filters[i]);
+        //}
 
-        for (var i in filters) {
-            mdx = mdxParser.applyFilter(mdx, filters[i]);
-        }
+        console.log("LPT MDX request:", mdx);
 
-        console.log("Requesting MDX: " + mdx);
-
-        _._post(_.SOURCE_URL + "/" + _.ACTION + (_.NAMESPACE ? "?Namespace=" + _.NAMESPACE : ""), {
+        _._post(
+            _.SOURCE_URL + "/" +
+            (mdxType === "drillthrough" ? "MDXDrillthrough" : "MDX")
+            + (_.NAMESPACE ? "?Namespace=" + _.NAMESPACE : ""
+        ), {
             MDX: mdx
         }, function (data) {
+            _.LPT.pivotView.removeMessage();
             ready.data = data;
             ready.state++;
             handleDataReady();
         });
     };
+
+    _.LPT.pivotView.displayLoading();
 
     if (this.DATA_SOURCE_PIVOT) {
         this._post(this.SOURCE_URL + "/DataSource"

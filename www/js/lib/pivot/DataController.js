@@ -80,6 +80,8 @@ DataController.prototype.getData = function () {
 
 DataController.prototype.setData = function (data) {
 
+    var _ = this;
+
     if (!this.isValidData(data)) {
         console.error("Invalid data to set.", data);
         return;
@@ -87,11 +89,192 @@ DataController.prototype.setData = function (data) {
 
     this._dataStack[this._dataStack.length - 1].data = data;
     //this.data = data;
+    this.resetDimensionProps();
+    this.resetConditionalFormatting();
     this.resetRawData();
+
+    if (data.info.mdxType === "drillthrough") {
+        this.setDrillThroughHandler(function (params) {
+            _.controller.pivotView.displayMessage(params["cellData"]["value"] || "", true);
+            return false;
+        });
+    }
 
     this._trigger();
     return data;
 
+};
+
+/**
+ * Handle drillThrough on current level.
+ * If handler returns boolean false, drillThrough won't be performed.
+ *
+ * @param {function} handler
+ */
+DataController.prototype.setDrillThroughHandler = function (handler) {
+    this._dataStack[this._dataStack.length - 1].data.info.drillThroughHandler = handler;
+};
+
+/**
+ * Sets properties of rows/columns.
+ */
+DataController.prototype.resetDimensionProps = function () {
+
+    var data, columnProps = [];
+
+    if (!(data = this._dataStack[this._dataStack.length - 1].data)) {
+        console.error("Unable to get dimension props for given data set.");
+        return;
+    }
+
+    var cloneObj = function (obj) {
+        var i, newObj = {};
+        for (i in obj) newObj[i] = obj[i];
+        return newObj;
+    };
+
+    var parse = function (obj, props) {
+        var tObj, clonedProps, i;
+        if (obj["children"] && obj["children"].length > 0) {
+            for (i in obj.children) {
+                clonedProps = cloneObj(props);
+                tObj = obj.children[i];
+                if (tObj["format"]) clonedProps["format"] = tObj["format"];
+                if (tObj["style"]) clonedProps["style"] =
+                    (clonedProps["style"] || "") + tObj["style"];
+                if (tObj["summary"]) clonedProps["summary"] = tObj["summary"];
+                if (tObj["type"]) clonedProps["type"] = tObj["type"];
+                parse(tObj, clonedProps);
+            }
+        } else {
+            clonedProps = cloneObj(props);
+            columnProps.push(clonedProps);
+        }
+    };
+
+    parse({ children: data.dimensions[0] }, {});
+
+    data.columnProps = columnProps;
+
+};
+
+DataController.prototype.resetConditionalFormatting = function () {
+
+    var data, cs, c1, c2, arr, min, max,
+        cfArr = {/* "[y],[x]|<null>": Array[{style:"", operator: "", ...}] */},
+        ocfArr;
+
+    if (!(data = this._dataStack[this._dataStack.length - 1].data)) {
+        console.error("Unable to get conditional formatting for given data set.");
+        return;
+    }
+    if (!(this.controller.CONFIG.pivotProperties)) {
+        data.conditionalFormatting = cfArr;
+        return;
+    }
+
+    if (cs = this.controller.CONFIG.pivotProperties["colorScale"]) {
+        if (cs.indexOf("custom:") > -1) {
+            arr = cs.split(":")[1].split(",");
+            c2 = { r: parseInt(arr[0]), g: parseInt(arr[1]), b: parseInt(arr[2]) };
+            arr = cs.split(":")[2].split(",");
+            c1 = { r: parseInt(arr[0]), g: parseInt(arr[1]), b: parseInt(arr[2]) };
+        } else {
+            arr = cs.split("-to-");
+            c1 = this.controller.pivotView.colorNameToRGB(arr[0]);
+            c2 = this.controller.pivotView.colorNameToRGB(arr[1]);
+        }
+        cfArr["colorScale"] = {
+            from: c2,
+            to: c1,
+            min: min = Math.min.apply(Math, (data.dataArray || [])),
+            max: max = Math.max.apply(Math, (data.dataArray || [])),
+            diff: max - min,
+            invert: (c2.r + c2.b + c2.g) / 3 < 128
+        };
+    }
+
+    ocfArr = this.controller.CONFIG.pivotProperties["formatRules"] || [];
+    if (ocfArr.length && typeof this.controller.CONFIG.conditionalFormattingOn === "undefined") {
+        this.controller.CONFIG.conditionalFormattingOn = true;
+    }
+    for (var i in ocfArr) {
+        // Warn: range ",2-3" is valid for standard pivot as ",2".
+        // LPT will parse ",2-3" range as invalid.
+        if (!cfArr[ocfArr[i]["range"]]) cfArr[ocfArr[i]["range"]] = [];
+        cfArr[ocfArr[i]["range"]].push(ocfArr[i]);
+    }
+    data.conditionalFormatting = cfArr;
+
+};
+
+/**
+ * Total functions definition. When adding new total function, also check getTotalFunction.
+ * "this" in context of functions equals to TOTAL_FUNCTIONS object.
+ *
+ * @see getTotalFunction
+ */
+DataController.prototype.TOTAL_FUNCTIONS = {
+    
+    totalSUM: function (array, iStart, iEnd, column) {
+        var sum = 0;
+        for (var i = iStart; i < iEnd; i++) {
+            if (isFinite(array[i][column]["value"])) {
+                sum += parseFloat(array[i][column]["value"]) || 0;
+            }
+        }
+        return sum || "";
+    },
+
+    totalAVG: function (array, iStart, iEnd, column) {
+        var sum = 0;
+        for (var i = iStart; i < iEnd; i++) {
+            if (!isFinite(array[i][column]["value"])) {
+                sum = 0;
+                break;
+            }
+            sum += parseFloat(array[i][column]["value"]) || 0;
+        }
+        return sum/(iEnd - iStart) || "";
+    },
+
+    totalCOUNT: function (array, iStart, iEnd) {
+        return iEnd - iStart;
+    },
+    
+    totalMIN: function (array, iStart, iEnd, column) {
+        var min = Infinity;
+        for (var i = iStart; i < iEnd; i++) {
+            if (isFinite(array[i][column]["value"]) && array[i][column]["value"] < min) {
+                min = array[i][column]["value"];
+            }
+        }
+        return min;
+    },
+
+    totalMAX: function (array, iStart, iEnd, column) {
+        var max = -Infinity;
+        for (var i = iStart; i < iEnd; i++) {
+            if (isFinite(array[i][column]["value"]) && array[i][column]["value"] > max) {
+                max = array[i][column]["value"];
+            }
+        }
+        return max;
+    },
+    
+    totalPERCENTAGE: function (array, iStart, iEnd, column, xStart) {
+        var averages = [], x, summ;
+        for (x = xStart; x < array[0].length; x++) {
+            averages.push(this.totalSUM(array, iStart, iEnd, x));
+        }
+        summ = averages.reduce(function(a, b) { return a + b; });
+        return (averages[column - xStart] / summ * 100 || 0).toFixed(2) + "%";
+    },
+    
+    totalNONE: function () {
+        return "";
+    }
+    
 };
 
 /**
@@ -242,6 +425,7 @@ DataController.prototype.resetRawData = function () {
                                || (data["info"] || {})["cubeName"]
                                || ""
                     };
+                    applyHeaderStyle(rawData[y][x], false);
                 } else {
                     rawData[y][x] = rd1[y-xh][x];
                 }
@@ -262,32 +446,26 @@ DataController.prototype.resetRawData = function () {
     this.SUMMARY_SHOWN = false;
     this._dataStack[this._dataStack.length - 1].SUMMARY_SHOWN = false;
 
-    var countSummaryByColumn = function (array, iStart, iEnd, column) {
-        var sum = 0;
-        for (var i = iStart; i < iEnd; i++) {
-            if (!isFinite(array[i][column]["value"])) {
-                sum = 0;
-                break;
-            }
-            sum += parseFloat(array[i][column]["value"]) || 0;
+    /**
+     * @param {number} columnIndex
+     * @returns {Function}
+     */
+    var getTotalFunction = function (columnIndex) {
+        if (!data["columnProps"][columnIndex]) return _.TOTAL_FUNCTIONS.totalSUM;
+        switch (data["columnProps"][columnIndex].summary) {
+            case "count": return _.TOTAL_FUNCTIONS.totalCOUNT;
+            case "avg": return _.TOTAL_FUNCTIONS.totalAVG;
+            case "min": return _.TOTAL_FUNCTIONS.totalMIN;
+            case "max": return _.TOTAL_FUNCTIONS.totalMAX;
+            case "pct": return _.TOTAL_FUNCTIONS.totalPERCENTAGE;
+            case "none": return _.TOTAL_FUNCTIONS.totalNONE;
+            default: return _.TOTAL_FUNCTIONS.totalSUM;
         }
-        return sum || "";
-    };
-
-    var countAverageByColumn = function (array, iStart, iEnd, column) {
-        var sum = 0;
-        for (var i = iStart; i < iEnd; i++) {
-            if (!isFinite(array[i][column]["value"])) {
-                sum = 0;
-                break;
-            }
-            sum += parseFloat(array[i][column]["value"]) || 0;
-        }
-        return sum/(iEnd - iStart) || "";
     };
 
     if (this.controller.CONFIG["showSummary"] && rawData.length - xh > 1 // xh - see above
         && (rawData[rawData.length - 1][0] || {})["isCaption"]) {
+        data.info.SUMMARY_SHOWN = true;
         this.SUMMARY_SHOWN = true;
         this._dataStack[this._dataStack.length - 1].SUMMARY_SHOWN = true;
         rawData.push(summary = []);
@@ -298,19 +476,17 @@ DataController.prototype.resetRawData = function () {
                     group: groupNum,
                     isCaption: true,
                     source: {},
+                    noDrillDown: true,
                     value: navigator.language === "ru" ? "Всего" : "Total"
-                }
+                };
+                applyHeaderStyle(summary[i], false);
             } else {
                 summary[i] = {
-                    // very hard workaround (applying "avg" last column spec)
-                    value: ((rawData[x].length - 1 === parseInt(i)
-                            && _.controller.CONFIG["_temp_lastColSpec"]
-                            && _.controller.CONFIG["_temp_lastColSpec"]["levelSummary"] === "avg")
-                                ? countAverageByColumn
-                                : countSummaryByColumn)(rawData, xh, rawData.length - 1, i),
-                    // end
-                    //value: (countSummaryByColumn)(rawData, xh, rawData.length - 1, i),
-                    style: "font-weight: 900;"
+                    value: getTotalFunction(parseInt(i) - data.info.leftHeaderColumnsNumber).call(
+                        this.TOTAL_FUNCTIONS,
+                        rawData, xh, rawData.length - 1, i, data.info.leftHeaderColumnsNumber
+                    ),
+                    style: "font-weight: bold;text-align: right;"
                 }
             }
         }
