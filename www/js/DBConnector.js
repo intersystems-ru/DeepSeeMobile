@@ -26,17 +26,6 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @property {string} username Username to connect to DB
          * @property {string} password Password to connect to DB
          */
-//        var defaults = {
-//            username: "_SYSTEM",
-//            password: "159eAe72a79539f32acb15b305030060",
-//            //password:"x79BTop",
-//            cubeName: "PatientsCube",
-//            server:"http://37.139.4.54/tfoms"
-////              username: "_SYSTEM",
-////            password: "x79BTop",
-////            cubeName: "SubGroupCube",
-////            server:"http://classroom.intersystems.ru:57772/stc/mdxrest"
-//        };
 
         var parseJSON = function (d) {
             try {
@@ -86,13 +75,9 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 url: App.settings.server+"/MDX?Namespace=" + App.settings.namespace,
                 type: "POST",
                 contentType: "text/plain;charset=UTF-8",
-                //username: App.settings.username,
-                //password:  App.settings.password,
                 success: function (d) {
-                    //console.log("%cGot data from server:","font-color:red",d);
                     var chartData,
                         transformedData = [];
-                        //localStorage[mdxRequested] = d;
                     if (d) {
 
                         d = parseJSON(d) || d;
@@ -174,8 +159,6 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 return;
             }
             var filter_list_opts = {
-                //username: App.settings.username,
-                //password: App.settings.password,
                 type: "GET",
                 url: App.settings.server+"/FilterValues/" + cube + "/" + path + "?Namespace=" + App.settings.namespace,
                 success: function (d) {
@@ -202,7 +185,6 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 widget = args.widget || null;
 
             var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
-            //console.log(widget);
             if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
             args.target = "drilldown1";
             args.data = {
@@ -210,15 +192,12 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                     MDX: MDX
                 }
             };
-           // console.log(args);
             this.acquireData(args);
         };
 
         this.acquireDashboardData = function (args) {
             var dashName = args;
             var dash_opts = {
-                //username: App.settings.username,
-                //password: App.settings.password,
                 type: "POST",
                 url: App.settings.server+"/Widgets?Namespace=" + App.settings.namespace,
                 data: JSON.stringify({Dashboard: dashName}),
@@ -246,24 +225,13 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             }
 
             var dash_opts = {
-                //username: App.settings.username,
-                //password: App.settings.password,
                 type: "GET",
                 data: {"test":true},
                 dataType: 'json',
                 url: App.settings.server+"/Dashboards?Namespace="+App.settings.namespace,
-                //beforeSend: function (xhr) {
-                  //  xhr.setRequestHeader('Authorization', make_base_auth("_SYSTEM", "159eAe72a79539f32acb15b305030060"));
-                //},
                 success: function (d) {
                     if (d) {
                         if (typeof(d) == "string") d = parseJSON(d);
-                        //var d = parseJSON(d) || d;
-                        // temp. delete after debug. hide trash items
-                        /*var r = [];
-                        for (var i = 0; i < d.children.length; i++) if (d.children[i].path.indexOf("$TRASH") == -1) r.push(d.children[i]);
-                        d.children = r;*/
-                        // ---------------
                         mc.publish("data_acquired:dashboard_list", d);
 
                     }
