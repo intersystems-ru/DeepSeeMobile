@@ -96,5 +96,4 @@ require([
         if (!txt) $("#mainTitle").text(App.settings.title); else $("#mainTitle").text(txt);
     }
 
-
 });
