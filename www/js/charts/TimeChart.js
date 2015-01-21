@@ -6,17 +6,11 @@ define(['charts/ChartBase'], function (cb) {
 
 
             function daysBetween(first, second) {
-
-                // Copy date parts of the timestamps, discarding the time parts.
                 var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
                 var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
-
-                // Do the math.
                 var millisecondsPerDay = 1000 * 60 * 60 * 24;
                 var millisBetween = two.getTime() - one.getTime();
                 var days = millisBetween / millisecondsPerDay;
-
-                // Round down.
                 return Math.floor(days);
             }
 
@@ -99,37 +93,11 @@ define(['charts/ChartBase'], function (cb) {
                         text : 'All'
                     }];
             }
-
-            /*/this.config.rangeSelector.buttons =
-            [{
-                type : 'hour',
-                count : 1,
-                text : '1h'
-            }, {
-                type : 'day',
-                count : 1,
-                text : '1D'
-            }, {
-                type : 'all',
-                count : 1,
-                text : 'All'
-            }];
-*/
-            /*for (var c = 0; c < this.config.xAxis.categories.length; c++) {
-                this.config.xAxis.categories[c] = "!";//new Date(this.config.xAxis.categories[c]);
-            }*/
-            //delete this.config.xAxis.categories;
-            /*
-            this.config.xAxis.plotBands = [];
-            this.config.xAxis.plotBands.push(
-            {
-                color: '#0', // Color value
-                from:  new Date(this.config.xAxis.categories[0]), // Start of the plot band
-                to:     new Date(this.config.xAxis.categories[0])+1000*24*3600*30
-                //30 days
-            });*/
         },
         config: {
+            tooltip: {
+                formatter: cb.defaultTimechartTooltipFormatter
+            },
             timechart: 1,
             rangeSelector:{
                 inputEnabled: false,
@@ -147,7 +115,6 @@ define(['charts/ChartBase'], function (cb) {
                     text : 'All'
                 }],
                 selected : 1
-            //enabled:true
             },
             scrollbar : {
                 enabled : false
@@ -157,10 +124,6 @@ define(['charts/ChartBase'], function (cb) {
             },
             xAxis: {
                 type: 'datetime',
-                /*dateTimeLabelFormats: { // don't display the dummy year
-                    month: '%e. %b',
-                    year: '%b'
-                },*/
                 title: {
                     text: ''
                 }

@@ -3,10 +3,9 @@ define(['charts/ChartBase'], function (cb) {
         type: "highcharts",
         callback: function (d) {
 
-            //console.log("HERE:", d);
+
             var data = d.data;
-            //this.config.xAxis.type="category";
-            //this.config.xAxis.showEmpty = false;
+
             this.config.xAxis.title = {
                 text: data.Cols[1].caption
             };
@@ -15,7 +14,7 @@ define(['charts/ChartBase'], function (cb) {
             };
             var _pos = 0;
             this.config.xAxis.categories = [];
-            this    .config.series = [];
+            this.config.series = [];
             for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                 this.config.xAxis.categories.push(data.Cols[1].tuples[i].caption.toString());
             }
@@ -36,21 +35,25 @@ define(['charts/ChartBase'], function (cb) {
                     colorByPoint:  (data.Cols[0].tuples.length>1) ? false : true,
                     data: tempData,
                     name: data.Cols[0].tuples[j].caption,
+                    format: data.Cols[0].tuples[j].format
                 });
             }
 
         },
         config: {
+            tooltip: {
+                formatter: cb.defaultTooltipFormatter
+            },
+            drilldown: {
+                series: []
+            },
             chart: {
                 type: 'bar',
                 events: {
                     drilldown: function (e) {
-                        console.log("DFGDF");
                         if(this._isDrilldown) return;
                         this._isDrilldown = true;
                         var chart = this;
-                        //var catName = chart.options.xAxis[0].title.text;
-
                         // Show the loading label
                         chart.showLoading('Doing drilldown ...');
                         var mc = require("MessageCenter");
@@ -118,21 +121,8 @@ define(['charts/ChartBase'], function (cb) {
                 categories: []
             },
             yAxis: {},
-            legend:{enabled:true},
-            /*plotOptions: {
-                bar: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true
-                    }
-                }
-            },*/
-            series: [],
-            drilldown: {
-                series: []
-            }
-
+            legend:{enabled:false},
+            series: []
         }
     }
 });

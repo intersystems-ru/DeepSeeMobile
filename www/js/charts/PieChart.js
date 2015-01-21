@@ -8,20 +8,19 @@ define(['charts/ChartBase'], function (cb) {
             for (var d = 0; d < data.Cols[1].tuples.length; d++) {
                 retVal.push([data.Cols[1].tuples[d].caption, data.Data[d]]);
             };
-            //console.log("GOT DATA PIE:", this, retVal);
             this.config.series[0].data = retVal;
-            //                this.renderWidget();
+            this.config.series[0].name = data.Cols[0].tuples[0].caption;
+            this.config.series[0].format = data.Cols[0].tuples[0].format;
         },
         config: {
+            tooltip: {
+                formatter: cb.defaultPieTooltipFormatter
+            },
             chart: {
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false
             },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            //legend:{enabled:true},
             plotOptions: {
                 pie: {
                     allowPointSelect: true,

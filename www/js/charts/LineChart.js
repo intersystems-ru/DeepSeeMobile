@@ -3,8 +3,13 @@ define(['charts/ChartBase'], function (cb) {
         type: "highcharts",
         callback: function (d) {
             cb.multivalueDataConvertor(this.config, d);
+
+            var self = this;
         },
         config: {
+            tooltip: {
+                formatter: cb.defaultTooltipFormatter
+            },
             zoomType: "x",
             title: {
                 text: ''
