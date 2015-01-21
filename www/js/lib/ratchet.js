@@ -719,9 +719,10 @@
     if ($(target).parents(".highcharts-navigator-handle-right").length != 0) return;
     if ($(target).parents(".highcharts-navigator-handle-left").length != 0) return;
 
-    var scroller = $(target).parent("svg").find(".highcharts-navigator-handle-right");
+    var scroller = $(target).parents("svg").find(".highcharts-navigator-handle-right");
     if (scroller.size() != 0) {
-      if ((e.touches[0].pageY - 40 < scroller.position().top + 64) && (e.touches[0].pageY - 40 > scroller.position().top - 20)) return;
+      var sy = scroller.position().top;
+      if ((e.touches[0].pageY - 44 < sy + 64) && (e.touches[0].pageY - 44 > sy - 20)) return;
     }
 
     var p = $(target).parents("div");
