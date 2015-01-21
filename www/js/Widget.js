@@ -184,10 +184,6 @@ define([
         return "Widget" + this.id;
     };
     Widget.prototype.init = function (opts) {
-
-       // if (this.cube) {
-         //   mc.publish('filters_requested', {cube: this.cube});
-        //}
         this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
             subscriber: this,
             callback: this.onDataAcquired
@@ -217,23 +213,6 @@ define([
     Widget.prototype.createHolder = function () {
         var def = $.Deferred();
 
-
-        ///temp
-        /*var w = $("#mainScreen > .content").get(0).offsetWidth / 2;
-        var h = $("#mainScreen > .content").get(0).offsetHeight / 2;
-        var widget_holder = this.dashboard.config.holder + " > table";
-        if ($(widget_holder).find("tr").last().find("td").size() != 1) {
-            $("<tr><td style='width:"+w+"px; height:"+h+"px' id='widget" + this.id + "'></td></tr>").appendTo(widget_holder);
-        } else {
-            $("<td style='width:"+w+"px; height:"+h+"px' id='widget" + this.id + "'></td>").appendTo($(widget_holder).find("tr").last());
-        }
-        def.resolve();
-        return def.promise();*/
-        ////////////////
-
-
-
-        //if (!this.active) return this;
         var widget_holder = this.dashboard.config.holder + " .dashboard" || ".content .dashboard";
         var self = this;
         require(["text!../views/Widget.html"], function (html) {
@@ -241,8 +220,6 @@ define([
             if ($("#widget" + self.id)[0] == undefined) {
                 $(widget_holder).append(html);
                 def.resolve();
-                //mc.publish("[Render]Holder created: " + self.name);
-                
             }
             self = null;
         });
