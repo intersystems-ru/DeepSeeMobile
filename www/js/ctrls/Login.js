@@ -59,7 +59,6 @@ define([], function(){
                 if (!options.beforeSend) {
                     options.beforeSend = function (xhr) {
                         xhr.setRequestHeader('Authorization', make_base_auth(login, pass));
-                        //xhr.setRequestHeader('Authorization', make_base_auth("_SYSTEM", "159eAe72a79539f32acb15b305030060"));
                     }
                 }
             });
