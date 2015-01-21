@@ -2,8 +2,6 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
     function DashboardListController() {
 
         var onDashboardListAcquired = function (e) {
-            //App.m.publish("clear:dashboard");
-
             $("#btnMainRefresh").off('tap').on('tap', function() {
                 if (App.a) {
                     if (App.a.widgets[App.a.activeWidget]) App.a.widgets[App.a.activeWidget].requestData();
@@ -13,7 +11,6 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
                 }
             });
 
-            //console.log("Entered controller");
             App.dashboardList = e.children;
             if (sessionStorage.getItem("dashboard_list") == null) {
                 sessionStorage.setItem('dashboard_list', JSON.stringify(e))
@@ -31,8 +28,6 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
                     e.preventDefault();
                     final.find("> *").removeClass("active");
                     $(this).addClass("active");
-                    //Устраняем самопроизвольный запрос  dashboard_list'a
-                    //myScroll.destroy();
                     App.a = new Dashboard(App.dashboardList[$(this).data('id')].path).render();
                     return false;
                 });
@@ -40,39 +35,6 @@ define([/*'lib/iscroll-probe',*/ 'MessageCenter', 'Dashboard'], function (/*_isc
 
                 $('#mainScreen > .content').html(final);
                 $('#mainScreen > .content').find(".loader").remove();
-                //new IScroll($('#mainScreen > .content').get(0), {vScrollbar: true});
-
-
-                //$('body').html(final);
-                //var pullDownEl = document.getElementById('pullDown'),
-                  //  pullDownOffset = pullDownEl.offsetHeight;
-                /*var myScroll = new IScroll('#mainScreen > .content', {
-                    probeType: 1, click: true
-                });
-                myScroll.on('scroll', function () {
-                    if (this.y > 5 && !pullDownEl.className.match('flip')) {
-                        pullDownEl.className = 'flip';
-                        pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to refresh...';
-                        this.minScrollY = 0;
-                    } else if (this.y < 5 && pullDownEl.className.match('flip')) {
-                        pullDownEl.className = '';
-                        pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
-                        this.minScrollY = -pullDownOffset;
-                    }
-                });
-                myScroll.on('scrollEnd', function () {
-                    if (pullDownEl.className.match('flip')) {
-                        pullDownEl.className = 'loading';
-                        pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';
-                        //console.log("Entered onScrollEnd");
-                        MessageCenter.subscribe("data_acquired:dashboard_list", {
-                            subscriber: this,
-                            callback: function(e){myScroll.destroy(); onDashboardListAcquired(e); },
-                            once: true
-                        });
-                        MessageCenter.publish("data_requested:dashboard_list");
-                    }
-                });*/
             });
         };
         if (sessionStorage.getItem("dashboard_list") == null) {
