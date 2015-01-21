@@ -121,12 +121,6 @@ define([
                     }
                     $("#btnMainFilter").removeClass("tab-item-green");
                 });
-
-                /*if (IScroll) {
-                    new IScroll('#filters .content', {
-                        tap: true
-                    });
-                };*/
             });
 
         };
@@ -204,13 +198,6 @@ define([
                         // is any filter is checked? then show button accept
                         if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
                         else $("#btnFilterAccept").hide();
-                        /*App.a.widgets[App.a.activeWidget].filters.setFilter({
-                            name: $(this).data("name"),
-                            path: self.selectedFilter.path,
-                            value: $(this).data("value"),
-                            valueName: $(this).data("valueName")
-                        });
-                        $("#filters").removeClass("active");*/
                     });
                     list.append(li);
 
@@ -220,11 +207,6 @@ define([
                 if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
                 else $("#btnFilterAccept").hide();
 
-                /*if (IScroll) {
-                    new IScroll('#filters .content', {
-                        tap: true
-                    });
-                }*/
                 $("#btnFilterAccept").off("tap").on("tap", function(){
                     $("#btnMainFilter").removeClass("tab-item-green");
                     var items = $("#filters .content").find(".icon-check:visible");
@@ -263,24 +245,6 @@ define([
             self.render();
             $("#filters").addClass("active");
         });
-
-/*
-        mc.subscribe("filters_acquired", {
-            subscriber: this,
-            callback: this.render
-        });
-        mc.subscribe("set_active_widget", {
-            subscriber: this,
-            callback: this.render
-        });*/
-        /*mc.subscribe("filters_acquired", {
-            subscriber: this,
-            callback: this.render
-        }); //TODO: - what comes first - this one or in DashBoard?*/
-        /*$("#filters").on('modalOpened', function() {
-            console.log("flt render");
-            self.render();
-        });*/
     };
     return new FiltersView();
 });
