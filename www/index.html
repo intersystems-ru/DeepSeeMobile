@@ -30,23 +30,20 @@
     <!--<script type="text/javascript" src="js/lib/pivot.js"></script>-->
     <script type="text/javascript" src="js/lib/underscore.js"></script>
 
-
-    <!--        <script src="js/lib/highcharts.src.js"></script>-
-
-            <script src="js/lib/Highcharts-LegendExtension.src.js"></script>
-            -->
-
-    <!--<script src="js/lib/drilldown.js"></script>
-    <script src="js/lib/solid-gauge.src.js"></script>
-    <script src="js/lib/funnel.js"></script>-->
     <script src="js/lib/jquery.tap.js"></script>
     <script src="js/lib/handlebars-v1.3.0.js"></script>
+    <script src="js/lib/numeral.js"></script>
 
+
+    <!-- Highcharts libraries -->
     <script src="js/lib/highstock.src.js"></script>
+    <script src="js/lib/drilldown.js"></script>
     <script src="js/lib/highcharts-more.js"></script>
     <script src="js/lib/heatmap.src.js"></script>
     <script src="js/lib/treemap.src.js"></script>
     <script src="js/lib/Highcharts-LegendExtension.src.js"></script>
+    <!-- <script src="js/lib/customEvents.js"></script>-->
+     <!-------------------------->
 
     <script type="text/javascript" src="js/lib/pivot/LightPivotTable.js"></script>
     <script type="text/javascript" src="js/lib/pivot/DataSource.js"></script>
@@ -57,11 +54,9 @@
 
     <!-- Include the compiled Ratchet JS -->
     <script src="js/lib/ratchet.js"></script>
-    <script src="js/lib/cordova.js"></script>
+    <script src="cordova.js"></script>
+    <!--<script src="http://jsconsole.com/remote.js?917BF5F0-B24A-4B3C-B608-7A79E380E254"></script>-->
 
-    <!--
-        <script src="http://jsconsole.com/remote.js?82FA66FF-B21F-4487-83C1-A11B5034B9D9"></script>
-        -->
 
     </head>
 
@@ -71,12 +66,6 @@
                 <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
             <h1 class="title" id="mainTitle">InterSystems DeepSee™</h1>
-
-            <!-- TODO: make widget page change from popover
-            <a href="#widgetList" class="pull-right">
-                <span class="icon icon-caret"></span>
-            </a>
-            -->
             <a id="btnMainBack" class="icon icon-left-nav pull-left" style="display: none"></a>
         </header>
 
@@ -85,8 +74,8 @@
 
         </div>
         <!--content-->
-        <div class="tri-left" style="display: none"></div>
-        <div class="tri-right" style="display: none"></div>
+        <div class="markets">
+        </div>
 
         <nav class="bar bar-tab">
             <a class="tab-item nav-home" href="#">
@@ -98,12 +87,6 @@
                 <span class="icon fa fa-filter"></span>
                 <span class="tab-label">Filters</span>
             </a>
-            <!--
-           <a class="tab-item" href="#" ontouchend="javascript:localStorage.clear();sessionStorage.clear();">
-               <span class="icon fa fa-trash" ></span>
-               <span class="tab-label">Clear</span>
-           </a>
-           -->
            <a id="btnMainRefresh" class="tab-item" href="#">
                <span class="icon fa fa-refresh"></span>
                <span class="tab-label">Reload</span>
@@ -124,7 +107,7 @@
         <h1 class="title">Filters</h1>
     </header>
 
-    <div class="content" style="left:0px">
+    <div class="content" style="left:0px; bottom: 0px;">
 
     </div>
 
@@ -133,22 +116,6 @@
     </div>
 </div>
 
-    <!--TODO: make widget settings
-   <div id="sideOptions" class="side-slider">
-
-   </div>
-
-   -->
-   <!--TODO: make widget page change from popover
-   <div id="widgetList" class="popover">
-       <ul class="table-view">
-
-
-       </ul>
-   </div>
-
-   -->
-<!--    <script src="http://lab.cubiq.org/iscroll/src/iscroll.js"></script>-->
        <script data-main="js/main" src="js/lib/require.js"></script>
 <script>
     $("#settings").off('tap').on('tap', function(){
@@ -165,7 +132,6 @@
                 if (w.pivot) {
                     if (w.pivot.DRILL_LEVEL == 0) return;
                     w.pivot.CONTROLS.back();
-                    //w.pivot.pivotView._backClickHandler(new Event("click"));
                     if (w.pivot.DRILL_LEVEL == 0) $("#btnMainBack").hide();
                 }
             }
@@ -181,7 +147,44 @@
         });
     });
 
-    </script>
+
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        document.addEventListener("backbutton", onBackKeyDown, false);
+    }
+
+    function onBackKeyDown(e) {
+        if ($("#filters").hasClass("active")) {
+            $("#filters").removeClass("active");
+            return false;
+        }
+        if ($("#btnMainBack").is(":visible")) {
+            $("#btnMainBack").trigger("tap");
+            return false;
+        }
+        if (App) {
+            if (App.v.currentView == "DashboardList") {
+                if (App.a) if (App.a.widgets) if (App.a.widgets.length != 0) {
+                    App.m.publish('viewchange:DashboardList', { holder: "#mainScreen > .content" });
+                    return false;
+                }
+                $("#mainScreen").hide();
+                $("#loginScreen").show();
+                App.m.publish("viewchange:Login", { holder: "#loginScreen" });
+                return false;
+            }
+        }
+        if (confirm("Quit application?")) {
+            navigator.app.exitApp();
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
 </body>
 
 </html>
