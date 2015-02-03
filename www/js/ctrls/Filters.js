@@ -14,9 +14,9 @@
  * @todo Delete high dependency with window.a = dashboard
  */
 define([
-    //'lib/iscroll',
+    'Language',
     "MessageCenter"
-], function (/*IScroll, */mc) {
+], function (Lang, mc) {
     'use strict';
     /**
      * Creates or returns existing FiltersView object
@@ -51,6 +51,10 @@ define([
          * @function module:FiltersView#render
          */
         this.render = function () {
+            $("#filters header h1").text(Lang.getText("filters"));
+            $("#btnDismissFilters").text(Lang.getText("dismissFilters"));
+            $("#btnFilterAccept").text(Lang.getText("accept"));
+
             require(['text!../views/Filters.html'], function (html) {
                 $("#fltBarFooter").hide();
 
@@ -58,7 +62,7 @@ define([
                 $("#btnFilterAccept").hide();
                 var holder = "#filters .content";
                 $(holder).empty();
-                $("#filters .title").text("Filters");
+                //$("#filters .title").text("Filters");
                 var list = $(html).clone();
                 list.empty();
                 $(holder).append(list);

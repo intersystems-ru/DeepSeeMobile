@@ -1,11 +1,21 @@
-define([], function(){
+define([
+    'Language'
+], function (Lang) {
     return function(d){
         var id = d.id;
-
         var servers;
+
+        $("#lblName").text(Lang.getText("title") + ":");
+        $("#lblIP").text(Lang.getText("address") + ":");
+        $("#lblNamespace").text(Lang.getText("namespace") + ":");
+        $("#lblUser").text(Lang.getText("login") + ":");
+        $("#lblPassword").text(Lang.getText("password") + ":");
+        $("#btnSave").text(Lang.getText("save"));
+
+
         if (localStorage.servers) servers = JSON.parse(localStorage.servers);
         if (!servers) servers = [];
-        if (id != undefined && id != null) $("#serverInfoTitle").text("Edit server");
+        if (id != undefined && id != null) $("#serverInfoTitle").text(Lang.getText("editServer")); else $("#serverInfoTitle").text(Lang.getText("newServer"));
 
         if (id != undefined) {
             //edit mode, fill fields

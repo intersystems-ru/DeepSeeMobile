@@ -1,9 +1,12 @@
-define([], function(){
+define([
+    'Language'
+], function (Lang) {
     return function(){
         var servers;
         var login;
         var pass;
 
+        Lang.applyLanguage();
 
         if (sessionStorage.dashboard_list) delete sessionStorage.dashboard_list;
 
@@ -12,7 +15,7 @@ define([], function(){
             if (localStorage.currentServerId) {
                 var id = parseInt(localStorage.currentServerId);
                 if (servers[id]) {
-                    if (servers[id].name) $("#selServer").text("Server: " + servers[id].name);
+                    if (servers[id].name) $("#selServer").text(Lang.getText("server")+ ": " + servers[id].name);
                     else $("#selServer").text("Server: " + servers[id].ip);
                     $("#txtLogin").val(servers[id].user);
                     $("#txtPassword").val(servers[id].password);
@@ -55,10 +58,13 @@ define([], function(){
             $("#loginProgress").hide();
             App.settings.username = login;
             App.settings.password = pass;
+
             $.ajaxPrefilter(function( options ) {
                 if (!options.beforeSend) {
                     options.beforeSend = function (xhr) {
-                        xhr.setRequestHeader('Authorization', make_base_auth(login, pass));
+                        //xhr.withCredentials = true;
+                        xhr.setRequestHeader('Authorization', make_base_auth(App.settings.username, App.settings.password));
+                        xhr.setRequestHeader('Accept-Language', Lang.currentLocale() + "-" + Lang.currentLocale().toUpperCase());
                     }
                 }
             });
@@ -78,6 +84,34 @@ define([], function(){
         });
 
         $("#btnLogin").off('tap').on('tap', DoLogin);
+        $("#btnLang").off('tap').on('tap', function() {
+            $("#langSelector .table-view-cell").removeClass("table-view-cell-sel");
+            switch (Lang.currentLocale()) {
+                case "en": {
+                    $("#langSelector .table-view-cell:eq(0)").addClass("table-view-cell-sel");
+                    break;
+                }
+                case "de": {
+                    $("#langSelector .table-view-cell:eq(1)").addClass("table-view-cell-sel");
+                    break;
+                }
+                case "ru": {
+                    $("#langSelector .table-view-cell:eq(2)").addClass("table-view-cell-sel");
+                    break;
+                }
+            }
+        });
+
+        $("#langSelector .table-view-cell").off('tap').on('tap', function(e) {
+            $("#langSelector .table-view-cell").removeClass("table-view-cell-sel");
+            $(e.target).addClass("table-view-cell-sel");
+            switch ($(e.target).text().toLowerCase()) {
+                case "english": Lang.setLocale("en"); break;
+                case "deutsch": Lang.setLocale("de"); break;
+                case "russian": Lang.setLocale("ru"); break;
+            }
+            $("#langSelector").removeClass("active");
+        });
 
 
 
