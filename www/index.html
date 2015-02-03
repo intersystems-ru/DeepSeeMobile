@@ -45,6 +45,7 @@
     <!-- <script src="js/lib/customEvents.js"></script>-->
      <!-------------------------->
 
+    <script type="text/javascript" src="js/lib/pivot/PivotLocale.js"></script>
     <script type="text/javascript" src="js/lib/pivot/LightPivotTable.js"></script>
     <script type="text/javascript" src="js/lib/pivot/DataSource.js"></script>
     <script type="text/javascript" src="js/lib/pivot/PivotView.js"></script>
@@ -80,20 +81,20 @@
         <nav class="bar bar-tab">
             <a class="tab-item nav-home" href="#">
                 <span class="icon fa fa-home"></span>
-                <span class="tab-label">Home</span>
+                <span id="mainHomeText" class="tab-label">Home</span>
             </a>
             <a id="btnMainFilter" class="tab-item" style="display:none;">
             <!--<a id="btnMainFilter" class="tab-item" href="#filters" data-transition="slide-in" style="display:none;">-->
                 <span class="icon fa fa-filter"></span>
-                <span class="tab-label">Filters</span>
+                <span id="mainFilterText" class="tab-label">Filters</span>
             </a>
            <a id="btnMainRefresh" class="tab-item" href="#">
                <span class="icon fa fa-refresh"></span>
-               <span class="tab-label">Reload</span>
+               <span id="mainReloadText" class="tab-label">Reload</span>
            </a>
             <a id="btnMainSignOut" class="tab-item" href="#">
                 <span class="icon fa fa-sign-out" ></span>
-                <span class="tab-label">Sign out</span>
+                <span id="mainSignoutText" class="tab-label">Sign out</span>
             </a>
        </nav>
    </div>
