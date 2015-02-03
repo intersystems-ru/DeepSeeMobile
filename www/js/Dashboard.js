@@ -63,13 +63,17 @@ define([
             var widgets = d.children;
             var self = this;
 
+            //var widget_configs = [];
             for (var i = 0; i < widgets.length; i++) {
 
                 var widget = widgets[i];
-                var widget_config = WidgetMap[widget.type];
-                if (!widget_config) {
+                var widget_config;
+
+                if (!WidgetMap[widget.type]) {
                     widget_config = WidgetMap["null"]
-                }
+                } else
+                    widget_config = $.extend(true, {}, WidgetMap[widget.type]);
+                widget_config.id = Math.random();
                 widget_config.datasource = {
                     pivot: widget.dataSource,
                     data: {
@@ -86,11 +90,12 @@ define([
                     });
                 });
 
-
+                if (!widget_config.config) widget_config.config = {};
                 widget_config.config.title = {
                     text: widget.title
                 };
                 self.addWidget(widget_config);
+                //widget_config.widget = self.widgets[self.widgets.length - 1];
                 self.widgets[self.widgets.length - 1].cube = widgets[i].cube;
                 if (widgets[i].cube) {
                     mc.publish('filters_requested', {cube: widgets[i].cube, widget: self.widgets[self.widgets.length - 1]});
