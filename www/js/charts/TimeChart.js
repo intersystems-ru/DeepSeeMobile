@@ -129,6 +129,7 @@ define(['charts/ChartBase'], function (cb) {
                 }
             },
             yAxis: {
+                min: 0,
                 title: {
                     text: ''
                 }
