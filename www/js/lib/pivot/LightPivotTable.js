@@ -171,7 +171,7 @@ LightPivotTable.prototype.popDataSource = function (popData) {
  */
 LightPivotTable.prototype.dataIsChanged = function () {
 
-    this.pivotView.renderRawData(this.dataController.getData());
+    this.pivotView.dataChanged(this.dataController.getData());
 
 };
 
@@ -295,6 +295,9 @@ LightPivotTable.prototype.getPivotProperty = function (path) {
  * @param config
  */
 LightPivotTable.prototype.normalizeConfiguration = function (config) {
+    if (typeof config["columnResizing"] === "undefined") config.columnResizing = true;
+    if (typeof config["pagination"] === "undefined") config.pagination = 200;
+    if (typeof config["enableSearch"] === "undefined") config.enableSearch = true;
     if (!config["triggers"]) config.triggers = {};
     if (!config["dataSource"]) config.dataSource = {};
 };
@@ -318,6 +321,8 @@ LightPivotTable.prototype.init = function () {
     this.CONTROLS.back = function () {
         _.pivotView._backClickHandler.call(_.pivotView);
     };
+
+    if (this.CONFIG["locale"]) { pivotLocale.setLocale(this.CONFIG["locale"]); }
 
     this.refresh();
 

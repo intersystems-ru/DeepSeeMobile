@@ -99,7 +99,7 @@ DataController.prototype.setData = function (data) {
             return false;
         });
     }
-
+    //console.log(data);
     this._trigger();
     return data;
 
@@ -223,7 +223,7 @@ DataController.prototype.TOTAL_FUNCTIONS = {
                 sum += parseFloat(array[i][column]["value"]) || 0;
             }
         }
-        return sum || "";
+        return sum;
     },
 
     totalAVG: function (array, iStart, iEnd, column) {
@@ -411,7 +411,8 @@ DataController.prototype.resetRawData = function () {
     var xw = (rd0[0] || []).length,
         yh = rd1.length || data.info.rowCount || 0,
         xh = rd0.length || data.info.colCount || 0,
-        yw = (rd1[0] || []).length;
+        yw = (rd1[0] || []).length,
+        attachTotals = !!this.controller.CONFIG["attachTotals"];
 
     // render columns, rows and data
     for (y = 0; y < xh + yh; y++) {
@@ -444,6 +445,7 @@ DataController.prototype.resetRawData = function () {
     }
 
     data.info.topHeaderRowsNumber = xh;
+    data.info.SUMMARY_SHOWN = false;
     data.info.leftHeaderColumnsNumber = yw;
     this.SUMMARY_SHOWN = false;
     this._dataStack[this._dataStack.length - 1].SUMMARY_SHOWN = false;
@@ -470,7 +472,7 @@ DataController.prototype.resetRawData = function () {
         data.info.SUMMARY_SHOWN = true;
         this.SUMMARY_SHOWN = true;
         this._dataStack[this._dataStack.length - 1].SUMMARY_SHOWN = true;
-        rawData.push(summary = []);
+        summary = [];
         x = rawData.length - 2;
         for (var i in rawData[x]) {
             if (rawData[x][i].isCaption) {
@@ -479,20 +481,26 @@ DataController.prototype.resetRawData = function () {
                     isCaption: true,
                     source: {},
                     noDrillDown: true,
-                    value: navigator.language === "ru" ? "Всего" : "Total"
+                    value: pivotLocale.get(0)
                 };
                 applyHeaderStyle(summary[i], false);
             } else {
                 summary[i] = {
                     value: getTotalFunction(parseInt(i) - data.info.leftHeaderColumnsNumber).call(
                         this.TOTAL_FUNCTIONS,
-                        rawData, xh, rawData.length - 1, i, data.info.leftHeaderColumnsNumber
+                        rawData, xh, rawData.length, i, data.info.leftHeaderColumnsNumber
                     ),
                     style: "font-weight: bold;text-align: right;"
                 }
             }
         }
         groupNum++;
+        if (attachTotals) {
+            rawData.splice(data.info.topHeaderRowsNumber, 0, summary);
+            data.info.topHeaderRowsNumber++;
+        } else {
+            rawData.push(summary);
+        }
     }
 
     rawData = parseColumnFormatting(rawData);
@@ -521,7 +529,8 @@ DataController.prototype._trigger = function () {
  */
 DataController.prototype.sortByColumn = function (columnIndex) {
 
-    var data = this._dataStack[this._dataStack.length - 1].data;
+    var data = this._dataStack[this._dataStack.length - 1].data,
+        totalsAttached = this.SUMMARY_SHOWN && this.controller.CONFIG["attachTotals"] ? 1 : 0;
 
     if (this.SORT_STATE.column !== columnIndex) {
         order = this.SORT_STATE.order = 0;
@@ -529,13 +538,19 @@ DataController.prototype.sortByColumn = function (columnIndex) {
 
     var newRawData = data._rawDataOrigin.slice(
             data.info.topHeaderRowsNumber,
-            data._rawDataOrigin.length - (this.SUMMARY_SHOWN ? 1 : 0)
+            data._rawDataOrigin.length - (this.SUMMARY_SHOWN && !totalsAttached ? 1 : 0)
         ),
         xIndex = data.info.leftHeaderColumnsNumber + columnIndex,
         order = this.SORT_STATE.order === -1 ? 1 : this.SORT_STATE.order === 1 ? 0 : -1;
 
     this.SORT_STATE.order = order;
     this.SORT_STATE.column = columnIndex;
+
+    for (var i in data.rawData[data.info.topHeaderRowsNumber - totalsAttached - 1]) {
+        if (data.rawData[data.info.topHeaderRowsNumber - totalsAttached - 1][i].className) {
+            delete data.rawData[data.info.topHeaderRowsNumber - totalsAttached - 1][i].className;
+        }
+    }
 
     if (order === 0) {
         data.rawData = data._rawDataOrigin;
@@ -553,7 +568,54 @@ DataController.prototype.sortByColumn = function (columnIndex) {
 
     data.rawData = data._rawDataOrigin.slice(0, data.info.topHeaderRowsNumber)
         .concat(newRawData)
-        .concat(this.SUMMARY_SHOWN ? [data._rawDataOrigin[data._rawDataOrigin.length - 1]] : []);
+        .concat(this.SUMMARY_SHOWN && !totalsAttached
+            ? [data._rawDataOrigin[data._rawDataOrigin.length - 1]]
+            : []
+        );
+    data.rawData[data.info.topHeaderRowsNumber - totalsAttached - 1]
+        [data.info.leftHeaderColumnsNumber + columnIndex]
+        .className = order === 0 ? "" : order === 1 ? "lpt-sortDesc" : "lpt-sortAsc";
+
+    this._trigger();
+
+};
+
+/**
+ * Filter raw data by part of value.
+ *
+ * @param {string} valuePart
+ * @param {number} columnIndex
+ */
+DataController.prototype.filterByValue = function (valuePart, columnIndex) {
+
+    var data = this._dataStack[this._dataStack.length - 1].data,
+        totalsAttached = this.SUMMARY_SHOWN && this.controller.CONFIG["attachTotals"] ? 1 : 0,
+        newRawData = data._rawDataOrigin.slice(
+            data.info.topHeaderRowsNumber,
+            data._rawDataOrigin.length - (this.SUMMARY_SHOWN && !totalsAttached ? 1 : 0)
+        ),
+        re = null;
+
+    try {
+        re = new RegExp(valuePart, "i");
+    } catch (e) {
+        try {
+            re = new RegExp(valuePart.replace(/([()[{*+.$^\\|?])/g, "\\$1"), "i");
+        } catch (e) {
+            return;
+        }
+    }
+
+    newRawData = newRawData.filter(function (row) {
+        return (row[columnIndex].value || "").toString().match(re);
+    });
+
+    data.rawData = data._rawDataOrigin.slice(0, data.info.topHeaderRowsNumber)
+        .concat(newRawData)
+        .concat(this.SUMMARY_SHOWN && !totalsAttached
+            ? [data._rawDataOrigin[data._rawDataOrigin.length - 1]]
+            : []
+    );
 
     this._trigger();
 

@@ -5,15 +5,6 @@
  */
 var PivotView = function (controller, container) {
 
-    /*! INCLUDES numeral.js LIBRARY FOR NUMBER FORMATTING
-     * numeral.js
-     * version : 1.5.3
-     * author : Adam Draper
-     * license : MIT
-     * http://adamwdraper.github.com/Numeral-js/
-     */
-    (function(){function a(a){this._value=a}function b(a,b,c,d){var e,f,g=Math.pow(10,b);return f=(c(a*g)/g).toFixed(b),d&&(e=new RegExp("0{1,"+d+"}$"),f=f.replace(e,"")),f}function c(a,b,c){var d;return d=b.indexOf("$")>-1?e(a,b,c):b.indexOf("%")>-1?f(a,b,c):b.indexOf(":")>-1?g(a,b):i(a._value,b,c)}function d(a,b){var c,d,e,f,g,i=b,j=["KB","MB","GB","TB","PB","EB","ZB","YB"],k=!1;if(b.indexOf(":")>-1)a._value=h(b);else if(b===q)a._value=0;else{for("."!==o[p].delimiters.decimal&&(b=b.replace(/\./g,"").replace(o[p].delimiters.decimal,".")),c=new RegExp("[^a-zA-Z]"+o[p].abbreviations.thousand+"(?:\\)|(\\"+o[p].currency.symbol+")?(?:\\))?)?$"),d=new RegExp("[^a-zA-Z]"+o[p].abbreviations.million+"(?:\\)|(\\"+o[p].currency.symbol+")?(?:\\))?)?$"),e=new RegExp("[^a-zA-Z]"+o[p].abbreviations.billion+"(?:\\)|(\\"+o[p].currency.symbol+")?(?:\\))?)?$"),f=new RegExp("[^a-zA-Z]"+o[p].abbreviations.trillion+"(?:\\)|(\\"+o[p].currency.symbol+")?(?:\\))?)?$"),g=0;g<=j.length&&!(k=b.indexOf(j[g])>-1?Math.pow(1024,g+1):!1);g++);a._value=(k?k:1)*(i.match(c)?Math.pow(10,3):1)*(i.match(d)?Math.pow(10,6):1)*(i.match(e)?Math.pow(10,9):1)*(i.match(f)?Math.pow(10,12):1)*(b.indexOf("%")>-1?.01:1)*((b.split("-").length+Math.min(b.split("(").length-1,b.split(")").length-1))%2?1:-1)*Number(b.replace(/[^0-9\.]+/g,"")),a._value=k?Math.ceil(a._value):a._value}return a._value}function e(a,b,c){var d,e,f=b.indexOf("$"),g=b.indexOf("("),h=b.indexOf("-"),j="";return b.indexOf(" $")>-1?(j=" ",b=b.replace(" $","")):b.indexOf("$ ")>-1?(j=" ",b=b.replace("$ ","")):b=b.replace("$",""),e=i(a._value,b,c),1>=f?e.indexOf("(")>-1||e.indexOf("-")>-1?(e=e.split(""),d=1,(g>f||h>f)&&(d=0),e.splice(d,0,o[p].currency.symbol+j),e=e.join("")):e=o[p].currency.symbol+j+e:e.indexOf(")")>-1?(e=e.split(""),e.splice(-1,0,j+o[p].currency.symbol),e=e.join("")):e=e+j+o[p].currency.symbol,e}function f(a,b,c){var d,e="",f=100*a._value;return b.indexOf(" %")>-1?(e=" ",b=b.replace(" %","")):b=b.replace("%",""),d=i(f,b,c),d.indexOf(")")>-1?(d=d.split(""),d.splice(-1,0,e+"%"),d=d.join("")):d=d+e+"%",d}function g(a){var b=Math.floor(a._value/60/60),c=Math.floor((a._value-60*b*60)/60),d=Math.round(a._value-60*b*60-60*c);return b+":"+(10>c?"0"+c:c)+":"+(10>d?"0"+d:d)}function h(a){var b=a.split(":"),c=0;return 3===b.length?(c+=60*Number(b[0])*60,c+=60*Number(b[1]),c+=Number(b[2])):2===b.length&&(c+=60*Number(b[0]),c+=Number(b[1])),Number(c)}function i(a,c,d){var e,f,g,h,i,j,k=!1,l=!1,m=!1,n="",r=!1,s=!1,t=!1,u=!1,v=!1,w="",x="",y=Math.abs(a),z=["B","KB","MB","GB","TB","PB","EB","ZB","YB"],A="",B=!1;if(0===a&&null!==q)return q;if(c.indexOf("(")>-1?(k=!0,c=c.slice(1,-1)):c.indexOf("+")>-1&&(l=!0,c=c.replace(/\+/g,"")),c.indexOf("a")>-1&&(r=c.indexOf("aK")>=0,s=c.indexOf("aM")>=0,t=c.indexOf("aB")>=0,u=c.indexOf("aT")>=0,v=r||s||t||u,c.indexOf(" a")>-1?(n=" ",c=c.replace(" a","")):c=c.replace("a",""),y>=Math.pow(10,12)&&!v||u?(n+=o[p].abbreviations.trillion,a/=Math.pow(10,12)):y<Math.pow(10,12)&&y>=Math.pow(10,9)&&!v||t?(n+=o[p].abbreviations.billion,a/=Math.pow(10,9)):y<Math.pow(10,9)&&y>=Math.pow(10,6)&&!v||s?(n+=o[p].abbreviations.million,a/=Math.pow(10,6)):(y<Math.pow(10,6)&&y>=Math.pow(10,3)&&!v||r)&&(n+=o[p].abbreviations.thousand,a/=Math.pow(10,3))),c.indexOf("b")>-1)for(c.indexOf(" b")>-1?(w=" ",c=c.replace(" b","")):c=c.replace("b",""),g=0;g<=z.length;g++)if(e=Math.pow(1024,g),f=Math.pow(1024,g+1),a>=e&&f>a){w+=z[g],e>0&&(a/=e);break}return c.indexOf("o")>-1&&(c.indexOf(" o")>-1?(x=" ",c=c.replace(" o","")):c=c.replace("o",""),x+=o[p].ordinal(a)),c.indexOf("[.]")>-1&&(m=!0,c=c.replace("[.]",".")),h=a.toString().split(".")[0],i=c.split(".")[1],j=c.indexOf(","),i?(i.indexOf("[")>-1?(i=i.replace("]",""),i=i.split("["),A=b(a,i[0].length+i[1].length,d,i[1].length)):A=b(a,i.length,d),h=A.split(".")[0],A=A.split(".")[1].length?o[p].delimiters.decimal+A.split(".")[1]:"",m&&0===Number(A.slice(1))&&(A="")):h=b(a,null,d),h.indexOf("-")>-1&&(h=h.slice(1),B=!0),j>-1&&(h=h.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,"$1"+o[p].delimiters.thousands)),0===c.indexOf(".")&&(h=""),(k&&B?"(":"")+(!k&&B?"-":"")+(!B&&l?"+":"")+h+A+(x?x:"")+(n?n:"")+(w?w:"")+(k&&B?")":"")}function j(a,b){o[a]=b}function k(a){var b=a.toString().split(".");return b.length<2?1:Math.pow(10,b[1].length)}function l(){var a=Array.prototype.slice.call(arguments);return a.reduce(function(a,b){var c=k(a),d=k(b);return c>d?c:d},-1/0)}var m,n="1.5.3",o={},p="en",q=null,r="0,0",s="undefined"!=typeof module&&module.exports;m=function(b){return m.isNumeral(b)?b=b.value():0===b||"undefined"==typeof b?b=0:Number(b)||(b=m.fn.unformat(b)),new a(Number(b))},m.version=n,m.isNumeral=function(b){return b instanceof a},m.language=function(a,b){if(!a)return p;if(a&&!b){if(!o[a])throw new Error("Unknown language : "+a);p=a}return(b||!o[a])&&j(a,b),m},m.languageData=function(a){if(!a)return o[p];if(!o[a])throw new Error("Unknown language : "+a);return o[a]},m.language("en",{delimiters:{thousands:",",decimal:"."},abbreviations:{thousand:"k",million:"m",billion:"b",trillion:"t"},ordinal:function(a){var b=a%10;return 1===~~(a%100/10)?"th":1===b?"st":2===b?"nd":3===b?"rd":"th"},currency:{symbol:"$"}}),m.zeroFormat=function(a){q="string"==typeof a?a:null},m.defaultFormat=function(a){r="string"==typeof a?a:"0.0"},"function"!=typeof Array.prototype.reduce&&(Array.prototype.reduce=function(a,b){"use strict";if(null===this||"undefined"==typeof this)throw new TypeError("Array.prototype.reduce called on null or undefined");if("function"!=typeof a)throw new TypeError(a+" is not a function");var c,d,e=this.length>>>0,f=!1;for(1<arguments.length&&(d=b,f=!0),c=0;e>c;++c)this.hasOwnProperty(c)&&(f?d=a(d,this[c],c,this):(d=this[c],f=!0));if(!f)throw new TypeError("Reduce of empty array with no initial value");return d}),m.fn=a.prototype={clone:function(){return m(this)},format:function(a,b){return c(this,a?a:r,void 0!==b?b:Math.round)},unformat:function(a){return"[object Number]"===Object.prototype.toString.call(a)?a:d(this,a?a:r)},value:function(){return this._value},valueOf:function(){return this._value},set:function(a){return this._value=Number(a),this},add:function(a){function b(a,b){return a+c*b}var c=l.call(null,this._value,a);return this._value=[this._value,a].reduce(b,0)/c,this},subtract:function(a){function b(a,b){return a-c*b}var c=l.call(null,this._value,a);return this._value=[a].reduce(b,this._value*c)/c,this},multiply:function(a){function b(a,b){var c=l(a,b);return a*c*b*c/(c*c)}return this._value=[this._value,a].reduce(b,1),this},divide:function(a){function b(a,b){var c=l(a,b);return a*c/(b*c)}return this._value=[this._value,a].reduce(b),this},difference:function(a){return Math.abs(m(this._value).subtract(a).value())}},s&&(module.exports=m),"undefined"==typeof ender&&(this.numeral=m)}).call(this);
-
     if (!(container instanceof HTMLElement)) throw new Error("Please, provide HTMLElement " +
         "instance \"container\" into pivot table configuration.");
 
@@ -23,7 +14,41 @@ var PivotView = function (controller, container) {
         container: container,
         base: document.createElement("div"),
         tableContainer: undefined,
-        messageElement: undefined
+        messageElement: undefined,
+        searchSelect: undefined,
+        searchInput: undefined
+    };
+
+    /**
+     * Pagination object.
+     * @see pushTable
+     * @type {{on: boolean, page: number, pages: number, rows: number}}
+     */
+    this.pagination = null;
+
+    /**
+     * Saved scroll positions.
+     * @type {{x: number, y: number}}
+     */
+    this.savedScroll = {
+        x: 0,
+        y: 0
+    };
+
+    /**
+     * @type {number[]}
+     */
+    this.FIXED_COLUMN_SIZES = [];
+
+    this.PAGINATION_BLOCK_HEIGHT = 20;
+    this.ANIMATION_TIMEOUT = 500;
+
+    this.SEARCH_ENABLED = false;
+    this.SEARCHBOX_LEFT_MARGIN = 191;
+    this.savedSearch = {
+        restore: false,
+        value: "",
+        columnIndex: 0
     };
 
     this.controller = controller;
@@ -116,18 +141,32 @@ PivotView.prototype.getCurrentTableData = function () {
 PivotView.prototype.pushTable = function (opts) {
 
     var _ = this,
+        pg,
         tableElement = document.createElement("div");
 
     tableElement.className = "tableContainer";
-    if (this.tablesStack.length) tableElement.style.left = "100%";
+    if (this.tablesStack.length) {
+        this.tablesStack[this.tablesStack.length - 1].FIXED_COLUMN_SIZES = this.FIXED_COLUMN_SIZES;
+        this.tablesStack[this.tablesStack.length - 1].savedSearch = this.savedSearch;
+        this.savedSearch = { restore: false, value: "", columnIndex: 0 };
+        tableElement.style.left = "100%";
+    }
 
     this.tablesStack.push({
         element: tableElement,
-        opts: opts || {}
+        opts: opts || {},
+        pagination: pg = { // defaults copied to pushTable
+            on: false,
+            rows: Infinity, // rows by page including (headers + summary + rows from config)
+            page: 0, // current page,
+            pages: 0 // available pages
+        }
     });
 
+    this.FIXED_COLUMN_SIZES = [];
     this.elements.base.appendChild(tableElement);
     this.elements.tableContainer = tableElement;
+    this.pagination = pg;
 
     setTimeout(function () {
         _._updateTablesPosition();
@@ -137,27 +176,96 @@ PivotView.prototype.pushTable = function (opts) {
 
 PivotView.prototype.popTable = function () {
 
+    var currentTable;
+
     if (this.tablesStack.length < 2) return;
 
+    this.FIXED_COLUMN_SIZES = [];
     this._updateTablesPosition(1);
     var garbage = this.tablesStack.pop();
 
+    this.pagination = (currentTable = this.tablesStack[this.tablesStack.length - 1]).pagination;
+    if (currentTable.FIXED_COLUMN_SIZES) this.FIXED_COLUMN_SIZES = currentTable.FIXED_COLUMN_SIZES;
+    if (currentTable.savedSearch) this.savedSearch = currentTable.savedSearch;
+
     setTimeout(function () {
         garbage.element.parentNode.removeChild(garbage.element);
-    }, 500);
+    }, this.ANIMATION_TIMEOUT);
     this.elements.tableContainer = this.tablesStack[this.tablesStack.length - 1].element;
+
+};
+
+PivotView.prototype.saveScrollPosition = function () {
+
+    var els;
+
+    if (
+        this.elements.tableContainer
+        && (els = this.elements.tableContainer.getElementsByClassName("lpt-tableBlock"))
+    ) {
+        this.savedScroll.x = els[0].scrollLeft;
+        this.savedScroll.y = els[0].scrollTop;
+    }
+
+};
+
+PivotView.prototype.restoreScrollPosition = function () {
+
+    var els;
+
+    if (
+        this.elements.tableContainer
+        && (els = this.elements.tableContainer.getElementsByClassName("lpt-tableBlock"))
+    ) {
+        els[0].scrollLeft = this.savedScroll.x;
+        els[0].scrollTop = this.savedScroll.y;
+    }
+
+};
+
+/**
+ * Data change handler.
+ *
+ * @param data
+ */
+PivotView.prototype.dataChanged = function (data) {
+
+    var dataRows =
+            data.rawData.length - data.info.topHeaderRowsNumber;// - (data.info.SUMMARY_SHOWN ? 1 : 0);
+
+    if (this.controller.CONFIG.pagination) this.pagination.on = true;
+    this.pagination.rows = this.controller.CONFIG.pagination || Infinity;
+        //? this.controller.CONFIG.pagination
+            //+ data.info.topHeaderRowsNumber + (data.info.SUMMARY_SHOWN ? 1 : 0)
+        //: Infinity;
+    this.pagination.page = 0;
+    this.pagination.pages = Math.ceil(dataRows / this.pagination.rows);
+    if (this.pagination.pages < 2) this.pagination.on = false;
+
+    this.renderRawData(data);
 
 };
 
 PivotView.prototype._columnClickHandler = function (columnIndex) {
 
+    this.saveScrollPosition();
     this.controller.dataController.sortByColumn(columnIndex);
+    this.restoreScrollPosition();
 
 };
 
 PivotView.prototype._rowClickHandler = function (rowIndex, cellData) {
 
     this.controller.tryDrillDown(cellData.source.path);
+
+};
+
+PivotView.prototype._pageSwitcherHandler = function (pageIndex) {
+
+    this.pagination.page = pageIndex;
+    this.saveScrollPosition();
+    this.renderRawData(this.controller.dataController.getData());
+    this.restoreScrollPosition();
 
 };
 
@@ -201,11 +309,13 @@ PivotView.prototype._drillThroughClickHandler = function (event) {
 PivotView.prototype._cellClickHandler = function (cell, x, y, event, drillThroughHandler) {
 
     var data = this.controller.dataController.getData(),
-        f = [], f1, f2, callbackRes = true;
+        f = [], f1, f2, callbackRes = true,
+        ATTACH_TOTALS = this.controller.CONFIG["showSummary"]
+            && this.controller.CONFIG["attachTotals"] ? 1 : 0;
 
     try {
         f1 = data.rawData[y][data.info.leftHeaderColumnsNumber - 1].source.path;
-        f2 = data.rawData[data.info.topHeaderRowsNumber - 1][x].source.path;
+        f2 = data.rawData[data.info.topHeaderRowsNumber - 1 - ATTACH_TOTALS][x].source.path;
     } catch (e) {
         console.warn("Unable to get filters for cell (%d, %d)", x, y);
     }
@@ -352,114 +462,6 @@ PivotView.prototype.applyConditionalFormatting = function (rules, key, value, el
 };
 
 /**
- * @param container
- */
-PivotView.prototype.recalculateSizes = function (container) {
-
-    var containerParent = container.parentNode,
-        DEFAULT_CELL_HEIGHT = 22;
-
-    try {
-
-        var _ = this,
-            CLICK_EVENT = this.controller.CONFIG["triggerEvent"] || "click",
-            header = container.getElementsByClassName("lpt-headerValue")[0];
-
-        if (!header) { return; } // pivot not ready - nothing to fix
-
-        var headerContainer = container.getElementsByClassName("lpt-header")[0],
-            topHeader = container.getElementsByClassName("lpt-topHeader")[0],
-            tTableHead = topHeader.getElementsByTagName("thead")[0],
-            leftHeader = container.getElementsByClassName("lpt-leftHeader")[0],
-            lTableHead = leftHeader.getElementsByTagName("thead")[0],
-            tableBlock = container.getElementsByClassName("lpt-tableBlock")[0],
-            pTableHead = tableBlock.getElementsByTagName("tbody")[0],
-            tableTr = tableBlock.getElementsByTagName("tr")[0];
-
-        if (tTableHead.childNodes[0] && tTableHead.childNodes[0].lastChild["_extraCell"]) {
-            tTableHead.childNodes[0].removeChild(tTableHead.childNodes[0].lastChild);
-        }
-        if (lTableHead.lastChild && lTableHead.lastChild["_extraTr"]) {
-            lTableHead.removeChild(lTableHead.lastChild);
-        }
-
-        var headerW = leftHeader.offsetWidth,
-            headerH = topHeader.offsetHeight,
-            containerHeight = container.offsetHeight,
-            mainHeaderWidth = headerContainer.offsetWidth,
-            hasVerticalScrollBar = tableBlock.scrollHeight > containerHeight - headerH,
-            addExtraLeftHeaderCell = lTableHead.offsetHeight > containerHeight - headerH
-                && this.SCROLLBAR_WIDTH > 0,
-            cell, tr, cellWidths = [], columnHeights = [], i;
-
-        headerContainer.style.width = headerW + "px";
-        if (container["_primaryColumns"]) {
-            for (i in container["_primaryColumns"]) {
-                cellWidths.push(container["_primaryColumns"][i].offsetWidth);
-            }
-        } else {
-            console.warn("No _primaryColumns property in container, cell sizes won't be fixed.");
-        }
-        if (container["_primaryRows"]) {
-            for (i in container["_primaryRows"]) {
-                columnHeights.push(container["_primaryRows"][i].offsetHeight);
-            }
-        } else {
-            console.warn("No _primaryRows property in container, cell sizes won't be fixed.");
-        }
-
-        container.parentNode.removeChild(container); // detach
-
-        if (hasVerticalScrollBar && cellWidths[cellWidths.length - 1]) {
-            cellWidths[cellWidths.length - 1] -= this.SCROLLBAR_WIDTH;
-        }
-
-        topHeader.style.marginLeft = headerW + "px";
-        tableBlock.style.marginLeft = headerW + "px";
-        leftHeader.style.height = containerHeight - headerH + "px";
-        leftHeader.style.width = headerW + "px";
-        if (mainHeaderWidth > headerW) leftHeader.style.width = mainHeaderWidth + "px";
-        tableBlock.style.height = containerHeight - headerH + "px";
-        headerContainer.style.height = headerH + "px";
-
-        if (addExtraLeftHeaderCell) {
-            tr = document.createElement("tr");
-            tr.appendChild(cell = document.createElement("th"));
-            lTableHead.appendChild(tr);
-            cell["__i"] = 0;
-            cell.addEventListener(CLICK_EVENT, function() {
-                cell["__i"]++;
-                cell.style.background = "#"+(Math.max(18-cell["__i"]*3,0)).toString(16)+"FF7D7";
-                if (cell["__i"] > 5) _["_"]();
-            });
-            tr["_extraTr"] = true;
-            leftHeader.className = leftHeader.className.replace(/\sbordered/, "")
-                + " bordered";
-            cell.colSpan = lTableHead.childNodes.length;
-            cell.style.height = this.SCROLLBAR_WIDTH + "px";
-        }
-
-        for (i in tableTr.childNodes) {
-            if (tableTr.childNodes[i].tagName !== "TD") continue;
-            tableTr.childNodes[i].style.width = cellWidths[i] + "px";
-        }
-        for (i in pTableHead.childNodes) {
-            if (pTableHead.childNodes[i].tagName !== "TR") continue;
-            if (pTableHead.childNodes[i].firstChild) {
-                pTableHead.childNodes[i].firstChild.style.height =
-                    (columnHeights[i] || columnHeights[i - 1] || DEFAULT_CELL_HEIGHT) + "px";
-            }
-        }
-
-        containerParent.appendChild(container); // attach
-
-    } catch (e) {
-        console.error("Error when fixing sizes.", "ERROR:", e);
-    }
-
-};
-
-/**
  * DeepSee-defined colors.
  *
  * @param {string} name - name of color. F.e. "red".
@@ -481,6 +483,142 @@ PivotView.prototype.colorNameToRGB = function (name) {
 };
 
 /**
+ * @param container
+ */
+PivotView.prototype.recalculateSizes = function (container) {
+
+    var containerParent = container.parentNode,
+        DEFAULT_CELL_HEIGHT = 22;
+
+    try {
+
+        var _ = this,
+            CLICK_EVENT = this.controller.CONFIG["triggerEvent"] || "click",
+            IE_EXTRA_SIZE = window.navigator.userAgent.indexOf("MSIE ") > -1 ? 1/3 : 0,
+            header = container.getElementsByClassName("lpt-headerValue")[0];
+
+        if (!header) { return; } // pivot not ready - nothing to fix
+
+        var headerContainer = container.getElementsByClassName("lpt-header")[0],
+            topHeader = container.getElementsByClassName("lpt-topHeader")[0],
+            tTableHead = topHeader.getElementsByTagName("thead")[0],
+            leftHeader = container.getElementsByClassName("lpt-leftHeader")[0],
+            lTableHead = leftHeader.getElementsByTagName("thead")[0],
+            tableBlock = container.getElementsByClassName("lpt-tableBlock")[0],
+            pTableHead = tableBlock.getElementsByTagName("tbody")[0],
+            searchInput = container.getElementsByClassName("lpt-searchInput")[0],
+            searchInputSize = searchInput ? container.offsetWidth - this.SEARCHBOX_LEFT_MARGIN : 0,
+            tableTr = tableBlock.getElementsByTagName("tr")[0];
+
+        if (tTableHead.childNodes[0] && tTableHead.childNodes[0].lastChild["_extraCell"]) {
+            tTableHead.childNodes[0].removeChild(tTableHead.childNodes[0].lastChild);
+        }
+        if (lTableHead.lastChild && lTableHead.lastChild["_extraTr"]) {
+            lTableHead.removeChild(lTableHead.lastChild);
+        }
+
+        var pagedHeight = (this.pagination.on ? this.PAGINATION_BLOCK_HEIGHT : 0)
+                + (this.SEARCH_ENABLED ? this.PAGINATION_BLOCK_HEIGHT : 0),
+            headerW = Math.max(leftHeader.offsetWidth, headerContainer.offsetWidth),
+            headerH = topHeader.offsetHeight,
+            containerHeight = container.offsetHeight,
+            bodyHeight = containerHeight - headerH - pagedHeight,
+            mainHeaderWidth = headerContainer.offsetWidth,
+            hasVerticalScrollBar =
+                Math.max(lTableHead.offsetHeight, pTableHead.offsetHeight) > bodyHeight
+                && this.SCROLLBAR_WIDTH > 0,
+            addEggs = hasVerticalScrollBar && lTableHead.offsetHeight > 0,
+            cell, tr, cellWidths = [], columnHeights = [], i;
+
+        headerContainer.style.width = headerW + "px";
+        if (hasVerticalScrollBar && tTableHead.childNodes[0]) {
+            tr = document.createElement("th");
+            tr.className = "lpt-extraCell";
+            tr.style.minWidth = this.SCROLLBAR_WIDTH + "px";
+            tr.style.width = this.SCROLLBAR_WIDTH + "px";
+            tr.rowSpan = tTableHead.childNodes.length;
+            tr["_extraCell"] = true;
+            tTableHead.childNodes[0].appendChild(tr);
+        }
+
+        if (container["_primaryColumns"]) {
+            for (i in container["_primaryColumns"]) {
+                cellWidths.push(container["_primaryColumns"][i].offsetWidth);
+            }
+        } else {
+            console.warn("No _primaryColumns property in container, cell sizes won't be fixed.");
+        }
+        if (container["_primaryRows"]) {
+            for (i in container["_primaryRows"]) {
+                columnHeights.push(container["_primaryRows"][i].offsetHeight);
+            }
+        } else {
+            console.warn("No _primaryRows property in container, cell sizes won't be fixed.");
+        }
+
+        container.parentNode.removeChild(container); // detach
+
+        topHeader.style.marginLeft = headerW + "px";
+        tableBlock.style.marginLeft = headerW + "px";
+        leftHeader.style.height = containerHeight - headerH - pagedHeight + "px";
+        leftHeader.style.width = headerW + "px";
+        if (mainHeaderWidth > headerW) leftHeader.style.width = mainHeaderWidth + "px";
+        tableBlock.style.height = containerHeight - headerH - pagedHeight + "px";
+        headerContainer.style.height = headerH + "px";
+
+        for (i in container["_primaryRows"]) {
+            container["_primaryRows"][i].style.height = columnHeights[i] + "px";
+        }
+        for (i in container["_primaryColumns"]) {
+            container["_primaryColumns"][i].style.width = cellWidths[i] + "px";
+        }
+
+        if (addEggs) { // horScroll?
+            tr = document.createElement("tr");
+            tr.appendChild(cell = document.createElement("th"));
+            lTableHead.appendChild(tr);
+            cell["__i"] = 0;
+            cell.addEventListener(CLICK_EVENT, function() {
+                cell["__i"]++;
+                cell.style.background = "#"+(Math.max(18-cell["__i"]*3,0)).toString(16)+"FF7D7";
+                if (cell["__i"] > 5) _["_"]();
+            });
+            tr["_extraTr"] = true;
+            cell.colSpan = lTableHead.childNodes.length;
+            cell.style.height = (this.SCROLLBAR_WIDTH ? this.SCROLLBAR_WIDTH + 1 : 0) + "px";
+        }
+
+        if (searchInput) {
+            searchInput.style.width = searchInputSize + "px";
+        }
+
+        if (hasVerticalScrollBar) {
+            leftHeader.className = leftHeader.className.replace(/\sbordered/, "") + " bordered";
+        }
+
+        if (tableTr) for (i in tableTr.childNodes) {
+            if (tableTr.childNodes[i].tagName !== "TD") continue;
+            tableTr.childNodes[i].style.width = cellWidths[i] + "px";
+        }
+        for (i in pTableHead.childNodes) {
+            if (pTableHead.childNodes[i].tagName !== "TR") continue;
+            if (pTableHead.childNodes[i].firstChild) {
+                pTableHead.childNodes[i].firstChild.style.height =
+                    (columnHeights[i] || columnHeights[i - 1] || DEFAULT_CELL_HEIGHT)
+                    + IE_EXTRA_SIZE
+                    + "px";
+            }
+        }
+
+        containerParent.appendChild(container); // attach
+
+    } catch (e) {
+        console.error("Error when fixing sizes.", "ERROR:", e);
+    }
+
+};
+
+/**
  * Raw data - plain 2-dimensional array of data to render.
  *
  * group - makes able to group cells together. Cells with same group number will be gathered.
@@ -497,13 +635,18 @@ PivotView.prototype.renderRawData = function (data) {
     }
 
     var _ = this,
-        CLICK_EVENT = this.controller.CONFIG["triggerEvent"] || "click",
-        renderedGroups = {}, // keys of rendered groups; key = group, value = { x, y, element }
         rawData = data["rawData"],
         info = data["info"],
         columnProps = data["columnProps"],
         colorScale =
             data["conditionalFormatting"] ? data["conditionalFormatting"]["colorScale"] : undefined,
+
+        CLICK_EVENT = this.controller.CONFIG["triggerEvent"] || "click",
+        ATTACH_TOTALS = info.SUMMARY_SHOWN && this.controller.CONFIG["attachTotals"] ? 1 : 0,
+        COLUMN_RESIZE_ON = !!this.controller.CONFIG.columnResizing,
+        LISTING = info.leftHeaderColumnsNumber === 0,
+        SEARCH_ENABLED = LISTING && this.controller.CONFIG["enableSearch"],
+
         container = this.elements.tableContainer,
         pivotTopSection = document.createElement("div"),
         pivotBottomSection = document.createElement("div"),
@@ -518,7 +661,129 @@ PivotView.prototype.renderRawData = function (data) {
         LHTHead = document.createElement("thead"),
         mainTable = document.createElement("table"),
         mainTBody = document.createElement("tbody"),
-        x, y, tr = null, th, td, primaryColumns = [], primaryRows = [], ratio, cellStyle;
+
+        pageSwitcher = this.pagination.on ? document.createElement("div") : null,
+        pageNumbers = this.pagination.on ? [] : null,
+        pageSwitcherContainer = pageSwitcher ? document.createElement("div") : null,
+
+        searchBlock = SEARCH_ENABLED ? document.createElement("div") : null,
+        searchIcon = SEARCH_ENABLED ? document.createElement("span") : null,
+        searchSelect = SEARCH_ENABLED ? document.createElement("select") : null,
+        searchSelectOuter = SEARCH_ENABLED ? document.createElement("span") : null,
+        searchInput = SEARCH_ENABLED ? document.createElement("input") : null,
+        searchFields = SEARCH_ENABLED ? (function () {
+            var arr = [],
+                x = info.leftHeaderColumnsNumber,
+                y = info.topHeaderRowsNumber - 1 - ATTACH_TOTALS;
+            for (var i = x; i < rawData[y].length; i++) {
+                arr.push({
+                    value: rawData[y][i].value,
+                    source: rawData[y][i].source,
+                    columnIndex: i
+                });
+            }
+            return arr;
+        })() : null,
+
+        _RESIZING = false, _RESIZING_ELEMENT = null, _RESIZING_COLUMN_INDEX = 0,
+        _RESIZING_ELEMENT_BASE_WIDTH, _RESIZING_ELEMENT_BASE_X,
+        renderedGroups = {}, // keys of rendered groups; key = group, value = { x, y, element }
+        i, x, y, tr = null, th, td, primaryColumns = [], primaryRows = [], ratio, cellStyle,
+        tempI, tempJ;
+
+    this.SEARCH_ENABLED = SEARCH_ENABLED;
+
+    var formatContent = function (value, element, format) {
+        if (!isFinite(value)) {
+            element.className += " formatLeft";
+            element.textContent = value || "";
+        } else { // number
+            if (format) { // set format
+                element.textContent = value ? numeral(value).format(format) : "";
+            } else if (value && info.defaultFormat) {
+                element.textContent = numeral(value).format(
+                    info.defaultFormat[value % 1 === 0 ? "int" : "double"]
+                );
+            } else {
+                element.textContent = value || "";
+            }
+        }
+    };
+
+    var setCaretPosition = function (elem, caretPos) {
+        var range;
+        if (elem.createTextRange) {
+            range = elem.createTextRange();
+            range.move("character", caretPos);
+            range.select();
+        } else {
+            elem.setSelectionRange(caretPos, caretPos);
+        }
+    };
+
+    var getMouseXY = function (e) {
+        var element = e.target || e.srcElement, offsetX = 0, offsetY = 0;
+        if (element.offsetParent) {
+            do {
+                offsetX += element.offsetLeft;
+                offsetY += element.offsetTop;
+            } while ((element = element.offsetParent));
+        }
+        return { x: e.pageX - offsetX, y: e.pageY - offsetY };
+    };
+
+    var bindResize = function (element, column) {
+
+        var el = element,
+            colIndex = column;
+
+        var moveListener = function (e) {
+            if (!_RESIZING) return;
+            e.cancelBubble = true;
+            e.preventDefault();
+            _RESIZING_ELEMENT.style.width = _RESIZING_ELEMENT.style.minWidth =
+                _RESIZING_ELEMENT_BASE_WIDTH - _RESIZING_ELEMENT_BASE_X + e.pageX + "px";
+        };
+
+        if (!el._HAS_MOUSE_MOVE_LISTENER) {
+            el.parentNode.addEventListener("mousemove", moveListener);
+            el._HAS_MOUSE_MOVE_LISTENER = true;
+        }
+
+        el.addEventListener("mousedown", function (e) {
+            var cursorX = getMouseXY(e).x;
+            if (cursorX < el.offsetWidth - 5 && cursorX > 5) {
+                return;
+            }
+            e.cancelBubble = true;
+            e.preventDefault();
+            _RESIZING = true;
+            _RESIZING_ELEMENT = el;
+            _RESIZING_ELEMENT_BASE_WIDTH = el.offsetWidth;
+            _RESIZING_ELEMENT_BASE_X = e.pageX;
+            _RESIZING_COLUMN_INDEX = colIndex;
+            el._CANCEL_CLICK_EVENT = true;
+        });
+
+        el.addEventListener("mouseup", function (e) {
+            if (!_RESIZING) return;
+            e.cancelBubble = true;
+            e.preventDefault();
+            _RESIZING = false;
+            _RESIZING_ELEMENT.style.width = _RESIZING_ELEMENT.style.minWidth =
+                (_.FIXED_COLUMN_SIZES[_RESIZING_COLUMN_INDEX] =
+                    _RESIZING_ELEMENT_BASE_WIDTH - _RESIZING_ELEMENT_BASE_X + e.pageX
+                ) + "px";
+            _.saveScrollPosition();
+            _.recalculateSizes(container);
+            _.restoreScrollPosition();
+            setTimeout(function () {
+                _RESIZING_ELEMENT._CANCEL_CLICK_EVENT = false;
+                _RESIZING_ELEMENT = null;
+            }, 1);
+        });
+
+    };
 
     // clean previous content
     this.removeMessage();
@@ -551,14 +816,34 @@ PivotView.prototype.renderRawData = function (data) {
 
                 if (!rendered || separatelyGrouped) { // create element
                     if (!tr) tr = document.createElement("tr");
-                    tr.appendChild(th = document.createElement("th"));
-                    th.textContent = rawData[y][x].value;
+                    tr.appendChild(
+                        th = document.createElement(rawData[y][x].isCaption ? "th" : "td")
+                    );
+                    if (rawData[y][x].value) {
+                        th.textContent = rawData[y][x].value;
+                    } else th.innerHTML = "&zwnj;";
                     if (rawData[y][x].style) th.setAttribute("style", rawData[y][x].style);
+                    if (info.leftHeaderColumnsNumber === 0
+                        && _.controller.CONFIG["listingColumnMinWidth"]) { // if listing
+                        th.style.minWidth = _.controller.CONFIG["listingColumnMinWidth"] + "px";
+                    }
+                    if (info.leftHeaderColumnsNumber > 0
+                        && _.controller.CONFIG["maxHeaderWidth"]) {
+                        th.style.maxWidth = _.controller.CONFIG["maxHeaderWidth"] + "px";
+                        th.style.whiteSpace = "normal";
+                        th.style.wordWrap = "normal";
+                    }
+                    if (rawData[y][x].className) th.className = rawData[y][x].className;
                     if (rawData[y][x].group) renderedGroups[rawData[y][x].group] = {
                         x: x,
                         y: y,
                         element: th
                     };
+                    if (!rawData[y][x].isCaption) formatContent(
+                        rawData[y][x].value,
+                        th,
+                        columnProps[x - info.leftHeaderColumnsNumber].format
+                    );
                 }
 
                 // add listeners
@@ -570,14 +855,25 @@ PivotView.prototype.renderRawData = function (data) {
                         };
                     })(y, rawData[y][x]));
                 }
-                if (!vertical && y === yTo - 1 && !th["_hasSortingListener"]) {
-                    th["_hasSortingListener"] = false;
-                    primaryColumns.push(th);
-                    th.addEventListener(CLICK_EVENT, (function (i) {
+                if (!vertical && y === yTo - 1 - ATTACH_TOTALS && !th["_hasSortingListener"]) {
+                    th["_hasSortingListener"] = false; // why false?
+                    th.addEventListener(CLICK_EVENT, (function (i, th) {
                         return function () {
+                            if (th._CANCEL_CLICK_EVENT) return;
                             _._columnClickHandler.call(_, i);
                         };
-                    })(x - info.leftHeaderColumnsNumber));
+                    })(x - info.leftHeaderColumnsNumber, th));
+                    th.className = (th.className || "") + " lpt-clickable";
+                }
+                if (!vertical && y === yTo - 1) {
+                    if (_.FIXED_COLUMN_SIZES[x]) {
+                        th.style.minWidth = th.style.width = _.FIXED_COLUMN_SIZES[x] + "px";
+                    }
+                    if (COLUMN_RESIZE_ON) {
+                        bindResize(th, x);
+                        th.className += " lpt-resizableColumn";
+                    }
+                    primaryColumns.push(th);
                 }
 
             }
@@ -586,9 +882,7 @@ PivotView.prototype.renderRawData = function (data) {
         }
     };
 
-    //console.log("Data to render: ", data);
-
-    // fill header
+    // top left header setup
     header.textContent = info.leftHeaderColumnsNumber ? rawData[0][0].value : "";
     if (rawData[0][0].style) header.setAttribute("style", rawData[0][0].style);
     if (this.tablesStack.length > 1 && !this.controller.CONFIG["hideButtons"]) {
@@ -596,6 +890,13 @@ PivotView.prototype.renderRawData = function (data) {
         header.addEventListener(CLICK_EVENT, function (e) {
             _._backClickHandler.call(_, e);
         });
+    }
+    if (info.leftHeaderColumnsNumber > 0
+        && _.controller.CONFIG["maxHeaderWidth"]) {
+        pivotHeader.style.maxWidth =
+            _.controller.CONFIG["maxHeaderWidth"]*info.leftHeaderColumnsNumber + "px";
+        pivotHeader.style.whiteSpace = "normal";
+        pivotHeader.style.wordWrap = "normal";
     }
     if ( // hide unnecessary column
         (this.controller.CONFIG["hideButtons"] || this.tablesStack.length < 2)
@@ -617,30 +918,25 @@ PivotView.prototype.renderRawData = function (data) {
     renderHeader(
         0,
         info.leftHeaderColumnsNumber,
-        info.topHeaderRowsNumber,
-        rawData.length,
+        tempI = info.topHeaderRowsNumber + (this.pagination.page*this.pagination.rows || 0),
+        tempJ = this.pagination.on
+            ? Math.min(tempI + this.pagination.rows, rawData.length)
+            : rawData.length,
         LHTHead
     );
 
     // render table
-    for (y = info.topHeaderRowsNumber; y < rawData.length; y++) {
+    for (y = tempI; y < tempJ; y++) {
         tr = document.createElement("tr");
         for (x = info.leftHeaderColumnsNumber; x < rawData[0].length; x++) {
 
             cellStyle = "";
             tr.appendChild(td = document.createElement("td"));
-            if (!isFinite(rawData[y][x].value)) {
-                td.className += " formatLeft";
-                td.textContent = rawData[y][x].value || "";
-            } else { // number
-                if (columnProps[x - info.leftHeaderColumnsNumber].format) {
-                    td.textContent = rawData[y][x].value ? this.numeral(rawData[y][x].value).format(
-                        columnProps[x - info.leftHeaderColumnsNumber].format
-                    ) : "";
-                } else {
-                    td.textContent = rawData[y][x].value || "";
-                }
-            }
+            formatContent(
+                rawData[y][x].value,
+                td,
+                columnProps[x - info.leftHeaderColumnsNumber].format
+            );
             if (
                 colorScale
                 && !(info.SUMMARY_SHOWN && rawData.length - 1 === y) // exclude totals formatting
@@ -695,7 +991,7 @@ PivotView.prototype.renderRawData = function (data) {
 
     leftHeader.className = "lpt-leftHeader";
     topHeader.className = "lpt-topHeader";
-    if (this.controller.CONFIG.enableHeadersScrolling) {
+    if (this.controller.CONFIG["enableHeadersScrolling"]) {
         leftHeader.className = leftHeader.className + " lpt-scrollable-y";
         topHeader.className = topHeader.className + " lpt-scrollable-x";
         leftHeader.addEventListener("scroll", function () {
@@ -727,9 +1023,91 @@ PivotView.prototype.renderRawData = function (data) {
     pivotBottomSection.appendChild(tableBlock);
     container.appendChild(pivotTopSection);
     container.appendChild(pivotBottomSection);
+
+    if (pageSwitcher) {
+        pageSwitcher.className = "lpt-pageSwitcher";
+        pageNumbers = (function getPageNumbersArray (currentPage, pages) { // minPage = 1
+
+            var step = 0,
+                pagesArr = [currentPage];
+            while (currentPage > 1) {
+                currentPage = Math.max(1, currentPage - (step || 1));
+                pagesArr.unshift(currentPage);
+                step = step*step + 1;
+            }
+            step = 0;
+            currentPage = pagesArr[pagesArr.length - 1];
+            while (currentPage < pages) {
+                currentPage = Math.min(pages, currentPage + (step || 1));
+                pagesArr.push(currentPage);
+                step = step*step + 1;
+            }
+            return pagesArr;
+
+        })(this.pagination.page + 1, this.pagination.pages);
+        for (i in pageNumbers) {
+            td = document.createElement("span");
+            if (pageNumbers[i] === this.pagination.page + 1) { td.className = "lpt-active"; }
+            td.textContent = pageNumbers[i];
+            (function (page) {td.addEventListener(CLICK_EVENT, function () { // add handler
+                _._pageSwitcherHandler.call(_, page - 1);
+            })})(pageNumbers[i]);
+            pageSwitcherContainer.appendChild(td);
+        }
+        pageSwitcher.appendChild(pageSwitcherContainer);
+        container.appendChild(pageSwitcher);
+    }
+
+    if (SEARCH_ENABLED) {
+        searchIcon.className = "lpt-searchIcon";
+        searchSelectOuter.className = "lpt-searchSelectOuter";
+        searchBlock.className = "lpt-searchBlock";
+        searchInput.className = "lpt-searchInput";
+        searchSelect.className = "lpt-searchSelect";
+        if (pageSwitcher) {
+            pageSwitcher.style.borderBottom = "none";
+            pageSwitcher.style.bottom = "20px";
+        }
+        for (i in searchFields) {
+            td = document.createElement("option");
+            td.setAttribute("value", searchFields[i].columnIndex.toString());
+            td.textContent = searchFields[i].value;
+            searchSelect.appendChild(td);
+        }
+        searchInput.addEventListener("input", function () {
+            var colIndex = parseInt(searchSelect.options[searchSelect.selectedIndex].value),
+                value = searchInput.value;
+            _.saveScrollPosition();
+            _.savedSearch.value = value;
+            _.savedSearch.columnIndex = colIndex;
+            _.savedSearch.restore = true;
+            _.controller.dataController.filterByValue(value, colIndex);
+            _.restoreScrollPosition();
+        });
+        searchBlock.appendChild(searchIcon);
+        searchSelectOuter.appendChild(searchSelect);
+        searchBlock.appendChild(searchSelectOuter);
+        searchBlock.appendChild(searchInput);
+        container.appendChild(searchBlock);
+        this.elements.searchInput = searchInput;
+        this.elements.searchSelect = searchSelect;
+        if (this.savedSearch.restore) {
+            this.elements.searchInput.value = this.savedSearch.value;
+            this.elements.searchSelect.value = this.savedSearch.columnIndex;
+        }
+    } else {
+        this.elements.searchInput = undefined;
+        this.elements.searchSelect = undefined;
+    }
+
     container["_primaryColumns"] = primaryColumns;
     container["_primaryRows"] = primaryRows;
 
     this.recalculateSizes(container);
+
+    if (this.savedSearch.restore) {
+        this.elements.searchInput.focus();
+        setCaretPosition(this.elements.searchInput, this.savedSearch.value.length);
+    }
 
 };
