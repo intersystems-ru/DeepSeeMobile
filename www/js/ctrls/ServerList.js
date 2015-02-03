@@ -1,7 +1,12 @@
-define([], function(){
+define([
+        'Language'
+], function (Lang) {
     return function(){
          var servers;
          if (localStorage.servers) servers = JSON.parse(localStorage.servers);
+
+         $("#txtSelServer").text(Lang.getText("selServer"));
+         $("#btnDone").text(Lang.getText("done"));
 
          if (servers) {
             var $lst = $("#lstServers");
@@ -9,7 +14,7 @@ define([], function(){
                 var idx = (i+1).toString();
                 var name = servers[i].name;
                 if (!name) name = servers[i].ip;
-                var $item = $('<li id="itemServer' + idx + '" class="table-view-cell filter-list-item" style="text-overflow: ellipsis">' + name + '<button id="btnEditServer' + idx + '" class="btn"><span class="icon icon-edit"></span>Edit</button><button id="btnDeleteServer' + idx + '" class="btn btn-negative" style="display:none"><span class="icon icon-trash"></span>Delete</button></li>');
+                var $item = $('<li id="itemServer' + idx + '" class="table-view-cell filter-list-item" style="text-overflow: ellipsis">' + name + '<button id="btnEditServer' + idx + '" class="btn"><span class="icon icon-edit"></span>' + Lang.getText("edit") + '</button><button id="btnDeleteServer' + idx + '" class="btn btn-negative" style="display:none"><span class="icon icon-trash"></span>' + Lang.getText("delete") +'</button></li>');
                 $item.attr("serverIndex", i.toString()).appendTo($lst);
                 if (localStorage.currentServerId == i) {
                     $item.addClass("active");
