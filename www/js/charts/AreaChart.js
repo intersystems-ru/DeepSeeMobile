@@ -17,6 +17,9 @@ define(['charts/ChartBase'], function (cb) {
                 categories: [],
                 title: {
                     text: ""
+                },
+                labels: {
+                    rotation: -45
                 }
             },
             yAxis: {
@@ -27,7 +30,7 @@ define(['charts/ChartBase'], function (cb) {
             legend:{enabled:true},
             plotOptions: {
                 series: {
-                    stacking: 'normal',
+                stacking: 'normal',
                     marker: {
                         enabled: false
                     }
