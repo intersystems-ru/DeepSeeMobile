@@ -1,4 +1,6 @@
-define([], function () {
+define([
+    'Language'
+], function (Lang) {
     function PivotWidget(conf) {
         var hasDiv = false;
         var showDrilldown = false;
@@ -7,7 +9,8 @@ define([], function () {
         this.renderWidget = function (isDrillDown) {
 
             if (this.pivot) {
-                this.pivot.changeBasicMDX(this.datasource.data.MDX);
+                var newMdx = this.datasource.data.MDX
+                if (this.pivot.getActualMDX() != newMdx) this.pivot.changeBasicMDX(newMdx);
                 //this.pivot.dataSource.BASIC_MDX =  this.datasource.data.MDX;
                 this.pivot.refresh();
                 return;
@@ -36,11 +39,13 @@ define([], function () {
                             $("#btnMainBack").show();
                         }
                     },
+                    columnResizing: false,
                     hideButtons: true,
                     showSummary: true,
                     enableHeadersScrolling: true,
                     loadingMessageHTML: '<div class="loader"></div>',
                     //triggerEvent: "click",
+                    locale: Lang.currentLocale(),
                     formatNumbers: "#,###.##"
                 }
 
