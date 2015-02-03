@@ -2,7 +2,7 @@ define(['charts/ChartBase'], function (cb) {
     var o = {
         type: "highcharts",
             callback: function (d) {
-                this.config.storedCats = [];
+                //this.config.storedCats = [];
                 this.config.c = null;
                 this.config.p = null;
                     var data = d.data;
@@ -34,7 +34,7 @@ define(['charts/ChartBase'], function (cb) {
             },
         config: {
 
-            storedCats: [],
+            //storedCats: [],
             requestDrilldown: function(point) {
 
                 var mc = require("MessageCenter");
@@ -49,7 +49,9 @@ define(['charts/ChartBase'], function (cb) {
                         if (d.data.Data.length == 0) return;
 
                         var data = d.data;
-                        this.storedCats.push(this.c.xAxis[0].categories);
+                        if (!point.series.chart.__storedCats) point.series.chart.__storedCats = [];
+                        point.series.chart.__storedCats.push(this.c.xAxis[0].categories);
+                        //this.storedCats.push(this.c.xAxis[0].categories);
                         this.c.xAxis[0].categories = [];
                         for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                             this.c.xAxis[0].categories.push(data.Cols[1].tuples[i].caption.toString());
@@ -73,7 +75,8 @@ define(['charts/ChartBase'], function (cb) {
                 var self = this;
                 mc.publish("data_requested:drilldown", {
                     cubeName: self.p.cube,
-                    path: self.p.path
+                    path: self.p.path,
+                    widget: self.c.widget
                 });
                 mc = null;
             },
@@ -98,7 +101,8 @@ define(['charts/ChartBase'], function (cb) {
                 margin: 75,
                 events: {
                     drillup: function (e) {
-                        this.xAxis[0].categories = o.config.storedCats.pop();
+                        this.xAxis[0].categories = e.target.__storedCats.pop();
+                        //this.xAxis[0].categories = o.config.storedCats.pop();
                     }
                 }
             },
