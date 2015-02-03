@@ -50,14 +50,14 @@ define([], function () {
         }
     }
 
-    ChartBase.prototype.fixData = function(tempData) {
+    ChartBase.fixData = function(tempData) {
         for (var g = 0; g < tempData.length; g++) {
             if (!tempData[g].y) tempData[g].y = 0;
             if (tempData[g].y == "") tempData[g].y = 0;
         }
     }
 
-    ChartBase.prototype.getMinValue = function(data) {
+    ChartBase.getMinValue = function(data) {
         var min = Infinity;
         for (var i = 0; i < data.length; i++) {
             if (data[i] < min) min = data[i];
@@ -68,7 +68,7 @@ define([], function () {
     ChartBase.prototype.multivalueDataConvertor = function(config, d) {
         var data = d.data;
 
-        config.yAxis.min = this.getMinValue(data.Data);
+        config.yAxis.min = ChartBase.getMinValue(data.Data);
 
         config.series = [];
         config.xAxis.categories = [];
@@ -91,7 +91,7 @@ define([], function () {
                         });
                         k++;
                     }
-                    this.fixData(tempData);
+                    ChartBase.fixData(tempData);
                     config.series.push({
                         data: tempData,
                         name: data.Cols[0].tuples[t].caption + "/" + data.Cols[0].tuples[t].children[c].caption,
@@ -110,7 +110,7 @@ define([], function () {
                         path: data.Cols[1].tuples[i].path
                     });
                 }
-                this.fixData(tempData);
+                ChartBase.fixData(tempData);
                 config.series.push({
                     data: tempData,
                     name: data.Cols[0].tuples[j].caption,
@@ -143,7 +143,7 @@ define([], function () {
 
     ChartBase.prototype.multivalueTimeDataConvertor = function(config, d) {
         var data = d.data;
-        config.yAxis.min = this.getMinValue(data.Data);
+        config.yAxis.min = ChartBase.getMinValue(data.Data);
         config.series = [];
         config.xAxis.categories = [];
         config.series = [];
