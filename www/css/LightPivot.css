@@ -48,12 +48,12 @@
     transition: left .5s ease;
 }
 
-.lpt tr:hover td {
+.lpt .lpt-tableBlock tr:hover td {
     box-shadow: inset 0 0 30px #FFF7D7;
 }
 
-.lpt table td:hover {
-    box-shadow: inset 0 0 20px #FEA;
+.lpt .lpt-tableBlock table td:hover {
+    box-shadow: inset 0 0 30px #FEA;
 }
 
 /* DeepSee theme */
@@ -89,9 +89,10 @@
 .lpt th, .lpt td {
     white-space: nowrap;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
-.lpt td {
+.lpt .lpt-tableBlock td {
     text-align: right;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -100,6 +101,7 @@
 }
 
 .lpt .lpt-topSection, .lpt .lpt-bottomSection {
+    border-right: 1px solid rgb(208, 208, 208);
     position: relative;
     overflow: hidden;
 }
@@ -139,11 +141,6 @@
     background: #FFF7D7;
 }
 
-.lpt .lpt-topHeader tr:last-child th:hover {
-    cursor: pointer;
-    background: #FFF7D7;
-}
-
 .lpt .lpt-tableBlock {
     position: relative;
     overflow: auto;
@@ -174,9 +171,50 @@
     /*border-bottom: none;*/
 }
 
-/*.lpt .lpt-leftHeader table {*/
-    /*margin-bottom: 10em;*/
-/*}*/
+.lpt .lpt-pageSwitcher {
+    position: absolute;
+    box-sizing: border-box;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    font-size: 14px;
+    border: 1px solid rgb(208, 208, 208);
+    background: #F0F0F0;
+}
+
+.lpt .lpt-pageSwitcher > div {
+    position: relative;
+    height: 100%;
+    text-align: center;
+}
+
+.lpt .lpt-pageSwitcher > div > span:first-child {
+    border-left: 1px solid rgb(208, 208, 208);
+}
+
+.lpt .lpt-pageSwitcher > div > span {
+    cursor: pointer;
+    padding: 0 5px 0 5px;
+    display: inline-block;
+    min-height: 100%;
+    border-right: 1px solid rgb(208, 208, 208);
+}
+
+.lpt .lpt-pageSwitcher > div > span:hover {
+    background: #FFF7D7;
+}
+
+.lpt-active {
+    background: #FFF7D7;
+}
+
+.lpt-sortDesc:before {
+    content: "\25bc ";
+}
+
+.lpt-sortAsc:before {
+    content: "\25b2 ";
+}
 
 /* lpt-dataWait */
 .lpt .lpt-hoverMessage {
@@ -312,4 +350,124 @@
         -o-transform: scaleY(1.0);
         transform: scaleY(1.0);
     }
+}
+
+.lpt .lpt-tableBlock::-webkit-scrollbar-corner {
+    background-color: #F0F0F0;
+}
+
+.lpt-clickable:hover {
+    cursor: pointer;
+    background: #FFF7D7;
+}
+
+.lpt .lpt-extraCell {
+    padding: 0 !important;
+}
+
+.lpt-searchBlock {
+    position: absolute;
+    box-sizing: border-box;
+    overflow: hidden;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    font-size: 14px;
+    border: 1px solid rgb(208, 208, 208);
+    background: #F0F0F0;
+}
+
+.lpt-searchSelectOuter {
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    margin: 1px 0 0 5px;
+    overflow: hidden;
+    vertical-align: top;
+    background: #F0F0F0;
+    border: 1px solid #D0D0D0;
+    border-top: none;
+    border-bottom: none;
+    border-radius: 10px;
+}
+
+.lpt-searchSelectOuter:after {
+    content: "\25bc";
+    position: absolute;
+    top: 0;
+    right: 5px;
+    color: gray;
+}
+
+.lpt-searchSelectOuter select {
+    font-size: 13px;
+    padding: 0 0 0 2px;
+    width: 170px;
+    vertical-align: top;
+    height: 17px;
+    max-height: 20px;
+    background: transparent;
+    outline: medium none;
+    border: 0;
+    cursor: pointer;
+}
+
+/* relative positioning is incorrect here */
+.lpt-resizableColumn {
+
+}
+
+.lpt-searchIcon {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    margin: 1px 0 0 1px;
+    width: 17px;
+    height: 17px;
+    border-radius: 9px;
+    background: #ffffff;
+    border: 1px solid rgb(208, 208, 208);
+}
+
+.lpt-searchIcon:before {
+    position: absolute;
+    content: "";
+    left: 1px;
+    top: 1px;
+    width: 4px;
+    height: 4px;
+    border: 3px solid grey;
+    border-radius: 5px;
+}
+
+.lpt-searchIcon:after {
+    position: absolute;
+    content: "";
+    left: 9px;
+    top: 7px;
+    width: 3px;
+    height: 6px;
+    background: grey;
+    border-radius: 1px;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.lpt-searchInput {
+    display: inline-block;
+    box-sizing: border-box;
+    font-size: 13px;
+    padding: 0 4px 0 4px;
+    margin: 1px 0 0 5px;
+    border-radius: 10px;
+    height: 17px;
+    background: #FFFFFF;
+    border: 1px solid #D0D0D0;
+    border-top: none;
+    border-bottom: none;
+    outline: none;
 }
