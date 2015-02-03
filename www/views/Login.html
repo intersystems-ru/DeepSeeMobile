@@ -1,7 +1,11 @@
 <div id="loginScreen">
     <header class="bar bar-nav">
+        <a id="btnLang" class="btn btn-link btn-nav pull-left" style="padding-right: 16px;padding-left: 16px" href="#langSelector">
+            <span class="icon fa fa-book"></span>
+            <span id="lang"></span>
+        </a>
         <h1 class="title">InterSystems</h1>
-        <div class="pull-right" style="font-size: x-small; color:#ffffff">1.0</div>
+        <div class="pull-right" style="font-size: x-small; color:#ffffff">1.09</div>
     </header>
     <div class="content" style="left:0px; height: 100%">
         <div style="max-height: 200px; width: 100%; text-align: center;">
@@ -33,6 +37,25 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="langSelector" class="modal">
+        <header class="bar bar-nav">
+            <a class="icon icon-close pull-right" href="#langSelector"></a>
+            <h1 class="title">Select language</h1>
+        </header>
+
+        <div class="content" style="left:0px; height: 100%">
+            <div class="content-padded">
+                <div class="card">
+                    <ul class="table-view">
+                        <li class="table-view-cell">English</li>
+                        <li class="table-view-cell">Deutsch</li>
+                        <li class="table-view-cell">Russian</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
