@@ -13,9 +13,9 @@ define([], function () {
                 var self = this;
                 if (Highcharts) {
                     if (this.config.timechart == 1)
-                        $(w_selector).highcharts('StockChart', this.config, function(chart){self.chart = chart});
+                        $(w_selector).highcharts('StockChart', this.config, function(chart){self.chart = chart; chart.widget = self;});
                     else
-                        $(w_selector).highcharts(this.config, function(chart){self.chart = chart});
+                        $(w_selector).highcharts(this.config, function(chart){self.chart = chart; chart.widget = self;});
                     $("svg text").filter(function(){return $(this).html()=='Highcharts.com'}).remove();
                 }
             }
