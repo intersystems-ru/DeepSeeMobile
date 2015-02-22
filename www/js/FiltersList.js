@@ -8,13 +8,24 @@ define(['Filter'], function (Filter) {
         var _filters = {};
         var self = this;
         this.hasFilters = function () {
-            return (_filters && (Object.keys(_filters).length != 0));
+            if (!_filters) return false;
+            for (var f in _filters) {
+                if (_filters[f].value != "") {
+                    return true;
+                }
+            }
+            return false;
+            //return (_filters && (Object.keys(_filters).length != 0));
         };
         this.getFilter = function (path) {
             return _filters[path] ? _filters[path] : "";
         };
         this.remove = function(path){
-            delete _filters[path];
+            if (_filters[path]) {
+                _filters[path].value = "";
+                _filters[path].valueName = "";
+            }
+            //delete _filters[path];
             if(options.onSetFilter) options.onSetFilter.call(options.w_obj);
         }
         this.getAll = function () {
