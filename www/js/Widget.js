@@ -67,7 +67,11 @@ define([
          */
         this.chart = '';
         this.subs = [];
-
+        this.pivotName = null;
+        this.pivotData = null;
+        this.drillLevel = 0;
+        this.drills = [];
+        this.controls = [];
         /**
          * @var {string} module:Widget#cube Cube name used by widget
          */
@@ -109,14 +113,14 @@ define([
                         }
                     }
                 }
-                if (this.controls) {
+                /*if (this.controls) {
                     for (var i = 0; i< this.controls.length; i++) {
                         if (this.controls[i].action == "applyFilter") {
                             retVal += ' %FILTER {' + this.controls[i].targetProperty +  "." + this.controls[i].value + "} ";
                         }
 
                     }
-                }
+                }*/
                 return {
                     data: {
                         MDX: retVal
@@ -141,6 +145,20 @@ define([
         if (_.has(opts, 'type') && _.has(typesMap, opts.type)) {
             _.extend(this, new typesMap[opts.type](opts))
         };
+
+        /**
+         * Callback, fired when pivot data acquired
+         * @function module:Widget#onPivotDataAcquired
+         * @private
+         *
+         */
+        this.onPivotDataAcquired = function (d) {
+            var data = d.data;
+            if (typeof data != "object") data = JSON.parse(d);
+            this.pivotData = data;
+        };
+
+
         /**
          * Callback, fired when data acquired
          * @function module:Widget#onDataAcquired
@@ -184,10 +202,18 @@ define([
         return "Widget" + this.id;
     };
     Widget.prototype.init = function (opts) {
+        this.pivotName = opts.datasource.pivot;
+
         this.subs.push(mc.subscribe("data_acquired:widget" + this.id, {
             subscriber: this,
             callback: this.onDataAcquired
         }));
+
+        this.subs.push(mc.subscribe("pivotdata_acquired:widget" + this.id, {
+            subscriber: this,
+            callback: this.onPivotDataAcquired
+        }));
+
         mc.subscribe("clear:widgets", {
             subscriber: this,
             callback: this.removeRefs,
@@ -233,9 +259,16 @@ define([
      * @fires module:MessageCenter#data_requested
      */
     Widget.prototype.requestData = function () {
+        this.drillLevel = 0;
+        this.drills = [];
         mc.publish("data_requested:widget" + this.id, {
             data: this.datasource.data
         });
+        if (this.pivotName) {
+            mc.publish("pivotdata_requested:widget" + this.id, {
+                data: this.pivotName
+            });
+        }
     };
 
     /**
