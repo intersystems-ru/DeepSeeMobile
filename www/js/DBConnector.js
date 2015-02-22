@@ -39,11 +39,29 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             return d;
         }
         this.mode = "ONLINE";
-        this.drillMDX = function (str, path) {
+        this.drillMDX = function (str, path, widget) {
             var pos = str.indexOf(" ON 0,");
             if (pos == -1) pos = 1;
             var row = str.substring(pos + 6, str.indexOf(" ON 1"));
-            str = str.replace(row, path + ".Children");
+            var customDrill = "";
+            if (widget) {
+                var drilldownSpec = "";
+                if (widget.pivotData) if (widget.pivotData.rowAxisOptions) if (widget.pivotData.rowAxisOptions.drilldownSpec) drilldownSpec = widget.pivotData.rowAxisOptions.drilldownSpec;
+                if (drilldownSpec) {
+                    var drills = drilldownSpec.split("^");
+                    if (drills.length != 0) {
+                        if (drills[widget.drillLevel]) customDrill = drills[widget.drillLevel];
+                        for (var i = 0; i < widget.drills.length; i++) {
+                            if (drills[i]) str += " %Filter " + widget.drills[i];
+                        }
+                    }
+                }
+            }
+            if (customDrill) {
+                str = str.replace(row, customDrill);
+                str += " %Filter " + path;
+            } else str = str.replace(row, path + ".Children");
+
             return str;
         }
         /**
@@ -101,7 +119,35 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 opts.success(mocks.MDXs[opts.data.MDX]);
             }
 
-        }
+        };
+
+        /**
+         * Does ajax request for pivotdata from server
+         * @function
+         * @name module:DBConnector#acquirePivotData
+         * @fires module:MessageCenter#*_pivotdata_acquired
+         * @listens module:MessageCenter#pivotdata_requested
+         */
+        this.acquirePivotData = function (args) {
+            var requester = args.target;
+            var opts = $.extend({
+                url: App.settings.server+"/DataSource?Namespace=" + App.settings.namespace,
+                type: "POST",
+                contentType: "text/plain;charset=UTF-8",
+                success: function (d) {
+                    if (d) {
+                        d = parseJSON(d) || d;
+                    }
+                    mc.publish("pivotdata_acquired:" + requester, {
+                        data: d
+                    });
+                    return 1;
+                }
+            }, args.data);
+            opts.data = JSON.stringify({DataSource: args.data.data});
+            $.ajax(opts);
+        };
+
         /**
          * Acquires filter list for cube from server
          * @function
@@ -109,7 +155,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @fires module:MessageCenter#filters_acquired
          * @listens module:MessageCenter#filters_requested
          */
-        this.acquireFilters = function (args) {
+        /*this.acquireFilters = function (args) {
             var filter_opts = {
                 //username: App.settings.username,
                 //password: App.settings.password,
@@ -138,7 +184,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             } else {
                 filter_opts.success(mocks.filters);
             }
-        };
+        };*/
         /**
          * Acquire possible values for selected filter
          * @function
@@ -146,7 +192,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
          * @fires module:MessageCenter#filter_list_acquired[path]
          * @listens module:MessageCenter#filter_list_requested
          */
-        this.acquireFilterValues = function (args) {
+       /* this.acquireFilterValues = function (args) {
             var path = args.target,
                 name = args.data.name,
                 cube = args.data.cube;
@@ -177,7 +223,7 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 }
             }
             $.ajax(filter_list_opts);
-        };
+        };*/
         this.acquireDrilldown = function (args) {
 
             var cubeName = args.cubeName,
@@ -185,7 +231,11 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 widget = args.widget || null;
 
             var MDX = "SELECT NON EMPTY " + path + ".children ON 1 FROM [" + cubeName + "]";
-            if (widget) MDX = this.drillMDX(widget.datasource.data.MDX, path);
+
+
+            if (widget) {
+                MDX = this.drillMDX(widget.datasource.data.MDX, path, widget);
+            }
             args.target = "drilldown1";
             args.data = {
                 data: {
@@ -250,14 +300,18 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
             subscriber: this,
             callback: this.acquireData
         });
-        mc.subscribe("filters_requested", {
+        mc.subscribe("pivotdata_requested", {
+            subscriber: this,
+            callback: this.acquirePivotData
+        });
+        /*mc.subscribe("filters_requested", {
             subscriber: this,
             callback: this.acquireFilters
         });
         mc.subscribe("filter_values_requested", {
             subscriber: this,
             callback: this.acquireFilterValues
-        });
+        });*/
         mc.subscribe("data_requested:dashboard_list", {
             subscriber: this,
             callback: this.acquireDashboardList
