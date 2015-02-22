@@ -14,6 +14,7 @@ define(['charts/ChartBase'], function (cb) {
                     };
                     this.config.xAxis.categories = [];
                     this.config.series = [];
+
                     for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                         this.config.xAxis.categories.push(data.Cols[1].tuples[i].caption.toString());
                         data.Data[i] = {
@@ -23,7 +24,7 @@ define(['charts/ChartBase'], function (cb) {
                             path: data.Cols[1].tuples[i].path
                         };
                     };
-
+                    require("charts/ChartBase").fixData(data.Data);
                     this.config.series = [{
                         colorByPoint: true,
                         data: data.Data,
@@ -40,6 +41,7 @@ define(['charts/ChartBase'], function (cb) {
                 var mc = require("MessageCenter");
                 this.p = point;
                 this.c = point.series.chart;
+                var self = this;
 
                 mc.subscribe("data_acquired:drilldown", {
                     subscriber: this,
@@ -47,12 +49,19 @@ define(['charts/ChartBase'], function (cb) {
                     callback: function (d) {
                         if (!d.data.Data) return;
                         if (d.data.Data.length == 0) return;
+                        var hasValue = false;
+                        for (var i = 0; i < d.data.Data.length; i++) if (d.data.Data[i]) {
+                            hasValue = true;
+                            break;
+                        }
+                        if (!hasValue) return;
 
                         var data = d.data;
-                        if (!point.series.chart.__storedCats) point.series.chart.__storedCats = [];
-                        point.series.chart.__storedCats.push(this.c.xAxis[0].categories);
+                        if (!self.c.widget.__storedCats) self.c.widget.__storedCats = [];
+                        self.c.widget.__storedCats.push(this.c.xAxis[0].categories);
                         //this.storedCats.push(this.c.xAxis[0].categories);
                         this.c.xAxis[0].categories = [];
+
                         for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                             this.c.xAxis[0].categories.push(data.Cols[1].tuples[i].caption.toString());
                             data.Data[i] = {
@@ -62,7 +71,9 @@ define(['charts/ChartBase'], function (cb) {
                                 path: data.Cols[1].tuples[i].path
                             };
                         };
-
+                        require("charts/ChartBase").fixData(data.Data);
+                        self.c.widget.drillLevel++;
+                        self.c.widget.drills.push(self.p.path);
                         this.c.addSeriesAsDrilldown(this.p,{
                             colorByPoint: true,
                             data: data.Data,
@@ -72,7 +83,12 @@ define(['charts/ChartBase'], function (cb) {
                     }
                 });
 
-                var self = this;
+
+               /* var path = self.p.path;
+                if (self.c.widget.pivotData)
+                    if (self.c.widget.pivotData.rowAxisOptions)
+                        if (self.c.widget.pivotData.rowAxisOptions.drilldownSpec) path = self.c.widget.pivotData.rowAxisOptions.drilldownSpec;
+*/
                 mc.publish("data_requested:drilldown", {
                     cubeName: self.p.cube,
                     path: self.p.path,
@@ -101,7 +117,9 @@ define(['charts/ChartBase'], function (cb) {
                 margin: 75,
                 events: {
                     drillup: function (e) {
-                        this.xAxis[0].categories = e.target.__storedCats.pop();
+                        this.xAxis[0].categories = this.widget.__storedCats.pop();
+                        this.widget.drills.pop();
+                        this.widget.drillLevel--;
                         //this.xAxis[0].categories = o.config.storedCats.pop();
                     }
                 }
