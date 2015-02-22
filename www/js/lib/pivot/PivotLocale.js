@@ -8,8 +8,12 @@
 var PivotLocale = function (locale) {
 
     this.LOCALE = "";
+    this.DEFAULT_LOCALE = "en";
 
-    this.setLocale(locale || navigator.language);
+    this.setLocale(locale
+                   || navigator.language
+                   || (navigator["browserLanguage"]
+                   || this.DEFAULT_LOCALE).substring(0, 2));
 
 };
 
@@ -19,7 +23,22 @@ var PivotLocale = function (locale) {
  * @type {{ru: string, en: string, de: string}[]}
  */
 PivotLocale.prototype.LOCALES = [
-    { "ru": "Всего", "en": "Total", "de": "Summe" }
+    { "ru": "Всего", "en": "Total", "de": "Summe" },
+    {
+        "ru": "Невозможно отобразить данные",
+        "en": "Unable to render data",
+        "de": "Daten können nicht rendern"
+    },
+    {
+        "ru": "Неправильные данные для отображения.",
+        "en": "Invalid data to display.",
+        "de": "Nicht korrekt Informationen angezeigt werden soll."
+    },
+    {
+        "ru": "Возникла ошибка при получении данных с сервера.",
+        "en": "Error while trying to retrieve data from server.",
+        "de": "Beim Abrufen der Daten vom Server ist ein Fehler aufgetreten."
+    }
 ];
 
 /**

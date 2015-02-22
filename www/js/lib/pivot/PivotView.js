@@ -630,7 +630,7 @@ PivotView.prototype.recalculateSizes = function (container) {
 PivotView.prototype.renderRawData = function (data) {
 
     if (!data["rawData"] || !data["rawData"][0] || !data["rawData"][0][0]) {
-        this.displayMessage("<h1>Unable to render data</h1><p>" + JSON.stringify(data) + "</p>");
+        this.displayMessage("<h1>" + pivotLocale.get(1) + "</h1><p>" + JSON.stringify(data) + "</p>");
         return;
     }
 
@@ -792,7 +792,7 @@ PivotView.prototype.renderRawData = function (data) {
     var renderHeader = function (xFrom, xTo, yFrom, yTo, targetElement) {
 
         var vertical = targetElement === LHTHead,
-            rendered, separatelyGrouped;
+            rendered, separatelyGrouped, tr, th, div;
 
         for (y = yFrom; y < yTo; y++) {
             for (x = xFrom; x < xTo; x++) {
@@ -819,9 +819,11 @@ PivotView.prototype.renderRawData = function (data) {
                     tr.appendChild(
                         th = document.createElement(rawData[y][x].isCaption ? "th" : "td")
                     );
+                    div = document.createElement("div");
                     if (rawData[y][x].value) {
-                        th.textContent = rawData[y][x].value;
-                    } else th.innerHTML = "&zwnj;";
+                        div.textContent = rawData[y][x].value;
+                    } else div.innerHTML = "&zwnj;";
+                    th.appendChild(div);
                     if (rawData[y][x].style) th.setAttribute("style", rawData[y][x].style);
                     if (info.leftHeaderColumnsNumber === 0
                         && _.controller.CONFIG["listingColumnMinWidth"]) { // if listing
@@ -968,7 +970,7 @@ PivotView.prototype.renderRawData = function (data) {
             }
 
             // apply style
-            if (cellStyle) td.setAttribute("style", cellStyle);
+            if (cellStyle) td.setAttribute("style", (td.getAttribute("style") || "") + cellStyle);
             // add handlers
             td.addEventListener(CLICK_EVENT, (function (x, y, cell) {
                 return function (event) {
