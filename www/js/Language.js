@@ -21,7 +21,8 @@ define([], function () {
             delete: "Delete",
             done: "Done",
             dismissFilters: "Dismiss filters",
-            accept: "Accept"
+            accept: "Accept",
+            folder: "Folder"
         },
         de: {
             home: "Zuhause",
@@ -43,7 +44,8 @@ define([], function () {
             delete: "Löschen",
             done: "Gemacht",
             dismissFilters: "Filter entlassen",
-            accept: "Akzeptieren"
+            accept: "Akzeptieren",
+            folder: "Mappe"
         },
         ru: {
             home: "Домой",
@@ -65,7 +67,8 @@ define([], function () {
             delete: "Удалить",
             done: "Готово",
             dismissFilters: "Сбросить фильтры",
-            accept: "Принять"
+            accept: "Принять",
+            folder: "Папка"
         },
         currentLocale: function() {
             var locale = localStorage.currentLocale;
