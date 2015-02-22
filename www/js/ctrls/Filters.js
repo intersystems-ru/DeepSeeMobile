@@ -46,11 +46,20 @@ define([
             return "FiltersView";
         };
 
+
+        this.getFilter = function(path) {
+            for (var i = 0; i < App.filters.length; i++) if (App.filters[i].path == path) {
+                if (App.filters[i].widget) if (App.filters[i].widget == App.a.widgets[App.a.activeWidget])
+                    return App.filters[i];
+            }
+            return null;
+        }
         /**
          * Does rendering of filters
          * @function module:FiltersView#render
          */
         this.render = function () {
+            //var self = this;
             $("#filters header h1").text(Lang.getText("filters"));
             $("#btnDismissFilters").text(Lang.getText("dismissFilters"));
             $("#btnFilterAccept").text(Lang.getText("accept"));
@@ -68,7 +77,37 @@ define([
                 $(holder).append(list);
                 var infoItem = $(html).find(".filter-list-info-item").clone();
                 $(holder).find(".filter-list-info").append(infoItem);
-                var filtersNum = App.filters.length;
+                var w = App.a.widgets[App.a.activeWidget];
+                var filtersNum = w.controls.length;
+                for (var i = 0; i < filtersNum; i++) if (w.controls[i].action == "applyFilter") {
+                    var listItem = $(html).find(".filter-list-item").clone();
+                    listItem.html(
+                        listItem.html().replace(/{{filterName}}/, w.controls[i].label)
+                    );
+                    var flt = w.filters.getFilter(w.controls[i].targetProperty);
+                    if (!flt) continue;
+                    //if (!flt)
+                    //var flt = w.getFilter(w.controls[i].targetProperty);
+                    listItem.data("filter", flt);
+
+
+                    var fv = flt.valueName || flt.value;
+                    if (fv) {
+                        listItem.html(listItem.html().replace(/{{filterValue}}/, fv));
+                        listItem.find(".toggle").addClass("active");
+                    } else {
+                        listItem.html(listItem.html().replace(/{{filterValue}}/, ""));
+                    }
+
+
+                    if (listItem.find(".toggle").hasClass('active')) {
+                        $(holder).find(".filter-list").prepend(listItem);
+                    } else {
+                        $(holder).find(".filter-list").append(listItem);
+                    }
+                    listItem = null;
+                }
+                /*var filtersNum = App.filters.length;
                 for (var i = 0; i < filtersNum; i++) {
                     if (App.a.activeWidget != App.filters[i].widget.id) continue;
                     var listItem = $(html).find(".filter-list-item").clone();
@@ -92,7 +131,7 @@ define([
                         $(holder).find(".filter-list").append(listItem);
                     }
                     listItem = null;
-                };
+                };*/
                 var $holder = $(holder);
                 $holder.find("a").off('tap').on('tap', function (e) {
                     //if ($(this).find(".toggle").hasClass("active")) return;
@@ -135,8 +174,21 @@ define([
          * @fires module:MessageCenter#filter_values_requested
          */
         this.getFilterInfo = function (d) {
-            var fv = sessionStorage.getItem("filters_values_" + self.selectedFilter.path);
-            if (!fv) {
+            //var fv = sessionStorage.getItem("filters_values_" + self.selectedFilter.path);
+            //if (!fv) {
+                var c = App.a.widgets[App.a.activeWidget].controls;
+                if (c) if (c.length != 0) {
+                    var d = [];
+                    for (var k = 0; k < c.length; k++) if (c[k].targetProperty == self.selectedFilter.path){
+                        for (var i = 0; i < c[k].values.length; i++) {
+                            d.push({name: c[k].values[i].name, value: c[k].values[i].path});
+                        }
+                        self.renderInfo({data: d, path: self.selectedFilter.path, name: c[k].targetPropertyDisplay});
+                        break;
+                    }
+                }
+            //} else self.renderInfo(JSON.parse(fv));
+            /*if (!fv) {
                 mc.subscribe("filter_values_acquired:" + self.selectedFilter.path, {
                     subscriber: self,
                     callback: self.renderInfo,
@@ -145,9 +197,7 @@ define([
                 mc.publish("filter_values_requested:" + self.selectedFilter.path, self.selectedFilter);
             } else {
                 self.renderInfo(JSON.parse(fv));
-            }
-
-
+            }*/
         };
         /**
          * Does rendering of selected filter's values
