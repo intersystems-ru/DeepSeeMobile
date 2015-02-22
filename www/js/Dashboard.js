@@ -96,14 +96,30 @@ define([
                 };
                 self.addWidget(widget_config);
                 //widget_config.widget = self.widgets[self.widgets.length - 1];
-                self.widgets[self.widgets.length - 1].cube = widgets[i].cube;
-                if (widgets[i].cube) {
-                    mc.publish('filters_requested', {cube: widgets[i].cube, widget: self.widgets[self.widgets.length - 1]});
-                }
-                if (widgets[i].controls) {
-                    self.widgets[self.widgets.length - 1].controls = [];
-                    for (var k = 0; k < widgets[i].controls.length; k++) if (widgets[i].controls[k].value != ""){
-                        self.widgets[self.widgets.length - 1].controls.push(widgets[i].controls[k]);
+                var curWidget = self.widgets[self.widgets.length - 1];
+                curWidget.cube = widgets[i].cube;
+
+                // setup widget controls
+                for (var c = 0; c < widgets[i].controls.length; c++) if (widgets[i].controls[c].action == "applyFilter") {
+                    curWidget.controls.push(widgets[i].controls[c]);
+                    curWidget.filters.setFilter(new Filter({name: widgets[i].controls[c].label, path: widgets[i].controls[c].targetProperty, info: widgets[i].controls[c].type}, widgets[i].cube, curWidget), true);
+                    //App.filters.push(new Filter({name: widgets[i].controls[c].label, path: widgets[i].controls[c].targetProperty, info: widgets[i].controls[c].type}, widgets[i].cube, curWidget));
+
+                    var val = widgets[i].controls[c].value;
+                    var disp = widgets[i].controls[c].targetPropertyDisplay;
+                    var matches = val.match(/\[(.*?)\]/);
+                    if (matches) disp = matches[1];
+
+                    if (val != "") {
+                        curWidget.filters.setFilter({
+                            name: widgets[i].controls[c].label,
+                            path: widgets[i].controls[c].targetProperty,
+                            value: [val],
+                            valueName: [disp]
+                            //cube: curWidget.cube,
+                            //widget: curWidget
+                        }, true);
+                        if (App.a.activeWidget == curWidget.id) $("#btnMainFilter").addClass("tab-item-green");
                     }
                 }
 
