@@ -26,7 +26,7 @@
     <link href="css/LightPivot.css" rel="stylesheet">
 
     <script type="text/javascript" src="js/lib/jquery-2.1.1.js"></script>
-    <script type="text/javascript" src="js/lib/jquery.fitTextToHeight.js"></script>
+    <!--<script type="text/javascript" src="js/lib/jquery.fitTextToHeight.js"></script>-->
     <!--<script type="text/javascript" src="js/lib/pivot.js"></script>-->
     <script type="text/javascript" src="js/lib/underscore.js"></script>
 
@@ -36,7 +36,7 @@
 
 
     <!-- Highcharts libraries -->
-    <script src="js/lib/highstock.src.js"></script>
+    <script src="js/lib/highstock.js"></script>
     <script src="js/lib/drilldown.js"></script>
     <script src="js/lib/highcharts-more.js"></script>
     <script src="js/lib/heatmap.src.js"></script>
@@ -126,21 +126,37 @@
     });
 
     // TODO: move events to another unit
-    $("#btnMainBack").off('tap').on('tap', function(){
-        if (App.a.activeWidget != null && App.a.activeWidget != undefined) {
-            var w = App.a.widgets[App.a.activeWidget];
-            if (w) {
-                if (w.pivot) {
-                    if (w.pivot.DRILL_LEVEL == 0) return;
-                    w.pivot.CONTROLS.back();
-                    if (w.pivot.DRILL_LEVEL == 0) $("#btnMainBack").hide();
+    $("#btnMainBack").off('tap').on('tap', function() {
+
+        if (App.a) {
+            if (App.a.activeWidget != null && App.a.activeWidget != undefined) {
+                var w = App.a.widgets[App.a.activeWidget];
+                if (w) {
+                    if (w.pivot) {
+                        if (w.pivot.DRILL_LEVEL == 0) return;
+                        w.pivot.CONTROLS.back();
+                        if (w.pivot.DRILL_LEVEL == 0) $("#btnMainBack").hide();
+                        return;
+                    }
                 }
+            }
+        } else {
+            if (App.v.currentView == "DashboardList") {
+                var f = App.folder.split("/");
+                if (f.length <= 1) return;
+                f.splice(f.length - 1, 1);
+                App.folder = f.join("/");
+                if (f.length == 1) $("#btnMainBack").hide();
+                App.m.publish('viewchange:DashboardList', {
+                    holder: "#mainScreen > .content"
+                });
             }
         }
     });
 
 
     $("#btnMainSignOut").off('tap').on('tap', function(){
+        App.clearData();
         $("#mainScreen").hide();
         $("#loginScreen").show();
         App.m.publish("viewchange:Login", {
