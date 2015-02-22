@@ -2,17 +2,8 @@ define(['charts/ChartBase'], function (cb) {
     return {
         type: "highcharts",
         callback: function (d) {
+
             cb.multivalueTimeDataConvertor(this.config, d);
-
-
-            function daysBetween(first, second) {
-                var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-                var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
-                var millisecondsPerDay = 1000 * 60 * 60 * 24;
-                var millisBetween = two.getTime() - one.getTime();
-                var days = millisBetween / millisecondsPerDay;
-                return Math.floor(days);
-            }
 
             //determine max data range
             var minDate = +Infinity;
@@ -24,6 +15,18 @@ define(['charts/ChartBase'], function (cb) {
                 if (minValue < minDate) minDate = minValue;
                 if (maxValue > maxDate) maxDate = maxValue;
             }
+
+
+            function daysBetween(first, second) {
+                var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+                var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+                var millisecondsPerDay = 1000 * 60 * 60 * 24;
+                var millisBetween = two.getTime() - one.getTime();
+                var days = millisBetween / millisecondsPerDay;
+                return Math.floor(days);
+            }
+
+
 
             var days = daysBetween(new Date(minValue), new Date(maxValue));
 
@@ -92,6 +95,7 @@ define(['charts/ChartBase'], function (cb) {
                         count : 1,
                         text : 'All'
                     }];
+                this.config.rangeSelector.selected = 3;
             }
         },
         config: {
