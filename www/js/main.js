@@ -34,39 +34,49 @@ require([
     App.ui = {
         navBar: $("#mainScreen .bar-nav")
     };
+    App.folder = "Mobile";
+    App.rootFolder = App.folder;
 
     App.m = MessageCenter;
     App.v = ViewManager;
     App.filters = [];
-    MessageCenter.subscribe("filters_acquired", {
+   /* MessageCenter.subscribe("filters_acquired", {
         subscriber: this,
         callback: function (d) {
-            for (var i = 0; i < d.data.data.length; i++) {
-                App.filters.push(new Filter(d.data.data[i], d.data.cube, d.data.widget));
-            }
-            if (d.data.widget.controls) if (d.data.widget.controls.length != 0) {
+            if (d.data.widget.controls.length == 0) {
+                for (var i = 0; i < d.data.data.length; i++) {
+                    App.filters.push(new Filter(d.data.data[i], d.data.cube, d.data.widget));
+                }
+            } else
+            {
                 // move controls to filters if exists
                 for (var c = 0; c < d.data.widget.controls.length; c++) {
-                    for (var i = 0; i < App.filters.length; i++) if (App.filters[i].widget == d.data.widget) {
-                        if (App.filters[i].path == d.data.widget.controls[c].targetProperty) {
+                    //for (var i = 0; i < App.filters.length; i++) if (App.filters[i].widget == d.data.widget) {
+                        //if (App.filters[i].path == d.data.widget.controls[c].targetProperty) {
+                            App.filters.push(new Filter({name: d.data.widget.controls[c].label, path: d.data.widget.controls[c].targetProperty, info: d.data.widget.controls[c].type}, d.data.cube, d.data.widget));
+
                             var val = d.data.widget.controls[c].value;
                             var disp = d.data.widget.controls[c].targetPropertyDisplay;
                             var matches = val.match(/\[(.*?)\]/);
                             if (matches) disp = matches[1];
-                            d.data.widget.filters.setFilter({
-                                name: App.filters[i].name,
-                                path: App.filters[i].path,
-                                value: [val],
-                                valueName: [disp]
-                            }, true);
-                        }
-                    }
+
+
+                            if (val != "") {
+                                d.data.widget.filters.setFilter({
+                                    name: d.data.widget.controls[c].label,
+                                    path: d.data.widget.controls[c].targetProperty,
+                                    value: [val],
+                                    valueName: [disp]
+                                }, true);
+                            }
+                        //}
+                    //}
                 }
                 if (d.data.widget == App.a.widgets[App.a.activeWidget]) $("#btnMainFilter").addClass("tab-item-green");
                 d.data.widget.controls = [];
             }
         }
-    });
+    });*/
 
 
     MessageCenter.publish("viewchange:Login", {
@@ -75,13 +85,16 @@ require([
 
     $("a.nav-home").off('tap').on('tap', function (e) {
         e.preventDefault();
-        //App.clearData();
+        $("#btnMainBack").hide();
+        App.folder = App.rootFolder;
         MessageCenter.publish('viewchange:DashboardList', {
             holder: "#mainScreen > .content"
         });
         return false;
     });
     App.clearData = function() {
+        App.folder = App.rootFolder;
+        $("#btnMainBack").hide();
         App.m.publish("clear:widgets");
         if (App.a && App.a.widget) {
             _.each(App.a.widgets, function (w, i) {
