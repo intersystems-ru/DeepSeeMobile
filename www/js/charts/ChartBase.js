@@ -50,10 +50,10 @@ define([], function () {
         }
     }
 
-    ChartBase.fixData = function(tempData) {
+    ChartBase.prototype.fixData = function(tempData) {
         for (var g = 0; g < tempData.length; g++) {
-            if (!tempData[g].y) tempData[g].y = 0;
-            if (tempData[g].y == "") tempData[g].y = 0;
+            if (!tempData[g].y) tempData[g].y = null;
+            if (tempData[g].y == "") tempData[g].y = null;
         }
     }
 
@@ -63,9 +63,19 @@ define([], function () {
             if (data[i] < min) min = data[i];
         }
         return min;
+    };
+
+    ChartBase.getMaxValue = function(data) {
+        var max = Number.NEGATIVE_INFINITY;
+        for (var i = 0; i < data.length; i++) {
+            if (data[i] > max) max = data[i];
+        }
+        return max;
     }
 
+
     ChartBase.prototype.multivalueDataConvertor = function(config, d) {
+        var cb = this;
         var data = d.data;
 
         config.yAxis.min = ChartBase.getMinValue(data.Data);
@@ -91,7 +101,7 @@ define([], function () {
                         });
                         k++;
                     }
-                    ChartBase.fixData(tempData);
+                    cb.fixData(tempData);
                     config.series.push({
                         data: tempData,
                         name: data.Cols[0].tuples[t].caption + "/" + data.Cols[0].tuples[t].children[c].caption,
@@ -110,7 +120,7 @@ define([], function () {
                         path: data.Cols[1].tuples[i].path
                     });
                 }
-                ChartBase.fixData(tempData);
+                cb.fixData(tempData);
                 config.series.push({
                     data: tempData,
                     name: data.Cols[0].tuples[j].caption,
@@ -118,7 +128,36 @@ define([], function () {
                 });
             }
         }
+    };
+
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(date.getDate() + days);
+        return result;
     }
+
+    ChartBase.prototype.convertDateFromCache = function(s) {
+        if (s == "" && s == undefined || s == null) return null;
+        var str = s.toString();
+        if (str.length == 4) return this.getDate(s);
+        if (str.indexOf("-") != -1) return this.getDate(s);
+        if (str.indexOf(" ") != -1) return this.getDate(s);
+        if (str.length == 6) {
+            var y = str.substr(0, 4);
+            var m = str.substr(4, 2);
+            return Date.parse(new Date(parseInt(y), parseInt(m)-1, 1));
+        }
+        if (str.length == 5 && !isNaN(parseInt(str))) {
+            var base = new Date(1840, 11, 31);
+            var p = str.toString().split(",");
+            var d = parseInt(p[0]);
+            var t = null;
+            if (p.length > 1) t = parseInt(p[1]);
+            base = addDays(base, parseInt(d));
+            if (t) base.setSeconds(t);
+            return Date.parse(base);
+        } else return this.getDate(s);
+    };
 
     ChartBase.prototype.getDate = function(str) {
         var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -144,23 +183,42 @@ define([], function () {
     ChartBase.prototype.multivalueTimeDataConvertor = function(config, d) {
         var data = d.data;
         config.yAxis.min = ChartBase.getMinValue(data.Data);
+        //config.yAxis.max = ChartBase.getMaxValue(data.Data);
         config.series = [];
         config.xAxis.categories = [];
         config.series = [];
         var tempData = [];
+        var minDate = Number.POSITIVE_INFINITY;
+        var maxDate = Number.NEGATIVE_INFINITY;
 
         if (data.Cols[0].tuples[0].children) {
             var k = 0;
             for(var t = 0; t < data.Cols[0].tuples.length; t++) {
                 for (var c = 0; c < data.Cols[0].tuples[t].children.length; c++) {
                     tempData = [];
+                    minDate = Number.POSITIVE_INFINITY;
+                    maxDate = Number.NEGATIVE_INFINITY;
                     for (var d = 0; d < data.Cols[1].tuples.length; d++) {
+                        var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
+                        //if (da < minDate) minDate = da;
+                        //if (da > maxDate) maxDate = da;
                         tempData.push([
-                            this.getDate(data.Cols[1].tuples[i].caption),
+                            da,
                             data.Data[data.Cols[0].tuples.length * data.Cols[0].tuples[t].children.length * d + t * data.Cols[0].tuples[t].children.length + c]
                                 ]);
+                        if (tempData[tempData.length - 1][1] == "") tempData[tempData.length - 1][1] = null;
                         k++;
                     }
+                   /* if (minDate != Number.POSITIVE_INFINIT && maxDate !=  Number.NEGATIVE_INFINITY) {
+                        tempData.splice(0, 0, [
+                            minDate - 1,
+                            null
+                        ]);
+                        tempData.push([
+                            maxDate + 1,
+                            null
+                        ]);
+                    }*/
                     config.series.push({
                         data: tempData,
                         name: data.Cols[0].tuples[t].caption + "/" + data.Cols[0].tuples[t].children[c].caption,
@@ -171,12 +229,28 @@ define([], function () {
         } else {
             for(var j = 0; j < data.Cols[0].tuples.length; j++) {
                 tempData = [];
+                minDate = Number.POSITIVE_INFINITY;
+                maxDate = Number.NEGATIVE_INFINITY;
                 for (var i = 0; i < data.Cols[1].tuples.length; i++) {
-
+                    //var da = this.getDate(data.Cols[1].tuples[i].caption);
+                    var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
+                    //tempData.push(
+                      //  {x: da, y: data.Data[i * data.Cols[0].tuples.length + j], name: data.Cols[1].tuples[i].caption }
+                    //);
                     tempData.push(
-                        [this.getDate(data.Cols[1].tuples[i].caption), data.Data[i * data.Cols[0].tuples.length + j]]
+                        [da, data.Data[i * data.Cols[0].tuples.length + j]]
                         );
                 }
+                /*if (minDate !=  Number.POSITIVE_INFINITY && maxDate !=  Number.NEGATIVE_INFINITY) {
+                    tempData.splice(0, 0, [
+                        minDate - 1,
+                        null
+                    ]);
+                    tempData.push([
+                        maxDate + 1,
+                        null
+                    ]);
+                }*/
                 config.series.push({
                     data: tempData,
                     name: data.Cols[0].tuples[j].caption,
