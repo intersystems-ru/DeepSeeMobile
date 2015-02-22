@@ -1,10 +1,10 @@
 <ul class="table-view dashboard-list" style="display: none">
     {{#each dashboardList}}
     <li class="table-view-cell media dashboard-item" data-id="{{@index}}">
-            <i class="fa fa-dashboard media-object pull-left" style="font-size:2em"></i>
+            <i class="fa {{this.icon}} media-object pull-left" style="font-size:2em"></i>
             <div class="media-body">
                 <h3>{{this.title}}</h3>
-                <small>{{this.path}}</small>
+                <small>{{this.desc}}</small>
             </div>
     </li>
     {{/each}}
