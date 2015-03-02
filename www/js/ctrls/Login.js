@@ -34,8 +34,9 @@ define([
                 $.ajax
                 ({
                     type: "GET",
-                    url: App.settings.server + "/Test",
+                    url: App.settings.server + "/Test?Namespace=" + (App.settings.namespace == undefined ? "" : App.settings.namespace),
                     dataType: 'text',
+                    timeout: 5000,
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("Authorization", make_base_auth(login, pass));
                     },
@@ -51,7 +52,32 @@ define([
             return "Basic " + hash;
         }
 
+        function IsError(d) {
+            if (typeof d != "object") {
+                try {
+                    d = JSON.parse(d);
+                } catch (e) {
+                    ShowError(Lang.getText("errWrongJson"));
+                    return true;
+                }
+            }
+            if (d.Error) {
+                ShowError(d.Error);
+                return true;
+            }
+            if (!d.Status) {
+                ShowError(Lang.getText("errNoStatus"));
+                return true;
+            }
+            if (d.Status != "OK") {
+                ShowError(Lang.getText("errWrongStatus") + ": " + d.Status);
+                return true;
+            }
+            return false;
+        }
+
         function loginSuccess(d){
+            if (IsError(d)) return;
             $("#loginScreen").hide();
             $("#mainScreen").show();
             $("#txtError").hide();
@@ -74,9 +100,26 @@ define([
             });
         }
 
-        function loginError(d) {
+        function ShowError(txt) {
             $("#loginProgress").hide();
-            $("#txtError").text("Wrong login or password").show();
+            $("#txtError").text(txt).show();
+        }
+
+        function loginError(d) {
+            if (d.status == 401) {
+                ShowError(Lang.getText("errUnauthorized"));
+                return;
+            }
+            if (d.statusText == "timeout") {
+                ShowError(Lang.getText("errTimeout"));
+                return;
+            }
+            if ((d.statusText == "error" && d.status == 0) || (d.status == 404)) {
+                ShowError(Lang.getText("errNotFound"));
+                return;
+            }
+            if (IsError(d.responseText)) return;
+            ShowError(Lang.getText("error") + ": " + d.responseText);
         }
 
         $("#selServer").off('tap').on('tap', function(){
