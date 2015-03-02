@@ -22,7 +22,14 @@ define([], function () {
             done: "Done",
             dismissFilters: "Dismiss filters",
             accept: "Accept",
-            folder: "Folder"
+            folder: "Folder",
+            error: "Error",
+            errNoStatus: "No status in JSON response",
+            errWrongStatus: "Wrong status received",
+            errWrongJson: "Incorrect json received",
+            errUnauthorized: "Incorrect username or password",
+            errTimeout: "Request timeout error",
+            errNotFound: "Requested page not found on server"
         },
         de: {
             home: "Zuhause",
@@ -45,7 +52,14 @@ define([], function () {
             done: "Gemacht",
             dismissFilters: "Filter entlassen",
             accept: "Akzeptieren",
-            folder: "Mappe"
+            folder: "Mappe",
+            error: "Fehler",
+            errNoStatus: "Nein Status in JSON antwort",
+            errWrongStatus: "Falscher status erhalten",
+            errWrongJson: "Falsche json erhalten",
+            errUnauthorized: "Benutzernamen oder Ihr Password",
+            errTimeout: "Antrag Timeout-Fehler",
+            errNotFound: "Angeforderte Seite konnte nicht auf dem Server gefunden"
         },
         ru: {
             home: "Домой",
@@ -68,7 +82,14 @@ define([], function () {
             done: "Готово",
             dismissFilters: "Сбросить фильтры",
             accept: "Принять",
-            folder: "Папка"
+            folder: "Папка",
+            error: "Ошибка",
+            errNoStatus: "В ответе сервера не указан status",
+            errWrongStatus: "Получен неверный status",
+            errWrongJson: "Получен неверный json",
+            errUnauthorized: "Неверный логин или пароль",
+            errTimeout: "Превышен интервал ожидания ответа сервера",
+            errNotFound: "Запрошенная страница не найдена на сервере"
         },
         currentLocale: function() {
             var locale = localStorage.currentLocale;
