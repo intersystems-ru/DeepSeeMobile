@@ -68,7 +68,7 @@ define([
                 $("#fltBarFooter").hide();
 
                 $("#filters").data("isValues", 0);
-                $("#btnFilterAccept").hide();
+                //$("#btnFilterAccept").hide();
                 var holder = "#filters .content";
                 $(holder).empty();
                 //$("#filters .title").text("Filters");
@@ -204,6 +204,7 @@ define([
          * @function module:FiltersView#renderInfo
          */
         this.renderInfo = function (d) {
+            $("#btnFilterAccept").show();
             var self = this;
             var fv = sessionStorage.getItem("filters_values_" + self.selectedFilter.path);
             if (!fv) {
@@ -250,21 +251,25 @@ define([
                         }
 
                         // is any filter is checked? then show button accept
-                        if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
-                        else $("#btnFilterAccept").hide();
+                        //if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
+                        //else $("#btnFilterAccept").hide();
                     });
                     list.append(li);
 
 
                 }
 
-                if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
-                else $("#btnFilterAccept").hide();
+                //if ($("#filters .content").find(".icon-check:visible").length != 0) $("#btnFilterAccept").show();
+                //else $("#btnFilterAccept").hide();
 
                 $("#btnFilterAccept").off("tap").on("tap", function(){
                     $("#btnMainFilter").removeClass("tab-item-green");
                     var items = $("#filters .content").find(".icon-check:visible");
-                    if (items.length == 0) return;
+                    if (items.length == 0) {
+                        App.a.widgets[App.a.activeWidget].filters.remove(self.selectedFilter.path);
+                        $("#filters").removeClass("active");
+                        return;
+                    };
                     var values = [];
                     var valueNames = [];
                     for (var i = 0; i < items.length; i++) {
@@ -287,6 +292,7 @@ define([
         };
 
         $("#btnFilterBack").off("tap").on("tap", function() {
+            $("#btnFilterAccept").hide();
             if ($("#filters").data("isValues") == 1) {
                 self.render();
             } else {
