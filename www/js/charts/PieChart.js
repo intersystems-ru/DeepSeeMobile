@@ -17,16 +17,23 @@ define(['charts/ChartBase'], function (cb) {
                 formatter: cb.defaultPieTooltipFormatter
             },
             chart: {
-                plotBackgroundColor: null,
+                /*plotBackgroundColor: null,
                 plotBorderWidth: null,
-                plotShadow: false
+                plotShadow: false,*/
+
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
                     dataLabels: {
+                        shadow: false,
+                        style: { "fontWeight": "normal", "fontSize": "11px", textShadow: "" },
                         enabled: true
+                        /*inside: true,
+                        distance: -20,
+                        softConnector: false,
+                        connectorWidth: 0*/
                     }
                 }
             },
