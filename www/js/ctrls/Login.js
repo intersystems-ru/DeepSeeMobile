@@ -36,7 +36,8 @@ define([
                     type: "GET",
                     url: App.settings.server + "/Test?Namespace=" + (App.settings.namespace == undefined ? "" : App.settings.namespace),
                     dataType: 'text',
-                    timeout: 5000,
+                    async: true,
+                    timeout: 15000,
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("Authorization", make_base_auth(login, pass));
                     },
