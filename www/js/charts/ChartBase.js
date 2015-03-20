@@ -178,6 +178,12 @@ define([], function () {
             if (!isNaN(d)) return d;
         }
         return 0;
+    };
+
+    ChartBase.prototype.extractValue = function(path) {
+        var idx = path.indexOf("&[");
+        if (idx == -1) return "";
+        return path.substring(idx + 2, path.length - 1);
     }
 
     ChartBase.prototype.multivalueTimeDataConvertor = function(config, d) {
@@ -199,7 +205,8 @@ define([], function () {
                     minDate = Number.POSITIVE_INFINITY;
                     maxDate = Number.NEGATIVE_INFINITY;
                     for (var d = 0; d < data.Cols[1].tuples.length; d++) {
-                        var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
+                        var da = this.convertDateFromCache(this.extractValue(data.Cols[1].tuples[i].path));//this.getDate(data.Cols[1].tuples[i].caption);
+                        //var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
                         //if (da < minDate) minDate = da;
                         //if (da > maxDate) maxDate = da;
                         tempData.push([
@@ -232,8 +239,9 @@ define([], function () {
                 minDate = Number.POSITIVE_INFINITY;
                 maxDate = Number.NEGATIVE_INFINITY;
                 for (var i = 0; i < data.Cols[1].tuples.length; i++) {
+                    var da = this.convertDateFromCache(this.extractValue(data.Cols[1].tuples[i].path));//this.getDate(data.Cols[1].tuples[i].caption);
                     //var da = this.getDate(data.Cols[1].tuples[i].caption);
-                    var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
+                    //var da = this.convertDateFromCache(data.Cols[1].tuples[i].valueID);//this.getDate(data.Cols[1].tuples[i].caption);
                     //tempData.push(
                       //  {x: da, y: data.Data[i * data.Cols[0].tuples.length + j], name: data.Cols[1].tuples[i].caption }
                     //);
