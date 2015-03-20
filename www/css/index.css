@@ -290,3 +290,16 @@ nav.bar.bar-tab a.tab-item {
     background-color:  rgb(220,231,241); !important;
 }
 
+/* fix IOS 8 dissapeared header */
+/*
+header.bar.bar-nav {
+    -webkit-transform: translateZ(0);
+}
+.bar.bar-header-secondary{
+    -webkit-transform: translateZ(0);
+}
+.bar.bar-footer{
+    -webkit-transform: translateZ(0);
+}*
+/
+/*********************************/
