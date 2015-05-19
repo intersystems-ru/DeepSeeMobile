@@ -15,7 +15,7 @@ define(['charts/ChartBase'], function (cb) {
                     this.config.xAxis.categories = [];
                     this.config.series = [];
 
-                    for (var i = 0; i < data.Cols[1].tuples.length; i++) {
+                   /* for (var i = 0; i < data.Cols[1].tuples.length; i++) {
                         this.config.xAxis.categories.push(data.Cols[1].tuples[i].caption.toString());
                         data.Data[i] = {
                             y: data.Data[i],
@@ -25,12 +25,20 @@ define(['charts/ChartBase'], function (cb) {
                         };
                     };
                     require("charts/ChartBase").fixData(data.Data);
+
+                    var name = "Count";
+                    var format = "";
+                    if (data.Cols[0].tuples[0]) {
+                        name = data.Cols[0].tuples[0].caption;
+                        format = data.Cols[0].tuples[0].format;
+                    }
                     this.config.series = [{
                         colorByPoint: true,
                         data: data.Data,
-                        name: data.Cols[0].tuples[0].caption,
-                        format: data.Cols[0].tuples[0].format
-                    }];
+                        name: name,
+                        format: format
+                    }];*/
+                cb.multivalueDataConvertor(this.config, d);
         //this.renderWidget();
             },
         config: {
@@ -74,11 +82,17 @@ define(['charts/ChartBase'], function (cb) {
                         require("charts/ChartBase").fixData(data.Data);
                         self.c.widget.drillLevel++;
                         self.c.widget.drills.push(self.p.path);
+                        var name = "Count";
+                        var format = "";
+                        if (data.Cols[0].tuples[0]) {
+                            name = data.Cols[0].tuples[0].caption;
+                            format = data.Cols[0].tuples[0].format;
+                        }
                         this.c.addSeriesAsDrilldown(this.p,{
                             colorByPoint: true,
                             data: data.Data,
-                            name: data.Cols[0].tuples[0].caption,
-                            format: data.Cols[0].tuples[0].format
+                            name: name,
+                            format: format
                         });
                     }
                 });
