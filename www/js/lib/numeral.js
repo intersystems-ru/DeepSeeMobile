@@ -6,26 +6,28 @@
  * http://adamwdraper.github.com/Numeral-js/
  */
 
-(function () {
+var numeral = function () {
 
     /************************************
-        Constants
-    ************************************/
+     Constants
+     ************************************/
 
     var numeral,
         VERSION = '1.5.3',
-        // internal storage for language config files
+    // internal storage for language config files
         languages = {},
         currentLanguage = 'en',
         zeroFormat = null,
-        defaultFormat = '0,0',
-        // check for nodeJS
-        hasModule = (typeof module !== 'undefined' && module.exports);
+        defaultFormat = '0,0';
 
+    var NUMBER_GROUP_LENGTH = 3,
+        NUMBER_GROUP_SEPARATOR = ",",
+        DECIMAL_SEPARATOR = ".",
+        NUM_REGEX = new RegExp("(\\d)(?=(\\d{" + NUMBER_GROUP_LENGTH + "})+(?!\\d))", "g");
 
     /************************************
-        Constructors
-    ************************************/
+     Constructors
+     ************************************/
 
 
     // Numeral prototype object
@@ -43,7 +45,7 @@
         var power = Math.pow(10, precision),
             optionalsRegExp,
             output;
-            
+
         //roundingFunction = (roundingFunction !== undefined ? roundingFunction : Math.round);
         // Multiply up by precision, round accurately, then divide and use native toFixed():
         output = (roundingFunction(value * power) / power).toFixed(precision);
@@ -57,8 +59,8 @@
     }
 
     /************************************
-        Formatting
-    ************************************/
+     Formatting
+     ************************************/
 
     // determine what type of formatting we need to do
     function formatNumeral (n, format, roundingFunction) {
@@ -188,7 +190,7 @@
         }
 
         output = formatNumber(value, format, roundingFunction);
-        
+
         if (output.indexOf(')') > -1 ) {
             output = output.split('');
             output.splice(-1, 0, space + '%');
@@ -358,7 +360,7 @@
                 w = d.split('.')[0];
 
                 if (d.split('.')[1].length) {
-                    d = languages[currentLanguage].delimiters.decimal + d.split('.')[1];
+                    d = (DECIMAL_SEPARATOR || languages[currentLanguage].delimiters.decimal) + d.split('.')[1];
                 } else {
                     d = '';
                 }
@@ -377,7 +379,8 @@
             }
 
             if (thousands > -1) {
-                w = w.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + languages[currentLanguage].delimiters.thousands);
+                w = w.toString().replace(NUM_REGEX, '$1'
+                    + (NUMBER_GROUP_SEPARATOR || languages[currentLanguage].delimiters.thousands));
             }
 
             if (format.indexOf('.') === 0) {
@@ -389,8 +392,8 @@
     }
 
     /************************************
-        Top Level Functions
-    ************************************/
+     Top Level Functions
+     ************************************/
 
     numeral = function (input) {
         if (numeral.isNumeral(input)) {
@@ -433,7 +436,7 @@
 
         return numeral;
     };
-    
+
     // This function provides access to the loaded language data.  If
     // no arguments are passed in, it will simply return the current
     // global language object.
@@ -441,11 +444,11 @@
         if (!key) {
             return languages[currentLanguage];
         }
-        
+
         if (!languages[key]) {
             throw new Error('Unknown language : ' + key);
         }
-        
+
         return languages[key];
     };
 
@@ -464,8 +467,8 @@
             var b = number % 10;
             return (~~ (number % 100 / 10) === 1) ? 'th' :
                 (b === 1) ? 'st' :
-                (b === 2) ? 'nd' :
-                (b === 3) ? 'rd' : 'th';
+                    (b === 2) ? 'nd' :
+                        (b === 3) ? 'rd' : 'th';
         },
         currency: {
             symbol: '$'
@@ -481,16 +484,16 @@
     };
 
     /************************************
-        Helpers
-    ************************************/
+     Helpers
+     ************************************/
 
     function loadLanguage(key, values) {
         languages[key] = values;
     }
 
     /************************************
-        Floating-point helpers
-    ************************************/
+     Floating-point helpers
+     ************************************/
 
     // The floating-point helper functions and implementation
     // borrows heavily from sinful.js: http://guipn.github.io/sinful.js/
@@ -502,14 +505,14 @@
     if ('function' !== typeof Array.prototype.reduce) {
         Array.prototype.reduce = function (callback, opt_initialValue) {
             'use strict';
-            
+
             if (null === this || 'undefined' === typeof this) {
                 // At the moment all modern browsers, that support strict mode, have
                 // native implementation of Array.prototype.reduce. For instance, IE8
                 // does not support strict mode, so this check is actually useless.
                 throw new TypeError('Array.prototype.reduce called on null or undefined');
             }
-            
+
             if ('function' !== typeof callback) {
                 throw new TypeError(callback + ' is not a function');
             }
@@ -543,7 +546,7 @@
         };
     }
 
-    
+
     /**
      * Computes the multiplier necessary to make x >= 1,
      * effectively eliminating miscalculations caused by
@@ -567,15 +570,24 @@
         return args.reduce(function (prev, next) {
             var mp = multiplier(prev),
                 mn = multiplier(next);
-        return mp > mn ? mp : mn;
+            return mp > mn ? mp : mn;
         }, -Infinity);
-    }        
+    }
 
 
     /************************************
-        Numeral Prototype
-    ************************************/
+     Numeral Prototype
+     ************************************/
 
+    numeral.setup = function (decimalSeparator, numberGroupSeparator, numberGroupLength) {
+        if (decimalSeparator !== DECIMAL_SEPARATOR) DECIMAL_SEPARATOR = decimalSeparator;
+        if (numberGroupSeparator !== NUMBER_GROUP_SEPARATOR)
+            NUMBER_GROUP_SEPARATOR = numberGroupSeparator;
+        if (numberGroupLength !== NUMBER_GROUP_LENGTH) {
+            NUMBER_GROUP_LENGTH = numberGroupLength;
+            NUM_REGEX = new RegExp("(\\d)(?=(\\d{" + NUMBER_GROUP_LENGTH + "})+(?!\\d))", "g");
+        }
+    };
 
     numeral.fn = Numeral.prototype = {
 
@@ -584,15 +596,15 @@
         },
 
         format : function (inputString, roundingFunction) {
-            return formatNumeral(this, 
-                  inputString ? inputString : defaultFormat, 
-                  (roundingFunction !== undefined) ? roundingFunction : Math.round
-              );
+            return formatNumeral(this,
+                inputString ? inputString : defaultFormat,
+                (roundingFunction !== undefined) ? roundingFunction : Math.round
+            );
         },
 
         unformat : function (inputString) {
-            if (Object.prototype.toString.call(inputString) === '[object Number]') { 
-                return inputString; 
+            if (Object.prototype.toString.call(inputString) === '[object Number]') {
+                return inputString;
             }
             return unformatNumeral(this, inputString ? inputString : defaultFormat);
         },
@@ -624,7 +636,7 @@
             function cback(accum, curr, currI, O) {
                 return accum - corrFactor * curr;
             }
-            this._value = [value].reduce(cback, this._value * corrFactor) / corrFactor;            
+            this._value = [value].reduce(cback, this._value * corrFactor) / corrFactor;
             return this;
         },
 
@@ -643,7 +655,7 @@
                 var corrFactor = correctionFactor(accum, curr);
                 return (accum * corrFactor) / (curr * corrFactor);
             }
-            this._value = [this._value, value].reduce(cback);            
+            this._value = [this._value, value].reduce(cback);
             return this;
         },
 
@@ -653,27 +665,6 @@
 
     };
 
-    /************************************
-        Exposing Numeral
-    ************************************/
+    this.numeral = numeral;
 
-    // CommonJS module is defined
-    if (hasModule) {
-        module.exports = numeral;
-    }
-
-    /*global ender:false */
-    if (typeof ender === 'undefined') {
-        // here, `this` means `window` in the browser, or `global` on the server
-        // add `numeral` as a global object via a string identifier,
-        // for Closure Compiler 'advanced' mode
-        this['numeral'] = numeral;
-    }
-
-    /*global define:false */
-    if (typeof define === 'function' && define.amd) {
-        define([], function () {
-            return numeral;
-        });
-    }
-}).call(this);
+};
