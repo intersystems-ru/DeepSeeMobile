@@ -87,8 +87,9 @@ define([], function () {
         };
         config.series = [];
         var tempData = [];
-
-        if (data.Cols[0].tuples[0].children) {
+        var hasChildren = false;
+        if (data.Cols[0].tuples[0]) if (data.Cols[0].tuples[0].children) hasChildren = true;
+        if (hasChildren) {
             var k = 0;
             for(var t = 0; t < data.Cols[0].tuples.length; t++) {
                 for (var c = 0; c < data.Cols[0].tuples[t].children.length; c++) {
@@ -97,6 +98,7 @@ define([], function () {
                         tempData.push({
                             y: data.Data[data.Cols[0].tuples.length * data.Cols[0].tuples[t].children.length * d + t * data.Cols[0].tuples[t].children.length + c],
                             cube: data.Info.cubeName,
+                            drilldown: true,
                             path: data.Cols[1].tuples[t].path
                         });
                         k++;
@@ -110,6 +112,7 @@ define([], function () {
                 }
             }
         } else {
+            if (data.Cols[0].tuples.length == 0) data.Cols[0].tuples = [""]; // for no measures
             for(var j = 0; j < data.Cols[0].tuples.length; j++) {
                 tempData = [];
                 for (var i = 0; i < data.Cols[1].tuples.length; i++) {
@@ -121,10 +124,17 @@ define([], function () {
                     });
                 }
                 cb.fixData(tempData);
+                var name = "Count";
+                var format = "";
+                if (data.Cols[0].tuples[j]) {
+                    name = data.Cols[0].tuples[j].caption;
+                    format = data.Cols[0].tuples[j].format;
+                }
+
                 config.series.push({
                     data: tempData,
-                    name: data.Cols[0].tuples[j].caption,
-                    format: data.Cols[0].tuples[j].format
+                    name: name,
+                    format: format
                 });
             }
         }
