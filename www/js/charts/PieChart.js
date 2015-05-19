@@ -6,11 +6,17 @@ define(['charts/ChartBase'], function (cb) {
             var retVal = [];
             this.config.series[0].name = data.Cols[0].caption;
             for (var d = 0; d < data.Cols[1].tuples.length; d++) {
-                retVal.push([data.Cols[1].tuples[d].caption, data.Data[d]]);
+                retVal.push([data.Cols[1].tuples[d].caption.toString(), data.Data[d]]);
             };
+            var name = "Count";
+            var format = "";
+            if (data.Cols[0].tuples[0]) {
+                name = data.Cols[0].tuples[0].caption;
+                format = data.Cols[0].tuples[0].format;
+            }
             this.config.series[0].data = retVal;
-            this.config.series[0].name = data.Cols[0].tuples[0].caption;
-            this.config.series[0].format = data.Cols[0].tuples[0].format;
+            this.config.series[0].name = name;
+            this.config.series[0].format = format;
         },
         config: {
             tooltip: {
