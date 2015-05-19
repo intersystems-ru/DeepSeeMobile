@@ -139,8 +139,12 @@ define([
                     $("#langSelector .table-view-cell:eq(1)").addClass("table-view-cell-sel");
                     break;
                 }
-                case "ru": {
+                case "sp": {
                     $("#langSelector .table-view-cell:eq(2)").addClass("table-view-cell-sel");
+                    break;
+                }
+                case "ru": {
+                    $("#langSelector .table-view-cell:eq(3)").addClass("table-view-cell-sel");
                     break;
                 }
             }
@@ -152,6 +156,7 @@ define([
             switch ($(e.target).text().toLowerCase()) {
                 case "english": Lang.setLocale("en"); break;
                 case "deutsch": Lang.setLocale("de"); break;
+                case "spanish": Lang.setLocale("sp"); break;
                 case "russian": Lang.setLocale("ru"); break;
             }
             $("#langSelector").removeClass("active");
