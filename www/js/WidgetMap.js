@@ -13,11 +13,10 @@ define([
     "charts/PieChart",
     "charts/AreaChart",
     "charts/TimeChart",
-    "charts/XYChart"
-    /* TODO: add widgets
+    "charts/XYChart",
     "charts/BubbleChart",
     "charts/HiLowChart",
-    "charts/TreeMap"*/],
+    "charts/TreeMap"],
     function (
         mc,
         lineChart,
@@ -27,11 +26,10 @@ define([
         pieChart,
         areaChart,
         timeChart,
-        xyChart
-        /* TODO: add widgets
+        xyChart,
         bubbleChart,
         hiLowChart,
-        treeMapChart*/
+        treeMapChart
         ) {
 
     var map = {};
@@ -44,11 +42,9 @@ define([
     map.pieChart = pieChart;
     map.timeChart = timeChart;
     map.xyChart = xyChart;
-    /* TODO: add widgets
     map.bubbleChart = bubbleChart;
     map.hilowChart = hiLowChart;
     map.treeMapChart = treeMapChart;
-    */
 
     // column chart stacked same as barChartStacked except type
     map.columnChartStacked = {};
@@ -56,7 +52,7 @@ define([
     map.columnChartStacked.config.chart.type = "column";
 
     // linechart markers same as linechart
-    map.lineChartMarkers = {}
+    map.lineChartMarkers = {};
     $.extend(true, map.lineChartMarkers, lineChart);
     map.lineChartMarkers.config.plotOptions.series.marker.enabled = true;
 
