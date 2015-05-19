@@ -33,7 +33,10 @@
 }
 
 .lpt table {
-    border-collapse: collapse;
+    /*border-collapse: collapse !important;*/
+    border-collapse: separate;
+    border-spacing: 0;
+    border: none;
     width: 100%;
 }
 
@@ -63,7 +66,9 @@
     text-align: left;
     border-radius: 0;
     padding: 3px 6px !important; /* DeepSee style overriding fix */
-    border: 1px solid rgb(208, 208, 208);
+    /*border: 1px solid rgb(208, 208, 208);*/
+    border-right: 1px solid rgb(208, 208, 208);
+    border-bottom: 1px solid rgb(208, 208, 208);
 }
 
 .lpt th, .lpt .lpt-headerValue {
@@ -94,10 +99,13 @@
 
 .lpt .lpt-tableBlock td {
     text-align: right;
-    text-overflow: ellipsis;
-    overflow: hidden;
     padding: 0 6px !important;
     cursor: pointer;
+}
+
+.lpt-tableBlock td > div {
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .lpt .lpt-topSection, .lpt .lpt-bottomSection {
@@ -111,8 +119,10 @@
     position: relative;
     float: left;
     z-index: 2;
-    box-shadow: 0 0 0 1px rgb(208, 208, 208);
+    /*box-shadow: 0 0 0 1px rgb(208, 208, 208);*/
+    border-right: 1px solid rgb(208, 208, 208);
     white-space: nowrap;
+    box-sizing: border-box;
 }
 
 .lpt .lpt-topHeader {
@@ -162,7 +172,7 @@
 }
 
 .lpt .lpt-leftHeader th {
-    border-right: none;
+    /*border-right: none;*/
 }
 
 .lpt .lpt-topHeader th {
@@ -202,6 +212,17 @@
 
 .lpt .lpt-pageSwitcher > div > span:hover {
     background: #FFF7D7;
+}
+
+.lpt-pageSpacer:before {
+    content: "...";
+    font-size: 75%;
+}
+
+.lpt-pageSpacer {
+    padding: 0 2px 0 2px !important;
+    background: inherit !important;
+    cursor: inherit !important;
 }
 
 .lpt-active {
@@ -368,11 +389,11 @@
 }
 
 .lpt-searchBlock {
-    position: absolute;
+    /*position: absolute;*/
     box-sizing: border-box;
     overflow: hidden;
-    bottom: 0;
-    width: 100%;
+    /*top: 0;*/
+    /*width: 100%;*/
     height: 20px;
     font-size: 14px;
     border: 1px solid rgb(208, 208, 208);
