@@ -4,6 +4,12 @@ define(['Language', 'MessageCenter', 'Dashboard'], function (Lang, MessageCenter
         this.FilterFolders = function(childs) {
             var items = [];
             var deep = App.folder.split("/").length;
+
+            function itemExists(pa) {
+                for (var i = 0; i < items.length; i++) if (items[i].path == pa) return true;
+                return false;
+            }
+
             for (var i = 0; i < childs.length; i++) {
                 var p = childs[i].path.split("/");
                 var path = "";
@@ -12,6 +18,8 @@ define(['Language', 'MessageCenter', 'Dashboard'], function (Lang, MessageCenter
                 path = path.toLowerCase();
                 if (path == App.folder.toLowerCase()) {
                     var firstPart = childs[i].path.toLowerCase().replace(App.folder.toLowerCase() + "/", "").split("/");
+                    if ((firstPart.length > 1) && (itemExists(firstPart[0]))) continue;
+
                     items.push({path: firstPart[0], desc: firstPart[0], title: childs[i].title, isFolder: firstPart.length > 1, icon: "fa-dashboard"});
                     if (items[items.length - 1].isFolder) {
                         items[items.length - 1].icon = "fa-folder-o";
