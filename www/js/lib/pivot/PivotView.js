@@ -10,6 +10,8 @@ var PivotView = function (controller, container) {
 
     this.tablesStack = [];
 
+    numeral.call(this);
+
     this.elements = {
         container: container,
         base: document.createElement("div"),
@@ -483,6 +485,9 @@ PivotView.prototype.colorNameToRGB = function (name) {
 };
 
 /**
+ * Size updater for LPT.
+ * Do not affect scroll positions in this function.
+ *
  * @param container
  */
 PivotView.prototype.recalculateSizes = function (container) {
@@ -501,10 +506,13 @@ PivotView.prototype.recalculateSizes = function (container) {
 
         var headerContainer = container.getElementsByClassName("lpt-header")[0],
             topHeader = container.getElementsByClassName("lpt-topHeader")[0],
+            topHeaderTable = container.getElementsByTagName("table")[0],
+            topHeaderTableWidth = topHeaderTable.offsetWidth,
             tTableHead = topHeader.getElementsByTagName("thead")[0],
             leftHeader = container.getElementsByClassName("lpt-leftHeader")[0],
             lTableHead = leftHeader.getElementsByTagName("thead")[0],
             tableBlock = container.getElementsByClassName("lpt-tableBlock")[0],
+            mainContentTable = tableBlock.getElementsByTagName("table")[0],
             pTableHead = tableBlock.getElementsByTagName("tbody")[0],
             searchInput = container.getElementsByClassName("lpt-searchInput")[0],
             searchInputSize = searchInput ? container.offsetWidth - this.SEARCHBOX_LEFT_MARGIN : 0,
@@ -520,25 +528,49 @@ PivotView.prototype.recalculateSizes = function (container) {
         var pagedHeight = (this.pagination.on ? this.PAGINATION_BLOCK_HEIGHT : 0)
                 + (this.SEARCH_ENABLED ? this.PAGINATION_BLOCK_HEIGHT : 0),
             headerW = Math.max(leftHeader.offsetWidth, headerContainer.offsetWidth),
-            headerH = topHeader.offsetHeight,
-            containerHeight = container.offsetHeight,
+            headerH = topHeader.offsetHeight;
+
+        topHeader.style.marginLeft = headerW + "px";
+
+        var containerHeight = container.offsetHeight,
             bodyHeight = containerHeight - headerH - pagedHeight,
             mainHeaderWidth = headerContainer.offsetWidth,
+            IS_LISTING = lTableHead.offsetHeight === 0,
             hasVerticalScrollBar =
                 Math.max(lTableHead.offsetHeight, pTableHead.offsetHeight) > bodyHeight
                 && this.SCROLLBAR_WIDTH > 0,
-            addEggs = hasVerticalScrollBar && lTableHead.offsetHeight > 0,
-            cell, tr, cellWidths = [], columnHeights = [], i;
+            hasHorizontalScrollBar =
+                tTableHead.offsetWidth >
+                    topHeader.offsetWidth - (hasVerticalScrollBar ? this.SCROLLBAR_WIDTH : 0);
 
-        headerContainer.style.width = headerW + "px";
-        if (hasVerticalScrollBar && tTableHead.childNodes[0]) {
+        // horizontal scroll bar may change vertical scroll bar, so we need recalculate
+        if (!hasVerticalScrollBar && hasHorizontalScrollBar) {
+            hasVerticalScrollBar =
+                Math.max(lTableHead.offsetHeight, pTableHead.offsetHeight) > bodyHeight - this.SCROLLBAR_WIDTH
+                && this.SCROLLBAR_WIDTH > 0;
+        }
+
+        var addEggs = hasVerticalScrollBar && !IS_LISTING,
+            cell, tr, cellWidths = [], columnHeights = [], i,
+            headerCellApplied = false;
+
+        var applyExtraTopHeadCell = function () {
+            if (!_.controller.CONFIG.stretchColumns &&
+                hasVerticalScrollBar && !hasHorizontalScrollBar) return;
+            headerCellApplied = true;
             tr = document.createElement("th");
             tr.className = "lpt-extraCell";
-            tr.style.minWidth = this.SCROLLBAR_WIDTH + "px";
-            tr.style.width = this.SCROLLBAR_WIDTH + "px";
+            tr.style.minWidth = _.SCROLLBAR_WIDTH + "px";
+            tr.style.width = _.SCROLLBAR_WIDTH + "px";
             tr.rowSpan = tTableHead.childNodes.length;
             tr["_extraCell"] = true;
             tTableHead.childNodes[0].appendChild(tr);
+        };
+
+        //return;
+        //console.log(lTableHead.offsetHeight, pTableHead.offsetHeight, bodyHeight, this.SCROLLBAR_WIDTH);
+        if (hasVerticalScrollBar && tTableHead.childNodes[0]) {
+            applyExtraTopHeadCell();
         }
 
         if (container["_primaryColumns"]) {
@@ -565,13 +597,24 @@ PivotView.prototype.recalculateSizes = function (container) {
         if (mainHeaderWidth > headerW) leftHeader.style.width = mainHeaderWidth + "px";
         tableBlock.style.height = containerHeight - headerH - pagedHeight + "px";
         headerContainer.style.height = headerH + "px";
+        headerContainer.style.width = headerW + "px";
+        if (!this.controller.CONFIG.stretchColumns) {
+            topHeaderTable.style.width = "auto";
+            mainContentTable.style.width =
+                hasHorizontalScrollBar ? "100%" : topHeaderTableWidth + "px";
+        }
 
-        for (i in container["_primaryRows"]) {
-            container["_primaryRows"][i].style.height = columnHeights[i] + "px";
-        }
-        for (i in container["_primaryColumns"]) {
-            container["_primaryColumns"][i].style.width = cellWidths[i] + "px";
-        }
+        // @TEST beta.13
+        //for (i in container["_primaryRows"]) {
+        //    container["_primaryRows"][i].style.height = columnHeights[i] + "px";
+        //}
+        //for (i in container["_primaryColumns"]) {
+        //    container["_primaryColumns"][i].style.width = cellWidths[i] + "px";
+        //}
+
+        //console.log(cellWidths);
+        //containerParent.appendChild(container); // attach
+        //return;
 
         if (addEggs) { // horScroll?
             tr = document.createElement("tr");
@@ -592,9 +635,9 @@ PivotView.prototype.recalculateSizes = function (container) {
             searchInput.style.width = searchInputSize + "px";
         }
 
-        if (hasVerticalScrollBar) {
-            leftHeader.className = leftHeader.className.replace(/\sbordered/, "") + " bordered";
-        }
+        //if (hasVerticalScrollBar) {
+        //    leftHeader.className = leftHeader.className.replace(/\sbordered/, "") + " bordered";
+        //}
 
         if (tableTr) for (i in tableTr.childNodes) {
             if (tableTr.childNodes[i].tagName !== "TD") continue;
@@ -611,6 +654,24 @@ PivotView.prototype.recalculateSizes = function (container) {
         }
 
         containerParent.appendChild(container); // attach
+
+        /*
+        * View in (listing) may have another size after attaching just because of applying
+        * DEFAULT_CELL_HEIGHT to all of the rows. So if it is listing, we will check if
+        * extra cell was actually added and if we need to add it now.
+        **/
+        if (/*IS_LISTING &&*/ Math.max(lTableHead.offsetHeight, pTableHead.offsetHeight) > bodyHeight
+                && this.SCROLLBAR_WIDTH > 0 && !headerCellApplied) {
+            applyExtraTopHeadCell();
+        }
+
+        // TEMPFIX: column sizes
+        //var gg = 0;
+        //if (tableTr && container["_primaryColumns"])
+        //    for (i in tableTr.childNodes) {
+        //        if (tableTr.childNodes[i].tagName !== "TD") continue;
+        //        container["_primaryColumns"][gg++].style.width = tableTr.childNodes[i].offsetWidth + "px";
+        //    }
 
     } catch (e) {
         console.error("Error when fixing sizes.", "ERROR:", e);
@@ -689,9 +750,15 @@ PivotView.prototype.renderRawData = function (data) {
         _RESIZING_ELEMENT_BASE_WIDTH, _RESIZING_ELEMENT_BASE_X,
         renderedGroups = {}, // keys of rendered groups; key = group, value = { x, y, element }
         i, x, y, tr = null, th, td, primaryColumns = [], primaryRows = [], ratio, cellStyle,
-        tempI, tempJ;
+        tempI, tempJ, div;
 
     this.SEARCH_ENABLED = SEARCH_ENABLED;
+
+    this.numeral.setup(
+        info["decimalSeparator"] || ".",
+        info["numericGroupSeparator"] || ",",
+        info["numericGroupSize"] || 3
+    );
 
     var formatContent = function (value, element, format) {
         if (!isFinite(value)) {
@@ -699,10 +766,10 @@ PivotView.prototype.renderRawData = function (data) {
             element.textContent = value || "";
         } else { // number
             if (format) { // set format
-                element.textContent = value ? numeral(value).format(format) : "";
+                element.textContent = value ? _.numeral(value).format(format) : "";
             } else if (value && info.defaultFormat) {
-                element.textContent = numeral(value).format(
-                    info.defaultFormat[value % 1 === 0 ? "int" : "double"]
+                element.textContent = _.numeral(value).format(
+                    value % 1 === 0 ? "#,###" : "#,###.##"
                 );
             } else {
                 element.textContent = value || "";
@@ -721,16 +788,16 @@ PivotView.prototype.renderRawData = function (data) {
         }
     };
 
-    var getMouseXY = function (e) {
-        var element = e.target || e.srcElement, offsetX = 0, offsetY = 0;
-        if (element.offsetParent) {
-            do {
-                offsetX += element.offsetLeft;
-                offsetY += element.offsetTop;
-            } while ((element = element.offsetParent));
-        }
-        return { x: e.pageX - offsetX, y: e.pageY - offsetY };
-    };
+    //var getMouseXY = function (e) {
+    //    var element = e.target || e.srcElement, offsetX = 0, offsetY = 0;
+    //    if (element.offsetParent) {
+    //        do {
+    //            offsetX += element.offsetLeft;
+    //            offsetY += element.offsetTop;
+    //        } while ((element = element.offsetParent));
+    //    }
+    //    return { x: e.pageX - offsetX, y: e.pageY - offsetY };
+    //};
 
     var bindResize = function (element, column) {
 
@@ -751,10 +818,11 @@ PivotView.prototype.renderRawData = function (data) {
         }
 
         el.addEventListener("mousedown", function (e) {
-            var cursorX = getMouseXY(e).x;
-            if (cursorX < el.offsetWidth - 5 && cursorX > 5) {
-                return;
-            }
+            //var cursorX = getMouseXY(e).x;
+            //if (cursorX < el.offsetWidth - 5 && cursorX > 5) {
+            //    return;
+            //}
+            if ((e.target || e.srcElement) !== el) return;
             e.cancelBubble = true;
             e.preventDefault();
             _RESIZING = true;
@@ -762,7 +830,7 @@ PivotView.prototype.renderRawData = function (data) {
             _RESIZING_ELEMENT_BASE_WIDTH = el.offsetWidth;
             _RESIZING_ELEMENT_BASE_X = e.pageX;
             _RESIZING_COLUMN_INDEX = colIndex;
-            el._CANCEL_CLICK_EVENT = true;
+            //el._CANCEL_CLICK_EVENT = true;
         });
 
         el.addEventListener("mouseup", function (e) {
@@ -778,7 +846,7 @@ PivotView.prototype.renderRawData = function (data) {
             _.recalculateSizes(container);
             _.restoreScrollPosition();
             setTimeout(function () {
-                _RESIZING_ELEMENT._CANCEL_CLICK_EVENT = false;
+                //_RESIZING_ELEMENT._CANCEL_CLICK_EVENT = false;
                 _RESIZING_ELEMENT = null;
             }, 1);
         });
@@ -820,9 +888,11 @@ PivotView.prototype.renderRawData = function (data) {
                         th = document.createElement(rawData[y][x].isCaption ? "th" : "td")
                     );
                     div = document.createElement("div");
+                    //div2 = document.createElement("div");
                     if (rawData[y][x].value) {
                         div.textContent = rawData[y][x].value;
-                    } else div.innerHTML = "&zwnj;";
+                    } else div.innerHTML = "&nbsp;";
+                    //div2.appendChild(div);
                     th.appendChild(div);
                     if (rawData[y][x].style) th.setAttribute("style", rawData[y][x].style);
                     if (info.leftHeaderColumnsNumber === 0
@@ -859,12 +929,13 @@ PivotView.prototype.renderRawData = function (data) {
                 }
                 if (!vertical && y === yTo - 1 - ATTACH_TOTALS && !th["_hasSortingListener"]) {
                     th["_hasSortingListener"] = false; // why false?
-                    th.addEventListener(CLICK_EVENT, (function (i, th) {
+                    //console.log("Click bind to", th);
+                    th.addEventListener(CLICK_EVENT, (function (i) {
                         return function () {
-                            if (th._CANCEL_CLICK_EVENT) return;
+                            //if (th._CANCEL_CLICK_EVENT) return;
                             _._columnClickHandler.call(_, i);
                         };
-                    })(x - info.leftHeaderColumnsNumber, th));
+                    })(x - info.leftHeaderColumnsNumber));
                     th.className = (th.className || "") + " lpt-clickable";
                 }
                 if (!vertical && y === yTo - 1) {
@@ -932,11 +1003,12 @@ PivotView.prototype.renderRawData = function (data) {
         tr = document.createElement("tr");
         for (x = info.leftHeaderColumnsNumber; x < rawData[0].length; x++) {
 
-            cellStyle = "";
+            cellStyle = this.controller.getPivotProperty(["cellStyle"]) || "";
             tr.appendChild(td = document.createElement("td"));
+            td.appendChild(div = document.createElement("div"));
             formatContent(
                 rawData[y][x].value,
-                td,
+                div,
                 columnProps[x - info.leftHeaderColumnsNumber].format
             );
             if (
@@ -965,7 +1037,7 @@ PivotView.prototype.renderRawData = function (data) {
                     data["conditionalFormatting"],
                     (y - info.topHeaderRowsNumber + 1) + "," + (x - info.leftHeaderColumnsNumber + 1),
                     rawData[y][x].value,
-                    td
+                    div
                 );
             }
 
@@ -1025,6 +1097,9 @@ PivotView.prototype.renderRawData = function (data) {
     pivotBottomSection.appendChild(tableBlock);
     container.appendChild(pivotTopSection);
     container.appendChild(pivotBottomSection);
+    if (!this.controller.CONFIG.stretchColumns) {
+        THTable.style.width = "auto"; // required for correct 1st resizing
+    }
 
     if (pageSwitcher) {
         pageSwitcher.className = "lpt-pageSwitcher";
@@ -1048,6 +1123,7 @@ PivotView.prototype.renderRawData = function (data) {
 
         })(this.pagination.page + 1, this.pagination.pages);
         for (i in pageNumbers) {
+            i = parseInt(i);
             td = document.createElement("span");
             if (pageNumbers[i] === this.pagination.page + 1) { td.className = "lpt-active"; }
             td.textContent = pageNumbers[i];
@@ -1055,6 +1131,11 @@ PivotView.prototype.renderRawData = function (data) {
                 _._pageSwitcherHandler.call(_, page - 1);
             })})(pageNumbers[i]);
             pageSwitcherContainer.appendChild(td);
+            if (pageNumbers[i + 1] && pageNumbers[i] + 1 !== pageNumbers[i + 1]) {
+                td = document.createElement("span");
+                td.className = "lpt-pageSpacer";
+                pageSwitcherContainer.appendChild(td);
+            }
         }
         pageSwitcher.appendChild(pageSwitcherContainer);
         container.appendChild(pageSwitcher);
@@ -1066,10 +1147,10 @@ PivotView.prototype.renderRawData = function (data) {
         searchBlock.className = "lpt-searchBlock";
         searchInput.className = "lpt-searchInput";
         searchSelect.className = "lpt-searchSelect";
-        if (pageSwitcher) {
-            pageSwitcher.style.borderBottom = "none";
-            pageSwitcher.style.bottom = "20px";
-        }
+        //if (pageSwitcher) {
+        //    pageSwitcher.style.borderBottom = "none";
+        //    pageSwitcher.style.bottom = "20px";
+        //}
         for (i in searchFields) {
             td = document.createElement("option");
             td.setAttribute("value", searchFields[i].columnIndex.toString());
@@ -1090,7 +1171,7 @@ PivotView.prototype.renderRawData = function (data) {
         searchSelectOuter.appendChild(searchSelect);
         searchBlock.appendChild(searchSelectOuter);
         searchBlock.appendChild(searchInput);
-        container.appendChild(searchBlock);
+        container.insertBefore(searchBlock, pivotTopSection);
         this.elements.searchInput = searchInput;
         this.elements.searchSelect = searchSelect;
         if (this.savedSearch.restore) {

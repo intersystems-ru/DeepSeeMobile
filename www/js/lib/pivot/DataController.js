@@ -28,11 +28,19 @@ var DataController = function (controller, dataChangeTrigger) {
  */
 DataController.prototype.isValidData = function (data) {
 
+    // add null column to display measures
+    if (
+        data.dimensions instanceof Array
+        && data.dimensions[0] instanceof Array
+        && !data.dimensions[0].length
+    )
+        data.dimensions[0] = [{}];
+
     return data.dimensions instanceof Array
         && data.dimensions[0] instanceof Array
-        && data.dimensions[0].length > 0
+        //&& data.dimensions[0].length > 0
         //&& data.dimensions[1].length > 0
-        && data.dimensions[0][0].hasOwnProperty("caption")
+        //&& data.dimensions[0][0].hasOwnProperty("caption")
         //&& data.dimensions[1][0].hasOwnProperty("caption")
         && data.dataArray instanceof Array
         && typeof data["info"] === "object"
@@ -336,7 +344,7 @@ DataController.prototype.resetRawData = function () {
 
         for (var i in c) {
             cnum = groupNum;
-            if (c[i].children) {
+            if (c[i].children && c[i].children.length) {
                 groupNum++;
                 obj = {
                     group: cnum,
@@ -455,8 +463,10 @@ DataController.prototype.resetRawData = function () {
      * @returns {Function}
      */
     var getTotalFunction = function (columnIndex) {
-        if (!data["columnProps"][columnIndex]) return _.TOTAL_FUNCTIONS.totalSUM;
-        switch (data["columnProps"][columnIndex].summary) {
+        var pivotDefault = _.controller.getPivotProperty(["rowTotalAgg"]);
+        if (!data["columnProps"][columnIndex] && !pivotDefault)
+            return _.TOTAL_FUNCTIONS.totalSUM;
+        switch (data["columnProps"][columnIndex].summary || pivotDefault) {
             case "count": return _.TOTAL_FUNCTIONS.totalCOUNT;
             case "avg": return _.TOTAL_FUNCTIONS.totalAVG;
             case "min": return _.TOTAL_FUNCTIONS.totalMIN;
