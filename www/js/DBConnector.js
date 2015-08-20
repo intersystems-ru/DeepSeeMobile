@@ -274,9 +274,10 @@ define(['MessageCenter', 'Mocks'], function (mc, mocks) {
                 return "Basic " + hash;
             }
 
+
             var dash_opts = {
                 type: "GET",
-                data: {"test":true},
+                data: {Folder:"Mobile"},
                 dataType: 'json',
                 url: App.settings.server+"/Dashboards?Namespace="+App.settings.namespace,
                 success: function (d) {
