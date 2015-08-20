@@ -5,3 +5,5 @@ Installation
     * http://www.phonegap.com  
 2. Run <code>phonegap build ios</code> in Terminal / Windows cmd
 3. For documentation rebuilding use <code>jsdoc -c documentation/conf.json</code> 
+
+*Node: application will show only dashboards placed in "Mobile" folder*
